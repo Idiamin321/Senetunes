@@ -10,9 +10,14 @@ class BaseAppBar extends StatelessWidget {
   final bool darkMode;
   final String logoPath;
   final bool isHome;
-  const BaseAppBar({Key key, this.logoPath, this.darkMode, @required this.isHome}) : super(key: key);
+  const BaseAppBar({Key key, this.logoPath, this.darkMode, this.isHome: false}) : super(key: key);
 
-  Widget leadingIcon({@required bool isHome, @required bool isCart, Brightness brightness, int cartLength, BuildContext context}) {
+  Widget leadingIcon(
+      {@required bool isHome,
+      @required bool isCart,
+      Brightness brightness,
+      int cartLength,
+      BuildContext context}) {
     return cartLength > 0 && !isCart
         ? Theme(
             data: Theme.of(context),

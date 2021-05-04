@@ -11,7 +11,6 @@ import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:flutter_rekord_app/widgtes/Common/BaseBlocButton.dart';
 import 'package:flutter_rekord_app/widgtes/common/BaseAppIcon.dart';
 import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
 import 'package:xml2json/xml2json.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -97,7 +96,8 @@ class _LoginScreenState extends State<LoginScreen> with BaseMixins {
       body: Center(
         child: Container(
           height: media.height,
-          padding: EdgeInsets.only(top: media.height / 20, left: media.height / 20, right: media.height / 20),
+          padding: EdgeInsets.only(
+              top: media.height / 20, left: media.height / 20, right: media.height / 20),
           child: Form(
             key: _formKey, //Works with statefull widget
             child: SingleChildScrollView(
@@ -132,11 +132,13 @@ class _LoginScreenState extends State<LoginScreen> with BaseMixins {
                             context,
                             'create_new_Account',
                           ),
-                          style: TextStyle(fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.webView,
-                              arguments: Tuple2("Senetunes", "https://www.senetunes.com/fr/authentification?back=my-account"));
+                          Navigator.pushNamed(context, AppRoutes.registerRoute);
+                          // Navigator.pushNamed(context, AppRoutes.webView,
+                          //     arguments: Tuple2("Senetunes", "https://www.senetunes.com/fr/authentification?back=my-account"));
                         },
                       )
                     ],

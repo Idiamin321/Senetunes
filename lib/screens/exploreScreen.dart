@@ -40,7 +40,8 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
     if (albumProvider.isLoaded && artistProvider.isLoaded) {
       albumProvider.updateTracksAndAlbumsWithArtists(artistProvider.allArtists);
       artistProvider.updateArtistsWithAlbums(albumProvider.allAlbums);
-      categoryProvider.updateWithAlbumsAndArtists(albumProvider.allAlbums, artistProvider.allArtists);
+      categoryProvider.updateWithAlbumsAndArtists(
+          albumProvider.allAlbums, artistProvider.allArtists);
       context.read<DownloadProvider>().initFlutterDownloader(albumProvider.allTracks);
     }
     return SafeArea(
@@ -130,8 +131,10 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
                           controller: scrollController,
                           itemCount: categoryProvider.categories.length,
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: responsive(context, isSmallPhone: 2, isPhone: 2, isTablet: 4),
-                              childAspectRatio: responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
+                              crossAxisCount:
+                                  responsive(context, isSmallPhone: 2, isPhone: 2, isTablet: 4),
+                              childAspectRatio: responsive(context,
+                                  isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {

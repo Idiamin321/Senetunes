@@ -36,8 +36,12 @@ class CategoryProvider extends ChangeNotifier {
           transformer.parse(r.body);
           var b = jsonDecode(transformer.toBadgerfish())['infoAlbums']['infoAlbum'];
           if (!(b is List<dynamic>)) b = [b];
-          _categories[i].albumIds = b?.map((e) => e['@albumId'] is String ? int.parse(e['@albumId']) : e['@albumId'])?.toList();
-          _categories[i].artistIds = b?.map((e) => e['@artistId'] is String ? int.parse(e['@artistId']) : e['@artistId'])?.toList();
+          _categories[i].albumIds = b
+              ?.map((e) => e['@albumId'] is String ? int.parse(e['@albumId']) : e['@albumId'])
+              ?.toList();
+          _categories[i].artistIds = b
+              ?.map((e) => e['@artistId'] is String ? int.parse(e['@artistId']) : e['@artistId'])
+              ?.toList();
         }
       }
     }
@@ -47,8 +51,10 @@ class CategoryProvider extends ChangeNotifier {
   void updateWithAlbumsAndArtists(List<Album> albums, List<Artist> artists) {
     if (!_updated) {
       for (var i = 0; i < _categories.length; i++) {
-        _categories[i].artist = artists.where((element) => _categories[i].artistIds?.contains(element.id)).toList();
-        _categories[i].albums = albums.where((element) => _categories[i].albumIds?.contains(element.id)).toList();
+        _categories[i].artist =
+            artists.where((element) => _categories[i].artistIds?.contains(element.id)).toList();
+        _categories[i].albums =
+            albums.where((element) => _categories[i].albumIds?.contains(element.id)).toList();
       }
       _updated = true;
     }
@@ -63,6 +69,9 @@ class CategoryProvider extends ChangeNotifier {
   }
 
   String getCategoryThumbnail(Category category) {
-    return category?.albums?.firstWhere((element) => element?.media?.thumbnail != null)?.media?.thumbnail;
+    return category?.albums
+        ?.firstWhere((element) => element?.media?.thumbnail != null)
+        ?.media
+        ?.thumbnail;
   }
 }

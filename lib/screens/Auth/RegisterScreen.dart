@@ -1,5 +1,6 @@
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rekord_app/config/AppColors.dart';
 import 'package:flutter_rekord_app/config/AppRoutes.dart';
 import 'package:flutter_rekord_app/config/AppValidation_rules.dart';
 import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
@@ -83,7 +84,8 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
   Widget _buildConfirmPasswordField() {
     return TextFormField(
       decoration: InputDecoration(labelText: $t(context, 'cnfrm_account')),
-      validator: (value) => AppValidation(context).validateConfirmPassword(value, passKey.currentState.value),
+      validator: (value) =>
+          AppValidation(context).validateConfirmPassword(value, passKey.currentState.value),
       obscureText: true,
     );
   }
@@ -127,7 +129,17 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text($t(context, 'create_new_Account')),
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).iconTheme.color,
+          ),
+        ),
+        title: Text(
+          $t(context, 'create_new_Account'),
+          style: TextStyle(color: primary),
+        ),
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),

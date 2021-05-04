@@ -55,10 +55,12 @@ class AlbumProvider extends ChangeNotifier {
   updateTracksAndAlbumsWithArtists(List<Artist> artists) async {
     if (!_updated) {
       for (var i = 0; i < _allTracks.length; i++) {
-        _allTracks[i].artistInfo = artists[artists.indexWhere((element) => element.id == _allTracks[i].artistId)];
+        _allTracks[i].artistInfo =
+            artists[artists.indexWhere((element) => element.id == _allTracks[i].artistId)];
       }
       for (var i = 0; i < _allAlbums.length; i++) {
-        _allAlbums[i].artistInfo = artists[artists.indexWhere((element) => element.id == _allAlbums[i].artistId)];
+        _allAlbums[i].artistInfo =
+            artists[artists.indexWhere((element) => element.id == _allAlbums[i].artistId)];
       }
       _updated = true;
     }
