@@ -13,10 +13,8 @@ import 'package:flutter_rekord_app/models/Album.dart';
 import 'package:flutter_rekord_app/models/Artist.dart';
 import 'package:flutter_rekord_app/models/Track.dart';
 import 'package:flutter_rekord_app/providers/BaseProvider.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 
 const String trackLocalDownloadStorageSearch = 'TrackLocalDownloadStorageSearch';
 const String trackDownloadList = 'TrackDownloadList';
@@ -58,8 +56,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
   }
 
   downloadAlbum(Album album, BuildContext context) async {
-    //TODO: FIX
-    if (context.read<CartProvider>().boughtAlbum.contains(album) || true) {
+    if (album.isBought) {
       if (!(album.tracks.fold(isDownloadSong(album.tracks[0]), (x, e) => x & isDownloadSong(e)))) {
         Flushbar(
           backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
@@ -103,7 +100,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
   }
 
   downloadAudio(Track song, BuildContext context) async {
-    if (context.read<CartProvider>().boughtTracks.contains(song) || true) {
+    if (song.albumInfo.isBought) {
       if (!isDownloadSong(song)) {
         Flushbar(
           backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
@@ -190,11 +187,14 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     await localStorage.ready;
     List<Album> albums = _downloadedAlbums.toList();
     List<Artist> artists = _downloadedArtists.toList();
-    await localStorage.setItem(trackDownloadList, _downloadSongs, (Object x) => (x as List<Track>).map((e) => e.toJson()).toList());
+    await localStorage.setItem(trackDownloadList, _downloadSongs,
+        (Object x) => (x as List<Track>).map((e) => e.toJson()).toList());
     await localStorage.ready;
-    await localStorage.setItem(AlbumDownloadList, albums, (Object x) => (x as List<Album>).map((e) => e.toJson()).toList());
+    await localStorage.setItem(AlbumDownloadList, albums,
+        (Object x) => (x as List<Album>).map((e) => e.toJson()).toList());
     await localStorage.ready;
-    await localStorage.setItem(ArtistDownloadList, artists, (Object x) => (x as List<Artist>).map((e) => e.toJson()).toList());
+    await localStorage.setItem(ArtistDownloadList, artists,
+        (Object x) => (x as List<Artist>).map((e) => e.toJson()).toList());
   }
 
   getDownloads() async {
@@ -222,9 +222,11 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   void _linkDownloadedSongsToAlbums() {
     for (int i = 0; i < _downloadSongs.length; i++) {
-      _downloadSongs[i].albumInfo = _downloadedAlbums.firstWhere((element) => element.id == _downloadSongs[i].albumId);
+      _downloadSongs[i].albumInfo =
+          _downloadedAlbums.firstWhere((element) => element.id == _downloadSongs[i].albumId);
       try {
-        _downloadSongs[i].artistInfo = _downloadedArtists.firstWhere((element) => element.id == _downloadSongs[i].artistId);
+        _downloadSongs[i].artistInfo =
+            _downloadedArtists.firstWhere((element) => element.id == _downloadSongs[i].artistId);
       } catch (e, s) {
         print(s);
       }
@@ -331,7 +333,11 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     if (!_tasks.any((element) => element.track.id == task.track.id)) {
       _tasks.add(task);
       task.taskId = await FlutterDownloader.enqueue(
-          url: task.track.playUrl, fileName: task.track.name, savedDir: localPath, showNotification: true, openFileFromNotification: false);
+          url: task.track.playUrl,
+          fileName: task.track.name,
+          savedDir: localPath,
+          showNotification: true,
+          openFileFromNotification: false);
     }
   }
 

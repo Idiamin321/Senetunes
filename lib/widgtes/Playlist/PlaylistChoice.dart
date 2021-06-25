@@ -20,7 +20,6 @@ class _PlaylistChoiceState extends State<PlaylistChoice> with BaseMixins {
   String playlistName;
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     playlistProvider = context.watch<PlaylistProvider>();
     playlistProvider.getPlaylists();
@@ -28,7 +27,6 @@ class _PlaylistChoiceState extends State<PlaylistChoice> with BaseMixins {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     playlistProvider = context.read<PlaylistProvider>();
     playlistProvider.getPlaylists();
@@ -51,8 +49,7 @@ class _PlaylistChoiceState extends State<PlaylistChoice> with BaseMixins {
             Text(
               $t(context, "add_to_playlist"),
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
+              style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
             ),
             Divider(
               color: Colors.white,
@@ -66,14 +63,12 @@ class _PlaylistChoiceState extends State<PlaylistChoice> with BaseMixins {
                         return Container(
                           margin: EdgeInsets.only(top: 15, bottom: 3.5),
                           child: InkWell(
-                            child: Text(
-                                playlistProvider.playlistsNames[index] ?? ""),
+                            child: Text(playlistProvider.playlistsNames[index] ?? ""),
                             onTap: () {
                               setState(
                                 () {
                                   playlistProvider.addSong(
-                                      playlistProvider.playlistsNames[index],
-                                      widget.track);
+                                      playlistProvider.playlistsNames[index], widget.track);
                                 },
                               );
                               Navigator.pop(context);
@@ -96,10 +91,8 @@ class _PlaylistChoiceState extends State<PlaylistChoice> with BaseMixins {
                         ),
                       ),
                       style: ButtonStyle(
-                        shadowColor: MaterialStateProperty.all<Color>(
-                            Colors.transparent),
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
+                        shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
                       ),
                       onPressed: () {
                         setState(
@@ -125,20 +118,15 @@ class _PlaylistChoiceState extends State<PlaylistChoice> with BaseMixins {
                           child: ElevatedButton(
                             child: Text(
                               "Ajouter",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(context).primaryColor),
+                              style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),
                             ),
                             onPressed: () {
                               if (playlistName == null) {
-                                Toast.show(
-                                    "Playlist name shouldn't be empty", context,
-                                    duration: Toast.LENGTH_SHORT,
-                                    gravity: Toast.TOP);
+                                Toast.show("Playlist name shouldn't be empty", context,
+                                    duration: Toast.LENGTH_SHORT, gravity: Toast.TOP);
                               } else {
                                 playlistProvider.createPlaylist(playlistName);
-                                playlistProvider.addSong(
-                                    playlistName, widget.track);
+                                playlistProvider.addSong(playlistName, widget.track);
                                 Navigator.pop(context);
                               }
                             },

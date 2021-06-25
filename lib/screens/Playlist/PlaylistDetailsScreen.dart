@@ -57,7 +57,6 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
   PlaylistProvider playlistProvider;
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     playlistProvider = context.watch<PlaylistProvider>();
     playlistProvider.getPlaylists();
@@ -65,7 +64,6 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     playlistProvider = context.read<PlaylistProvider>();
     playlistProvider.getPlaylists();
@@ -79,7 +77,8 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
             ? ListView.builder(
                 itemCount: playlistProvider.playlists[widget.playlistName].length,
                 itemBuilder: (context, index) {
-                  Track track = playlistProvider.findTrack(playlistProvider.playlists[widget.playlistName][index], context);
+                  Track track = playlistProvider.findTrack(
+                      playlistProvider.playlists[widget.playlistName][index], context);
                   Album album = playlistProvider.findAlbum(track, context);
                   return TrackTile(
                     track: track,

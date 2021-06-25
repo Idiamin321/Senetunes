@@ -23,19 +23,32 @@ class AlbumProvider extends ChangeNotifier {
   fetchAlbums() async {
     isLoaded = false;
     notifyListeners();
-    http.Response response = await http.get('${AppConfig.API}/album/list');
-    if (response.statusCode == 200) {
+    String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+    http.Response albumResponse = await http.get('${AppConfig.API}/album/list');
+    http.Response priceResponse = await http.get(
+        "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/products?display=[id,price]&output_format=JSON",
+        headers: <String, String>{'authorization': basicAuth});
+    if (albumResponse.statusCode == 200 && priceResponse.statusCode == 200) {
       var transformer = Xml2Json();
-      transformer.parse(response.body);
+      transformer.parse(albumResponse.body);
+
       List<dynamic> b = jsonDecode(transformer.toBadgerfish())['albums']['album'];
+      Map<int, double> prices = Map();
+      (jsonDecode(priceResponse.body)['products'] as List<dynamic>).forEach((element) {
+        prices[element['id']] = double.parse(element['price']);
+      });
       for (dynamic a in b) {
         Album album = Album.fromJson(a as Map<String, dynamic>);
         for (Track track in album.tracks) {
           track.albumInfo = album;
         }
+        album.price = prices[album.id];
         _allAlbums.add(album);
         _allTracks.addAll(album.tracks);
       }
+    } else {
+      print(albumResponse.body);
+      print(priceResponse.body);
     }
     isLoaded = true;
     notifyListeners();
@@ -63,6 +76,14 @@ class AlbumProvider extends ChangeNotifier {
             artists[artists.indexWhere((element) => element.id == _allAlbums[i].artistId)];
       }
       _updated = true;
+    }
+  }
+
+  updateBoughtAlbums(Map<int, bool> boughtAlbums) async {
+    print(boughtAlbums);
+    for (var i = 0; i < _allAlbums.length; i++) {
+      print(_allAlbums[i].id);
+      _allAlbums[i].isBought = boughtAlbums.containsKey(_allAlbums[i].id);
     }
   }
 }

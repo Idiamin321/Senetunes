@@ -150,11 +150,15 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   }
 
   isTrackInProgress(Track track) {
-    return player.isPlaying.value && player.current.value != null && player.current.value.audio.assetAudioPath == track.playUrl;
+    return player.isPlaying.value &&
+        player.current.value != null &&
+        player.current.value.audio.assetAudioPath == track.playUrl;
   }
 
   isLocalTrackInProgress(filePath) {
-    return player.isPlaying.value && player.current.value != null && player.current.value.audio.assetAudioPath == filePath;
+    return player.isPlaying.value &&
+        player.current.value != null &&
+        player.current.value.audio.assetAudioPath == filePath;
   }
 
   bool isPlaying() {
@@ -170,12 +174,10 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   handlePlayButton({album, Track track, index, BuildContext context}) async {
     //Disable shuffling
     CartProvider cartProvider = context.read<CartProvider>();
-    bool isBought = cartProvider.boughtAlbum.contains(album) || cartProvider.boughtTracks.contains(track);
     _shuffled = false;
 
     setBuffering(index);
-    //TODO: asdfas
-    if (isBought || true) {
+    if (album.isBought) {
       try {
         if (isTrackInProgress(track) || isLocalTrackInProgress(track.localPath)) {
           player.pause();
@@ -235,7 +237,8 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
 
   String getTrackThumbnail() {
     String image = '';
-    if (_currentTrack?.albumInfo?.media != null && _currentTrack?.albumInfo?.media?.thumbnail != null) {
+    if (_currentTrack?.albumInfo?.media != null &&
+        _currentTrack?.albumInfo?.media?.thumbnail != null) {
       image = _currentTrack.albumInfo.media.thumbnail;
     }
     return image;

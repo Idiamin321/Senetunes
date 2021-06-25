@@ -82,7 +82,8 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> with BaseMixins {
                                           showDialog(
                                             context: context,
                                             builder: (context) => AlertDialog(
-                                              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                              backgroundColor:
+                                                  Theme.of(context).scaffoldBackgroundColor,
                                               title: Center(
                                                 child: Icon(
                                                   Icons.info_outline,
@@ -118,12 +119,13 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> with BaseMixins {
                                       ),
                                     ),
                                   ),
-                                  if (!context.watch<CartProvider>().boughtAlbum.contains(album))
+                                  if (!album.isBought)
                                     Expanded(
                                       flex: 2,
                                       child: ElevatedButton(
                                         style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                          backgroundColor: MaterialStateProperty.all<Color>(
+                                              Theme.of(context).primaryColor),
                                         ),
                                         child: Column(
                                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -140,7 +142,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> with BaseMixins {
                                             FittedBox(
                                               fit: BoxFit.contain,
                                               child: Text(
-                                                "200 FCFA",
+                                                "${album.price} €",
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                 ),
@@ -169,8 +171,10 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> with BaseMixins {
                           builder: (context, isPlaying) {
                             return TextButton.icon(
                               style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
-                                  textStyle: MaterialStateProperty.all(TextStyle(color: Colors.white))),
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Theme.of(context).primaryColor),
+                                  textStyle:
+                                      MaterialStateProperty.all(TextStyle(color: Colors.white))),
                               icon: Icon(
                                 isPlaying && album.id == playerProvider.currentAlbum.id
                                     ? SimpleLineIcons.control_pause
@@ -181,7 +185,11 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> with BaseMixins {
                                 $t(context, 'play_tracks'),
                               ),
                               onPressed: () {
-                                playerProvider.handlePlayButton(album: album, track: album.tracks[0], index: 0, context: context);
+                                playerProvider.handlePlayButton(
+                                    album: album,
+                                    track: album.tracks[0],
+                                    index: 0,
+                                    context: context);
                               },
                             );
                           },
@@ -195,12 +203,6 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> with BaseMixins {
           ),
         ],
       );
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }
 
   @override
   Widget build(BuildContext context) {

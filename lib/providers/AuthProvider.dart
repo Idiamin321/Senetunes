@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_rekord_app/models/User.dart';
 import 'package:flutter_rekord_app/providers/BaseProvider.dart';
+import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:xml/xml.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
@@ -26,6 +28,7 @@ class AuthProvider extends BaseProvider {
 
   User _user;
   User get user => _user;
+  Map<int, bool> boughtAlbumsIds = Map();
 
   /*
   * Sign in Wiht Email
@@ -61,6 +64,7 @@ class AuthProvider extends BaseProvider {
     _user = User.fromJson(response);
     var temp = json.encode(_user.toJson());
     await _prefs.setString('user', temp);
+    await fetchBoughtAlbums(_user.email);
     isLoaded = true;
     notifyListeners();
   }
@@ -76,14 +80,43 @@ class AuthProvider extends BaseProvider {
  *
  */
 
+  fetchBoughtAlbums(String email) async {
+    String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+    http.Response response = await http.get(
+      "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?filter[userEmail]=$email&display=full",
+      headers: <String, String>{
+        'authorization': basicAuth,
+        'content-type': "text/xml;charset=utf-8"
+      },
+    );
+
+    var doc = XmlDocument.parse(response.body).findAllElements("albums");
+    for (var album in doc) {
+      String albumId = album
+          .getElement("songs")
+          .getElement('song')
+          .getElement("albumInfo")
+          .getElement("albumId")
+          .text;
+      print(albumId);
+      boughtAlbumsIds.putIfAbsent(int.parse(albumId), () => true);
+    }
+  }
+
   Future autoAuthenticate() async {
     isLoaded = false;
     notifyListeners();
     final SharedPreferences _prefs = await SharedPreferences.getInstance();
+
     String prefUser = _prefs.getString('user');
     if (prefUser != null) {
       Map userMap = jsonDecode(prefUser);
-      _user = User(id: userMap['id'], email: userMap['email'], firstName: userMap['firstName'], lastName: userMap['lastName']);
+      _user = User(
+          id: userMap['id'],
+          email: userMap['email'],
+          firstName: userMap['firstName'],
+          lastName: userMap['lastName']);
+      await fetchBoughtAlbums(userMap['email']);
     }
 
     if (_user != null) {
@@ -117,11 +150,40 @@ class AuthProvider extends BaseProvider {
     notifyListeners();
     String error;
 
-    final response = await post(formData);
-    final Map<String, dynamic> jsonMap = json.decode(response.body);
+    // final response = await post(formData);
+
+    http.Response response;
+    String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+
+    String xml = """<?xml version="1.0" encoding="UTF-8"?>
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+<customer>
+	<passwd><![CDATA[${formData['passwd']}]]></passwd>
+	<lastname><![CDATA[${formData['lastname']}]]></lastname>
+	<firstname><![CDATA[${formData['firstname']}]]></firstname>
+	<email><![CDATA[${formData['email']}]]></email>
+	<birthday><![CDATA[${formData['birthday']}]]></birthday>
+	<active>1</active>
+</customer>
+</prestashop>""";
+    response = await http.post(
+      "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/customers?schema=blank",
+      headers: <String, String>{
+        'authorization': basicAuth,
+        'content-type': "text/xml;charset=utf-8"
+      },
+      body: xml,
+    );
 
     isLoaded = true;
     notifyListeners();
-    return jsonMap['code'].toString();
+    if (response.statusCode == 201)
+      return null;
+    else {
+      print(response.body);
+      return response.body;
+    }
+
+    // return jsonMap['code'].toString();
   }
 }

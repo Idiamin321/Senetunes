@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rekord_app/config/AppRoutes.dart';
+import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:flutter_rekord_app/providers/CategoryProvider.dart';
 import 'package:flutter_rekord_app/providers/DownloadProvider.dart';
 import 'package:flutter_rekord_app/providers/PlaylistProvider.dart';
@@ -35,6 +36,7 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
     AlbumProvider albumProvider = context.watch<AlbumProvider>();
     ArtistProvider artistProvider = context.watch<ArtistProvider>();
     CategoryProvider categoryProvider = context.watch<CategoryProvider>();
+    AuthProvider authProvider = context.watch<AuthProvider>();
     context.read<PlaylistProvider>().getPlaylists();
     requestStorageAccess();
     if (albumProvider.isLoaded && artistProvider.isLoaded) {
@@ -42,6 +44,7 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
       artistProvider.updateArtistsWithAlbums(albumProvider.allAlbums);
       categoryProvider.updateWithAlbumsAndArtists(
           albumProvider.allAlbums, artistProvider.allArtists);
+      albumProvider.updateBoughtAlbums(authProvider.boughtAlbumsIds);
       context.read<DownloadProvider>().initFlutterDownloader(albumProvider.allTracks);
     }
     return SafeArea(
@@ -65,30 +68,30 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
                 children: [
                   Expanded(
                     child: TabBar(tabs: [
-                      Column(
+                      Row(
                         children: [
-                          Expanded(child: Icon(Icons.home)),
-                          Expanded(
-                            child: Tab(
-                              child: Text(
-                                $t(context, "home"),
-                              ),
+                          Icon(
+                            Icons.home,
+                            size: MediaQuery.of(context).size.height * 0.03,
+                          ),
+                          Tab(
+                            child: Text(
+                              $t(context, "home"),
                             ),
                           ),
                         ],
+                        mainAxisAlignment: MainAxisAlignment.center,
                       ),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(
-                            child: Icon(
-                              Icons.loop,
-                            ),
+                          Icon(
+                            Icons.loop,
+                            size: MediaQuery.of(context).size.height * 0.03,
                           ),
-                          Expanded(
-                            child: Tab(
-                              child: Text(
-                                $t(context, "categories"),
-                              ),
+                          Tab(
+                            child: Text(
+                              $t(context, "categories"),
                             ),
                           ),
                         ],

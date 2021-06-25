@@ -13,10 +13,19 @@ class Album {
   Media media;
   List contributors;
   List<Track> tracks;
-  double price = 200;
+  double price;
   bool isBought;
 
-  Album({this.id, this.name, this.description, this.artistId, this.artistInfo, this.uri, this.media, this.contributors, this.tracks});
+  Album(
+      {this.id,
+      this.name,
+      this.description,
+      this.artistId,
+      this.artistInfo,
+      this.uri,
+      this.media,
+      this.contributors,
+      this.tracks});
 
   static Album fromJson(Map<String, dynamic> json) {
     List<Track> tracks = [];
@@ -46,7 +55,9 @@ class Album {
                   ? int.parse(json['artistInfo']['@artistId'])
                   : json['artistInfo']['@artistId'],
       uri: json['uri'] is String ? json['uri'] : json['uri']['\$'],
-      media: Media(json['coverPictureUrls'] is String ? json['coverPictureUrls'] : json['coverPictureUrls']['\$']),
+      media: Media(json['coverPictureUrls'] is String
+          ? json['coverPictureUrls']
+          : json['coverPictureUrls']['\$']),
       contributors: json['contributors'] == null
           ? null
           : json['contributors']['contributors'] == null
@@ -73,6 +84,5 @@ class Album {
   bool operator ==(Object other) => other is Album && other.id == this.id;
 
   @override
-  // TODO: implement hashCode
   int get hashCode => id.hashCode;
 }

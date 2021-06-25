@@ -27,7 +27,6 @@ class Media {
 
   @override
   String toString() {
-    // TODO: implement toString
     return "$thumbnail $medium $cover";
   }
 }

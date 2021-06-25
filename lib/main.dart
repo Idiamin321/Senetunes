@@ -23,7 +23,6 @@ void main() async {
     await Permission.storage.request();
   }
 
-
   runApp(RekordApp());
 }
 
@@ -46,7 +45,7 @@ class RekordApp extends StatelessWidget {
               themeMode: value.darkMode ? ThemeMode.light : ThemeMode.dark,
               // List all of the app's supported locales here
               supportedLocales: [
-                Locale('sk', 'SK'),
+                Locale('fr', 'FR'),
                 Locale('en', 'EN'),
               ],
               // These delegates make sure that the localization data for the proper language is loaded
@@ -59,7 +58,8 @@ class RekordApp extends StatelessWidget {
                 GlobalWidgetsLocalizations.delegate,
               ],
               // Returns a locale which will be used by the app
-              localeResolutionCallback: (locale, supportedLocales) => AppLocalizations(locale).localeResolutionCallback(supportedLocales),
+              localeResolutionCallback: (locale, supportedLocales) =>
+                  AppLocalizations(locale).localeResolutionCallback(supportedLocales),
             );
           },
         ));

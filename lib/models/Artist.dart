@@ -11,7 +11,15 @@ class Artist {
   String uri;
   String uriAlbums;
   List<Track> tracks;
-  Artist({this.id, this.name, this.media, this.albumIds, this.albums, this.uri, this.uriAlbums, this.tracks});
+  Artist(
+      {this.id,
+      this.name,
+      this.media,
+      this.albumIds,
+      this.albums,
+      this.uri,
+      this.uriAlbums,
+      this.tracks});
 
   static Artist fromJson(Map<String, dynamic> json) {
     List<int> albumsIds = [];
@@ -22,7 +30,9 @@ class Artist {
           albumsIds?.add(int.parse(info['@albumId']));
         }
       } catch (TypeError) {
-        temp['@albumId'] is String ? albumsIds?.add(int.parse(temp['@albumId'])) : albumsIds?.add(temp['@albumId']);
+        temp['@albumId'] is String
+            ? albumsIds?.add(int.parse(temp['@albumId']))
+            : albumsIds?.add(temp['@albumId']);
       }
     }
 
@@ -57,6 +67,5 @@ class Artist {
   bool operator ==(Object other) => other is Artist && other.id == this.id;
 
   @override
-  // TODO: implement hashCode
   int get hashCode => id.hashCode;
 }

@@ -58,7 +58,7 @@ dependencies:
   xml2json: ^4.4.0
   flutter_downloader: ^1.5.2
   archive: ^2.0.13
-
+  xml:
 
 
 

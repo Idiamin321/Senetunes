@@ -47,14 +47,12 @@ class TrackContainer extends StatefulWidget with BaseMixins {
 class _TrackContainerState extends State<TrackContainer> {
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     context.read<PlaylistProvider>().getPlaylists();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     context.read<PlaylistProvider>().getPlaylists();
   }

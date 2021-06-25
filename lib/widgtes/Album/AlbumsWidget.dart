@@ -34,7 +34,7 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        context.watch<CartProvider>().boughtAlbum.contains(album)
+                        album.isBought
                             ? Expanded(
                                 flex: 2,
                                 child: Container(
@@ -60,7 +60,10 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                             margin: const EdgeInsets.only(right: 10),
                             child: InkWell(
                               onTap: () {
-                                var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+                                print(album.isBought);
+                                print(album.id);
+                                var playerProvider =
+                                    Provider.of<PlayerProvider>(context, listen: false);
 
                                 playerProvider.currentAlbum = album;
 
@@ -83,7 +86,8 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                         ),
                                   //  albumCard(album.media.thumbnail, 100, 100),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 0),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 12.0, horizontal: 0),
                                     child: Container(
                                       child: Text(
                                         '${album.name}',
@@ -97,13 +101,15 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                             ),
                           ),
                         ),
-                        !context.watch<CartProvider>().boughtAlbum.contains(album)
+                        !album.isBought
                             ? Expanded(
                                 flex: 4,
                                 child: ElevatedButton(
                                   style: ButtonStyle(
-                                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero),
-                                    backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                        EdgeInsets.zero),
+                                    backgroundColor: MaterialStateProperty.all<Color>(
+                                        Theme.of(context).primaryColor),
                                   ),
                                   child: Container(
                                     width: 95,
@@ -126,7 +132,7 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                           child: FittedBox(
                                             fit: BoxFit.scaleDown,
                                             child: Text(
-                                              "200 FCFA",
+                                              "${album.price} €",
                                               style: TextStyle(
                                                 fontSize: 30,
                                                 color: Colors.white,

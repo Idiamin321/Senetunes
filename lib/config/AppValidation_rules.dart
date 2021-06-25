@@ -5,8 +5,7 @@ class AppValidation with BaseMixins {
   final context;
   String validateName(String value) {
     if (value.length < 1) return $t(context, 'enter_your_name');
-    if (value.length < 3)
-      return $t(context, 'name_must_must_be_2_characters_long');
+    if (value.length < 3) return $t(context, 'name_must_must_be_2_characters_long');
     return null;
   }
 
@@ -40,15 +39,13 @@ class AppValidation with BaseMixins {
 
   String validatePassword(String value) {
     if (value.length < 1) return $t(context, 'enter_your_password');
-    if (value.length < 6)
-      return $t(context, 'password_must_be_6_characters_long');
+    if (value.length < 6) return $t(context, 'password_must_be_6_characters_long');
     return null;
   }
 
   String validateConfirmPassword(String value, String value2) {
     if (value.length < 1) return $t(context, 're_enter_your_password');
-    if (value.length < 6)
-      return $t(context, 'password_must_be_6_characters_long');
+    if (value.length < 6) return $t(context, 'password_must_be_6_characters_long');
     if (value != value2) return $t(context, 'password_must_match');
     return null;
   }

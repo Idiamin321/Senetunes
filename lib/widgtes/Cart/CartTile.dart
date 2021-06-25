@@ -54,12 +54,9 @@ class CartTile extends StatelessWidget {
                 ),
                 Expanded(
                   flex: 2,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Text(
-                      "${album.price} FCFA",
-                      textAlign: TextAlign.end,
-                    ),
+                  child: Text(
+                    "${album.price} €",
+                    textAlign: TextAlign.end,
                   ),
                 )
               ],

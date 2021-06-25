@@ -1,13 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rekord_app/models/Track.dart';
 import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../models/Album.dart';
+import 'AuthProvider.dart';
 import 'BaseProvider.dart';
 
 class CartProvider extends BaseProvider {
@@ -36,7 +36,7 @@ class CartProvider extends BaseProvider {
     notifyListeners();
   }
 
-  void getResponse(BuildContext context) async {
+  void getResponse(BuildContext context, String email) async {
     if (request != null) {
       var url =
           'https://app.paydunya.com/sandbox-api/v1/checkout-invoice/confirm/${request['token']}';
@@ -51,7 +51,9 @@ class CartProvider extends BaseProvider {
       );
       var body = jsonDecode(response.body);
       completed = body['status'];
-      if (completed == 'completed') {}
+      if (completed == 'completed') {
+        await boughtSuccessful(context, email);
+      }
 
       notifyListeners();
     }
@@ -71,8 +73,12 @@ class CartProvider extends BaseProvider {
     }
     var body = json.encode(
       {
-        "invoice": {"total_amount": totalAmount.toStringAsFixed(2), "description": description},
+        "invoice": {
+          "total_amount": (totalAmount * 600).toStringAsFixed(2),
+          "description": description
+        },
         "store": {"name": "Senetunes"},
+        "custom_data": {"currency": "EUR"},
         "actions": {"callback_url": "http://www.magasin-le-choco.com/callback_url.php"}
       },
     );
@@ -93,13 +99,56 @@ class CartProvider extends BaseProvider {
     return request;
   }
 
-  boughtSuccessful() {
+  boughtSuccessful(BuildContext context, String email) async {
     boughtAlbum.addAll(cart);
     for (Album album in cart) {
+      http.Response response;
+      String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+      String xml = """<?xml version="1.0" encoding="UTF-8"?>
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+<albums>
+	<description><![CDATA[${album.description}]]></description>
+	<totalPaid>${album.price}</totalPaid> 
+	<payment>paydunya</payment> 
+	<artistInfo notFilterable="true"><artistId><![CDATA[${album.artistId}]]></artistId></artistInfo>
+	<songs><albumId>${album.id}</albumId><albumId>40</albumId></songs>
+	<userEmail>$email</userEmail>
+</albums>
+</prestashop>""";
+      response = await http.post(
+        "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?schema=blank",
+        headers: <String, String>{
+          'authorization': basicAuth,
+          'content-type': "text/xml;charset=utf-8"
+        },
+        body: xml,
+      );
+      print(response.body);
       boughtTracks.addAll(album.tracks);
+      context.read<AuthProvider>().fetchBoughtAlbums(context.read<AuthProvider>().user.email);
+      context
+          .read<AlbumProvider>()
+          .updateBoughtAlbums(context.read<AuthProvider>().boughtAlbumsIds);
     }
-    Dio dio = Dio();
-    dio.post("http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier",data:"",options: Options(contentType: "text/xml",) )
+
+    // var request = http.Request(
+    //   'SEARCH',
+    //   Uri.parse('https://host123.com.br/remote.php/dav'),
+    // );
+    // request.headers.addAll({
+    //   HttpHeaders.authorizationHeader: 'Basic $credential',
+    //   'content-type': 'text/xml' // or text/xml;charset=utf-8
+    // });
+    //
+    // var xml = '<?xml version="1.0" encoding="UTF-8"?>...';
+    // // either
+    // request.body = xml;
+    // var streamedResponse = await client.send(request);
+    // print(streamedResponse.statusCode);
+    //
+    // var responseBody = await streamedResponse.stream.transform(utf8.decoder).join();
+    // print(responseBody);
+    // client.close();
     clearCart();
   }
 }

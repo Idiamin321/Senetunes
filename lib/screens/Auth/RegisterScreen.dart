@@ -14,19 +14,78 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
-  final Map<String, dynamic> formData = {'email': null, 'password': null};
+  DateTime birthday = DateTime.now();
+  TextEditingController birthdayController = TextEditingController();
+  final Map<String, dynamic> formData = {
+    'firstname': null,
+    'lastname': null,
+    'birthday': null,
+    'email': null,
+    'password': null
+  };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   var passKey = GlobalKey<FormFieldState>();
   var media;
 
-  Widget _buildNameField() {
+  Widget _buildFirstNameField() {
     return TextFormField(
       decoration: InputDecoration(
         labelText: $t(context, 'f_name'),
       ),
       validator: (value) => AppValidation(context).validateName(value),
       onSaved: (String value) {
-        formData['first_name'] = value;
+        formData['firstname'] = value;
+      },
+    );
+  }
+
+  Widget _buildLastNameField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: $t(context, 'l_name'),
+      ),
+      validator: (value) => AppValidation(context).validateName(value),
+      onSaved: (String value) {
+        formData['lastname'] = value;
+      },
+    );
+  }
+
+  Widget _buildBirthDayPicker() {
+    return TextFormField(
+      controller: birthdayController,
+      onTap: () async {
+        birthday = await showDatePicker(
+            builder: (BuildContext context, Widget child) {
+              return Theme(
+                data: ThemeData.dark().copyWith(
+                  colorScheme: ColorScheme.dark(
+                    primary: primary,
+                    onPrimary: Colors.white,
+                  ),
+                ),
+                child: child,
+              );
+            },
+            context: context,
+            initialDate: birthday,
+            lastDate: DateTime.now(),
+            firstDate: DateTime(1940),
+            locale: Locale.fromSubtags(languageCode: 'fr'));
+        if (birthday == null) birthday = DateTime.now();
+        setState(() {
+          birthdayController.text = "${birthday.year}-${birthday.month}-${birthday.day}";
+        });
+      },
+      decoration: InputDecoration(
+        suffixIcon: Icon(
+          Icons.calendar_today_outlined,
+          color: primary,
+        ),
+        labelText: $t(context, 'birthday'),
+      ),
+      onSaved: (String value) {
+        formData['birthday'] = value;
       },
     );
   }
@@ -48,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
       validator: (value) => AppValidation(context).validatePassword(value),
       obscureText: true,
       onSaved: (String value) {
-        formData['password'] = value;
+        formData['passwd'] = value;
       },
     );
   }
@@ -127,6 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
     var provider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: IconButton(
@@ -174,7 +234,9 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
-                                _buildNameField(),
+                                _buildFirstNameField(),
+                                _buildLastNameField(),
+                                _buildBirthDayPicker(),
                                 _buildEmailField(),
                                 _buildPasswordField(),
                                 _buildConfirmPasswordField(),

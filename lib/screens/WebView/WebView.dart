@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:flutter_rekord_app/providers/CartProvider.dart';
 import 'package:flutter_rekord_app/providers/DownloadProvider.dart';
 import 'package:flutter_rekord_app/widgtes/Common/CustomCircularProgressIndicator.dart';
@@ -35,7 +36,7 @@ class _WebViewCartState extends State<WebViewCart> {
       canGoForward = await flutterWebViewPlugin.canGoForward();
       if (mounted) {
         setState(() {
-          cartProvider.getResponse(context);
+          cartProvider.getResponse(context, context.read<AuthProvider>().user.email);
         });
       }
     });

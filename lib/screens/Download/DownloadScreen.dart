@@ -45,7 +45,6 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
   DownloadProvider downloadProvider;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     downloadProvider = context.read<DownloadProvider>();
   }
@@ -55,7 +54,8 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
     downloadProvider = context.watch<DownloadProvider>();
     return Container(
       padding: EdgeInsets.only(bottom: 0.0),
-      child: downloadProvider.downloadedAlbums.length > 0 && downloadProvider.downloadSongs.length > 0
+      child: downloadProvider.downloadedAlbums.length > 0 &&
+              downloadProvider.downloadSongs.length > 0
           ? downloadProvider.isLoaded
               ? GridView.builder(
                   shrinkWrap: true,
@@ -64,7 +64,8 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
                   itemCount: downloadProvider.downloadedAlbums.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: responsive(context, isSmallPhone: 2, isPhone: 2, isTablet: 4),
-                      childAspectRatio: responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
+                      childAspectRatio:
+                          responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () {

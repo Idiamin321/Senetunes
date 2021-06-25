@@ -15,15 +15,9 @@ class Cart extends StatefulWidget {
 
 class _CartState extends State<Cart> with BaseMixins {
   CartProvider cartProvider;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     cartProvider = context.watch<CartProvider>();
   }
@@ -92,7 +86,8 @@ class _CartState extends State<Cart> with BaseMixins {
                     print(request);
                     if (request['response_code'] == '00') {
                       cartProvider.url = request['response_text'];
-                      Navigator.pushNamed(context, AppRoutes.webView, arguments: Tuple2('Paydunya', cartProvider.url));
+                      Navigator.pushNamed(context, AppRoutes.webView,
+                          arguments: Tuple2('Paydunya', cartProvider.url));
                     }
                     print(cartProvider.completed);
                   },
