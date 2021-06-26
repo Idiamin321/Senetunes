@@ -66,7 +66,8 @@ class _PlayerScreenState extends State<PlayerScreen> with BaseMixins {
     );
   }
 
-  Widget buildTrackProgreesSlider(RealtimePlayingInfos infos, Track track, PlayerProvider playerProvider) {
+  Widget buildTrackProgreesSlider(
+      RealtimePlayingInfos infos, Track track, PlayerProvider playerProvider) {
     return infos != null
         ? PositionSeekWidget(
             currentPosition: infos.currentPosition,
@@ -78,7 +79,8 @@ class _PlayerScreenState extends State<PlayerScreen> with BaseMixins {
         : Container();
   }
 
-  Container buildTopContainer(double height, PlayerProvider playerProvider, double width, BuildContext context, Track track) {
+  Container buildTopContainer(double height, PlayerProvider playerProvider, double width,
+      BuildContext context, Track track) {
     var isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Container(
       height: isLandscape ? height / 1.35 : height / 2,
@@ -141,7 +143,9 @@ class _PlayerScreenState extends State<PlayerScreen> with BaseMixins {
                             child: TrackTileActions(
                               title: 'Detail',
                               child: Container(
-                                decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(50.0)),
+                                decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(50.0)),
                                 child: Icon(
                                   Octicons.info,
                                   color: Colors.white,
@@ -212,14 +216,17 @@ class _PlayerScreenState extends State<PlayerScreen> with BaseMixins {
     );
   }
 
-  Row buildPlayerActions(double height, PlayerProvider playerProvider, BuildContext context, double width) {
+  Row buildPlayerActions(
+      double height, PlayerProvider playerProvider, BuildContext context, double width) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         IconButton(
           icon: Icon(SimpleLineIcons.control_rewind),
           iconSize: height * 0.04,
-          color: playerProvider.isFirstTrack() ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+          color: playerProvider.isFirstTrack()
+              ? Theme.of(context).accentColor
+              : Theme.of(context).primaryColor,
           onPressed: () {
             playerProvider.prev();
           },
@@ -245,7 +252,9 @@ class _PlayerScreenState extends State<PlayerScreen> with BaseMixins {
         SizedBox(width: width * 0.09),
         IconButton(
           icon: Icon(SimpleLineIcons.control_forward),
-          color: playerProvider.isLastTrack(playerProvider.currentIndex + 1) ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+          color: playerProvider.isLastTrack(playerProvider.currentIndex + 1)
+              ? Theme.of(context).accentColor
+              : Theme.of(context).primaryColor,
           iconSize: height * 0.04,
           onPressed: () {
             if (playerProvider.isLastTrack(playerProvider.currentIndex + 1)) return;
@@ -256,7 +265,8 @@ class _PlayerScreenState extends State<PlayerScreen> with BaseMixins {
     );
   }
 
-  Material buildPlayerBttomActions(BuildContext context, PlayerProvider playerProvider, Track track) {
+  Material buildPlayerBttomActions(
+      BuildContext context, PlayerProvider playerProvider, Track track) {
     bool playlistDone;
     bool favDone;
     bool downloadDone;
@@ -275,7 +285,9 @@ class _PlayerScreenState extends State<PlayerScreen> with BaseMixins {
             onPressed: () => playerProvider.handleShuffle(),
           ),
           IconButton(
-            icon: Icon(!playerProvider.loopPlaylist && playerProvider.loopMode ? Icons.repeat_one : Icons.repeat),
+            icon: Icon(!playerProvider.loopPlaylist && playerProvider.loopMode
+                ? Icons.repeat_one
+                : Icons.repeat),
             color: activeColor(context, playerProvider.loopMode),
             onPressed: () => playerProvider.handleLoop(),
           ),
@@ -302,7 +314,8 @@ class AddToPlaylistButton extends StatelessWidget {
           if (GlobalConfiguration().getValue('playlistFirst'))
             PopOverWidget(
                 key: 'playlistFirst',
-                message: "Utilisez ce bouton afin de créer une Playlist et d'y ajouter vos musiques",
+                message:
+                    "Utilisez ce bouton afin de créer une Playlist et d'y ajouter vos musiques",
                 context: context,
                 popoverDirection: PopoverDirection.top);
           else

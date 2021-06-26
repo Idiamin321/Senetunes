@@ -94,7 +94,7 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
               //   )
               : CustomCircularProgressIndicator()
           : BaseMessageScreen(
-              title: $t(context, 'download_error2'),
+              title: $t(context, 'download_empty'),
               icon: Icons.data_usage,
               subtitle: '',
             ),

@@ -19,7 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
   final Map<String, dynamic> formData = {
     'firstname': null,
     'lastname': null,
-    'birthday': null,
+    // 'birthday': null,
     'email': null,
     'password': null
   };
@@ -51,44 +51,44 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
     );
   }
 
-  Widget _buildBirthDayPicker() {
-    return TextFormField(
-      controller: birthdayController,
-      onTap: () async {
-        birthday = await showDatePicker(
-            builder: (BuildContext context, Widget child) {
-              return Theme(
-                data: ThemeData.dark().copyWith(
-                  colorScheme: ColorScheme.dark(
-                    primary: primary,
-                    onPrimary: Colors.white,
-                  ),
-                ),
-                child: child,
-              );
-            },
-            context: context,
-            initialDate: birthday,
-            lastDate: DateTime.now(),
-            firstDate: DateTime(1940),
-            locale: Locale.fromSubtags(languageCode: 'fr'));
-        if (birthday == null) birthday = DateTime.now();
-        setState(() {
-          birthdayController.text = "${birthday.year}-${birthday.month}-${birthday.day}";
-        });
-      },
-      decoration: InputDecoration(
-        suffixIcon: Icon(
-          Icons.calendar_today_outlined,
-          color: primary,
-        ),
-        labelText: $t(context, 'birthday'),
-      ),
-      onSaved: (String value) {
-        formData['birthday'] = value;
-      },
-    );
-  }
+  // Widget _buildBirthDayPicker() {
+  //   return TextFormField(
+  //     controller: birthdayController,
+  //     onTap: () async {
+  //       birthday = await showDatePicker(
+  //           builder: (BuildContext context, Widget child) {
+  //             return Theme(
+  //               data: ThemeData.dark().copyWith(
+  //                 colorScheme: ColorScheme.dark(
+  //                   primary: primary,
+  //                   onPrimary: Colors.white,
+  //                 ),
+  //               ),
+  //               child: child,
+  //             );
+  //           },
+  //           context: context,
+  //           initialDate: birthday,
+  //           lastDate: DateTime.now(),
+  //           firstDate: DateTime(1940),
+  //           locale: Locale.fromSubtags(languageCode: 'fr'));
+  //       if (birthday == null) birthday = DateTime.now();
+  //       setState(() {
+  //         birthdayController.text = "${birthday.year}-${birthday.month}-${birthday.day}";
+  //       });
+  //     },
+  //     decoration: InputDecoration(
+  //       suffixIcon: Icon(
+  //         Icons.calendar_today_outlined,
+  //         color: primary,
+  //       ),
+  //       labelText: $t(context, 'birthday'),
+  //     ),
+  //     onSaved: (String value) {
+  //       formData['birthday'] = value;
+  //     },
+  //   );
+  // }
 
   Widget _buildEmailField() {
     return TextFormField(
@@ -236,7 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
                               children: <Widget>[
                                 _buildFirstNameField(),
                                 _buildLastNameField(),
-                                _buildBirthDayPicker(),
+                                // _buildBirthDayPicker(),
                                 _buildEmailField(),
                                 _buildPasswordField(),
                                 _buildConfirmPasswordField(),

@@ -65,5 +65,6 @@
     "buy": "buy",
     "add_to_playlist": "Add to playlist",
     "create_playlist": "Create Playlist",
-    "enter_playlist_name": "Enter playlist name"
- }
+    "enter_playlist_name": "Enter playlist name",
+    "download_empty": "The music you download will appear here"
+}

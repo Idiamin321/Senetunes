@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
 import 'package:flutter_rekord_app/models/Track.dart';
 import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
 import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
@@ -48,7 +47,9 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
                 child: albumProvider.isLoaded
                     ? searchedTracks.length == 0
                         ? BaseMessageScreen(
-                            title: searchKeyword == null ? $t(context, 'search_screen_title') : $t(context, 'search_screen_title_not_found'),
+                            title: searchKeyword == null || searchKeyword.isEmpty
+                                ? $t(context, 'search_screen_title')
+                                : $t(context, 'search_screen_title_not_found'),
                             subtitle: $t(context, 'search_screen_subtitle'),
                             icon: Icons.search,
                           )

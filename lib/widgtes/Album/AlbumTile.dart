@@ -46,14 +46,19 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                           ? Container()
                           : IconButton(
                               icon: Icon(
-                                isPlaying && album.id == context.watch<PlayerProvider>().currentAlbum.id
+                                isPlaying &&
+                                        album.id == context.watch<PlayerProvider>().currentAlbum.id
                                     ? AntDesign.pausecircleo
                                     : AntDesign.playcircleo,
                                 size: 30,
                                 color: Theme.of(context).primaryColor,
                               ),
                               onPressed: () {
-                                context.read<PlayerProvider>().handlePlayButton(album: album, track: album.tracks[0], index: 0, context: context);
+                                context.read<PlayerProvider>().handlePlayButton(
+                                    album: album,
+                                    track: album.tracks[0],
+                                    index: 0,
+                                    context: context);
                               },
                             );
                     },
@@ -87,7 +92,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                     ),
                   ),
                 SizedBox(width: 20),
-                if (!context.watch<CartProvider>().boughtAlbum.contains(album))
+                if (!album.isBought)
                   if (downloadScreen == null || downloadScreen == false)
                     Container(
                       height: 30,
@@ -95,7 +100,8 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                       child: ElevatedButton(
                         style: ButtonStyle(
                           padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero),
-                          backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
                         ),
                         child: Container(
                           margin: EdgeInsets.all(5),
@@ -117,7 +123,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                                 child: FittedBox(
                                   fit: BoxFit.contain,
                                   child: Text(
-                                    "200 FCFA",
+                                    "${album.price} €",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 10,

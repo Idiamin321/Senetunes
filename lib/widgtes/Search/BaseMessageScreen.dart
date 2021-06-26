@@ -34,6 +34,7 @@ class BaseMessageScreen extends StatelessWidget {
                 if (subtitle != null)
                   Text(
                     '$subtitle',
+                    textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 12.0, color: Colors.grey.shade500),
                   ),
                 SizedBox(

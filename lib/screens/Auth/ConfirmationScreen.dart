@@ -13,10 +13,6 @@ class ConfirmationScreen extends StatelessWidget with BaseMixins {
       child: Scaffold(
         body: BaseMessageScreen(
             title: $t(context, 'register_title'),
-            subtitle: $t(
-              context,
-              'register_title',
-            ),
             icon: Icons.check_box,
             child: FlatButton.icon(
                 icon: Icon(
@@ -25,9 +21,8 @@ class ConfirmationScreen extends StatelessWidget with BaseMixins {
                 ),
                 label: Text(
                   $t(context, 'sign_in'),
-                  style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: Theme.of(context).primaryColor),
+                  style:
+                      TextStyle(fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, AppRoutes.loginRoute);

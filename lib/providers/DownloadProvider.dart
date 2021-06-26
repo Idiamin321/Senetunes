@@ -15,6 +15,9 @@ import 'package:flutter_rekord_app/models/Track.dart';
 import 'package:flutter_rekord_app/providers/BaseProvider.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'AuthProvider.dart';
 
 const String trackLocalDownloadStorageSearch = 'TrackLocalDownloadStorageSearch';
 const String trackDownloadList = 'TrackDownloadList';
@@ -100,7 +103,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
   }
 
   downloadAudio(Track song, BuildContext context) async {
-    if (song.albumInfo.isBought) {
+    if (context.read<AuthProvider>().boughtAlbumsIds.containsKey(song.albumId)) {
       if (!isDownloadSong(song)) {
         Flushbar(
           backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),

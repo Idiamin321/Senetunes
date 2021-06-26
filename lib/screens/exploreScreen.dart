@@ -26,7 +26,7 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
 
   void requestStorageAccess() async {
     var status = await Permission.storage.status;
-    if (status.isUndetermined || status.isDenied) {
+    if (!status.isGranted) {
       await Permission.storage.request();
     }
   }
@@ -40,11 +40,11 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
     context.read<PlaylistProvider>().getPlaylists();
     requestStorageAccess();
     if (albumProvider.isLoaded && artistProvider.isLoaded) {
+      albumProvider.updateBoughtAlbums(authProvider.boughtAlbumsIds);
       albumProvider.updateTracksAndAlbumsWithArtists(artistProvider.allArtists);
       artistProvider.updateArtistsWithAlbums(albumProvider.allAlbums);
       categoryProvider.updateWithAlbumsAndArtists(
           albumProvider.allAlbums, artistProvider.allArtists);
-      albumProvider.updateBoughtAlbums(authProvider.boughtAlbumsIds);
       context.read<DownloadProvider>().initFlutterDownloader(albumProvider.allTracks);
     }
     return SafeArea(

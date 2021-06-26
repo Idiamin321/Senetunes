@@ -162,7 +162,6 @@ class AuthProvider extends BaseProvider {
 	<lastname><![CDATA[${formData['lastname']}]]></lastname>
 	<firstname><![CDATA[${formData['firstname']}]]></firstname>
 	<email><![CDATA[${formData['email']}]]></email>
-	<birthday><![CDATA[${formData['birthday']}]]></birthday>
 	<active>1</active>
 </customer>
 </prestashop>""";

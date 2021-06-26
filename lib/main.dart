@@ -19,7 +19,7 @@ void main() async {
   await GlobalConfiguration().loadFromAsset("config");
   await FlutterDownloader.initialize(debug: true);
   var status = await Permission.storage.status;
-  if (status.isUndetermined || status.isDenied) {
+  if (!status.isGranted) {
     await Permission.storage.request();
   }
 

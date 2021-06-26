@@ -74,7 +74,7 @@ class CartProvider extends BaseProvider {
     var body = json.encode(
       {
         "invoice": {
-          "total_amount": (totalAmount * 600).toStringAsFixed(2),
+          "total_amount": (totalAmount * 655).toStringAsFixed(2),
           "description": description
         },
         "store": {"name": "Senetunes"},
