@@ -9,7 +9,10 @@ import 'package:provider/provider.dart';
 class BaseDrawer extends StatelessWidget with BaseMixins {
   Widget leadingIcon({int cartLength}) {
     return cartLength > 0
-        ? Badge(position: BadgePosition.topEnd(top: 10, end: 10), badgeContent: Text(cartLength.toString()), child: Icon(Ionicons.md_cart))
+        ? Badge(
+            position: BadgePosition.topEnd(top: 10, end: 10),
+            badgeContent: Text(cartLength.toString()),
+            child: Icon(Ionicons.md_cart))
         : Icon(Ionicons.md_cart);
   }
 
@@ -102,6 +105,19 @@ class BaseDrawer extends StatelessWidget with BaseMixins {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, AppRoutes.downloadScreenRoute);
+              },
+            ),
+            ListTile(
+              leading: Icon(MaterialIcons.attach_money),
+              title: Text(
+                $t(
+                  context,
+                  'bought_albums',
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, AppRoutes.boughtAlbumsScreenRoute);
               },
             ),
             ListTile(

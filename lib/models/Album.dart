@@ -16,16 +16,19 @@ class Album {
   double price;
   bool isBought;
 
-  Album(
-      {this.id,
-      this.name,
-      this.description,
-      this.artistId,
-      this.artistInfo,
-      this.uri,
-      this.media,
-      this.contributors,
-      this.tracks});
+  Album({
+    this.id,
+    this.name,
+    this.description,
+    this.artistId,
+    this.artistInfo,
+    this.uri,
+    this.media,
+    this.contributors,
+    this.tracks,
+    this.isBought,
+    this.price,
+  });
 
   static Album fromJson(Map<String, dynamic> json) {
     List<Track> tracks = [];
@@ -64,6 +67,8 @@ class Album {
               ? null
               : json['contributors']['contributors'],
       tracks: tracks,
+      isBought: json['isBought'] == null ? false : json['isBought'],
+      price: json['price'] == null ? null : json['price'],
     );
   }
 
@@ -76,7 +81,9 @@ class Album {
       'uri': uri,
       'coverPictureUrls': "${media.cover} ${media.medium} ${media.thumbnail}",
       'contributors': {'contributors': contributors},
-      'songs': {'song': tracks.map((e) => e.toJson()).toList()}
+      'songs': {'song': tracks.map((e) => e.toJson()).toList()},
+      'isBought': isBought,
+      'price': price
     };
   }
 

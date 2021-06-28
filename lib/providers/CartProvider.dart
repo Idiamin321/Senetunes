@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
 import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -15,9 +14,6 @@ class CartProvider extends BaseProvider {
   String url;
   Map<String, dynamic> request;
   String completed;
-
-  Set<Album> boughtAlbum = Set();
-  Set<Track> boughtTracks = Set();
 
   void addAlbum(Album album) {
     if (!cart.contains(album)) {
@@ -100,7 +96,6 @@ class CartProvider extends BaseProvider {
   }
 
   boughtSuccessful(BuildContext context, String email) async {
-    boughtAlbum.addAll(cart);
     for (Album album in cart) {
       http.Response response;
       String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
@@ -124,31 +119,11 @@ class CartProvider extends BaseProvider {
         body: xml,
       );
       print(response.body);
-      boughtTracks.addAll(album.tracks);
-      context.read<AuthProvider>().fetchBoughtAlbums(context.read<AuthProvider>().user.email);
-      context
-          .read<AlbumProvider>()
-          .updateBoughtAlbums(context.read<AuthProvider>().boughtAlbumsIds);
     }
-
-    // var request = http.Request(
-    //   'SEARCH',
-    //   Uri.parse('https://host123.com.br/remote.php/dav'),
-    // );
-    // request.headers.addAll({
-    //   HttpHeaders.authorizationHeader: 'Basic $credential',
-    //   'content-type': 'text/xml' // or text/xml;charset=utf-8
-    // });
-    //
-    // var xml = '<?xml version="1.0" encoding="UTF-8"?>...';
-    // // either
-    // request.body = xml;
-    // var streamedResponse = await client.send(request);
-    // print(streamedResponse.statusCode);
-    //
-    // var responseBody = await streamedResponse.stream.transform(utf8.decoder).join();
-    // print(responseBody);
-    // client.close();
     clearCart();
+    await context.read<AuthProvider>().fetchBoughtAlbums(context.read<AuthProvider>().user.email);
+    await context
+        .read<AlbumProvider>()
+        .updateBoughtAlbums(context.read<AuthProvider>().boughtAlbumsIds);
   }
 }

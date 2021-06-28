@@ -19,7 +19,7 @@ class AuthProvider extends BaseProvider {
   // Items List
 
   bool isLoaded = true;
-  bool _isLoggedIn = false;
+  bool _isLoggedIn;
   bool inputerror = false;
   String errorMsg;
   bool check = true;
@@ -46,14 +46,7 @@ class AuthProvider extends BaseProvider {
     return response;
   }
 
-  _saveToken(response) async {
-    final _prefs = await SharedPreferences.getInstance();
-    if (response.containsKey('jwt')) {
-      _prefs.setString('token', response['jwt']);
-    }
-  }
-
-  setUser(response) async {
+  setUser(User user) async {
     isLoaded = false;
     notifyListeners();
     var status = await Permission.storage.status;
@@ -61,10 +54,11 @@ class AuthProvider extends BaseProvider {
       await Permission.storage.request();
     }
     final _prefs = await SharedPreferences.getInstance();
-    _user = User.fromJson(response);
+    _user = user;
     var temp = json.encode(_user.toJson());
     await _prefs.setString('user', temp);
     await fetchBoughtAlbums(_user.email);
+    _isLoggedIn = true;
     isLoaded = true;
     notifyListeners();
   }
@@ -81,6 +75,8 @@ class AuthProvider extends BaseProvider {
  */
 
   fetchBoughtAlbums(String email) async {
+    isLoaded = false;
+    notifyListeners();
     String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
     http.Response response = await http.get(
       "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?filter[userEmail]=$email&display=full",
@@ -98,12 +94,14 @@ class AuthProvider extends BaseProvider {
           .getElement("albumInfo")
           .getElement("albumId")
           .text;
-      print(albumId);
       boughtAlbumsIds.putIfAbsent(int.parse(albumId), () => true);
     }
+    print(boughtAlbumsIds);
+    isLoaded = true;
+    notifyListeners();
   }
 
-  Future autoAuthenticate() async {
+  autoAuthenticate() async {
     isLoaded = false;
     notifyListeners();
     final SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -176,9 +174,22 @@ class AuthProvider extends BaseProvider {
 
     isLoaded = true;
     notifyListeners();
-    if (response.statusCode == 201)
+    if (response.statusCode == 201) {
+      var customer =
+          XmlDocument.parse(response.body).getElement("prestashop").getElement("customer");
+      Map<String, dynamic> user = {
+        "id": customer.getElement('id').text,
+        "email": customer.getElement('email').text,
+        "firstName": customer.getElement('firstname').text,
+        "lastName": customer.getElement('lastname').text,
+      };
+      await setUser(User(
+          id: int.parse(user['id']),
+          email: user['email'],
+          firstName: user['firstName'],
+          lastName: user['lastName']));
       return null;
-    else {
+    } else {
       print(response.body);
       return response.body;
     }

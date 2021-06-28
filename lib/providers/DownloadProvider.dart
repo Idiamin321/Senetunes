@@ -159,19 +159,6 @@ class DownloadProvider extends BaseProvider with BaseMixins {
       isDownload = true;
 
       _requestDownload(_TaskInfo(track: song), downloadDir.path);
-
-      // await downloadFileTo(
-      //     dio: dio,
-      //     url: song.playUrl,
-      //     savePath: downloadPath,
-      //     progressFunction: (received, total) {
-      //       if (total != -1) {
-      //         downloadingProgress = received / total * 100;
-      //         isDone = received / total * 100;
-      //         notifyListeners();
-      //       }
-      //     });
-
     }
   }
 
@@ -251,10 +238,11 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     return _downloadSongs[_downloadSongs.indexOf(song)];
   }
 
-  removeSong(Track song) {
+  removeSong(Track song, {bool lastSong}) {
     if (_downloadSongs.contains(song)) {
       Directory dir = Directory(returnPath(song));
       dir.deleteSync(recursive: true);
+      if (lastSong) _downloadedAlbums.removeWhere((element) => element.id == song.albumId);
       _downloadSongs.remove(song);
       saveSongData();
       notifyListeners();
@@ -277,7 +265,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     tasks = await FlutterDownloader.loadTasks();
     _tasks.addAll(tasks.map((e) {
       Track track = allTracks.firstWhere((element) => element.name == e.filename);
-      if (track != null)
+      if (track != null && e.progress != 100)
         return _TaskInfo(track: track)
           ..status = e.status
           ..progress = e.progress
@@ -285,6 +273,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
       else
         return null;
     }));
+    _tasks.removeWhere((element) => element == null);
     _bindBackgroundIsolate();
     FlutterDownloader.registerCallback(downloadCallback);
   }
@@ -309,6 +298,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
           task.progress = progress;
           if (status == DownloadTaskStatus.complete) {
             addToDownloadSong(task.track);
+            _tasks.remove(task);
           } else if (status == DownloadTaskStatus.failed) {
             _retryDownload(_tasks[_tasks.indexWhere((element) => element.taskId == id)]);
           }
@@ -333,6 +323,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     if (!hasExisted) {
       savedDir.create();
     }
+    print(_tasks);
     if (!_tasks.any((element) => element.track.id == task.track.id)) {
       _tasks.add(task);
       task.taskId = await FlutterDownloader.enqueue(

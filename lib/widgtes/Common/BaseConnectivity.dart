@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:flutter_rekord_app/config/AppRoutes.dart';
 import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
 import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
 import 'package:flutter_rekord_app/providers/ArtistProvider.dart';
@@ -43,6 +45,19 @@ class _BaseConnectivityState extends State<BaseConnectivity> with BaseMixins {
             : BaseMessageScreen(
                 icon: Icons.perm_scan_wifi,
                 title: $t(context, 'no_internet'),
+                child: TextButton.icon(
+                    icon: Icon(
+                      EvilIcons.arrow_right,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    label: Text(
+                      $t(context, 'offline_message'),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, AppRoutes.downloadScreenRoute);
+                    }),
               );
       },
       child: Container(),

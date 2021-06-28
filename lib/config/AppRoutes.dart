@@ -15,18 +15,19 @@ import 'package:flutter_rekord_app/screens/Auth/LoginScreen.dart';
 import 'package:flutter_rekord_app/screens/Auth/ProfileEditScreen.dart';
 import 'package:flutter_rekord_app/screens/Auth/RegisterScreen.dart';
 import 'package:flutter_rekord_app/screens/Auth/UserAccountPage.dart';
+import 'package:flutter_rekord_app/screens/Bought%20Albums/BoughtAlbumsDetailsScreen.dart';
+import 'package:flutter_rekord_app/screens/Bought%20Albums/BoughtAlbumsScreen.dart';
 import 'package:flutter_rekord_app/screens/Download/DownloadDetailsScreen.dart';
 import 'package:flutter_rekord_app/screens/Info/AboutUs.dart';
 import 'package:flutter_rekord_app/screens/Info/ContactUs.dart';
 import 'package:flutter_rekord_app/screens/PlayerScreen.dart';
 import 'package:flutter_rekord_app/screens/Playlist/PlaylistDetailsScreen.dart';
+import 'package:flutter_rekord_app/screens/Playlist/PlaylistScreen.dart';
 import 'package:flutter_rekord_app/screens/WebView/WebView.dart';
 import 'package:flutter_rekord_app/screens/album/AlbumDetailScreen.dart';
 import 'package:flutter_rekord_app/screens/album/AlbumsScreen.dart';
 import 'package:flutter_rekord_app/screens/exploreScreen.dart';
 import 'package:flutter_rekord_app/widgtes/Common/BaseAuthCheck.dart';
-
-import 'file:///D:/Freelancing/Reskin%20and%20add%20payment%20gateway%20in%20Flutter%20app/My%20app/rekord-flutter-master/lib/screens/Playlist/PlaylistScreen.dart';
 
 import '../screens/Cart/Cart.dart';
 import '../screens/Category/CategoryDetailScreen.dart';
@@ -57,6 +58,8 @@ class AppRoutes {
   static const playlistDetails = '/playlistDetails';
   static const categoryScreen = '/categoryScreen';
   static const categoryDetail = '/categoryDetail';
+  static const boughtAlbumsScreenRoute = '/boughtAlbumsScreenRoute';
+  static const boughtAlbumsDetails = '/boughtAlbumsDetails';
   Map<String, WidgetBuilder> routes() {
     return {
       home: (context) => ExploreScreen(),
@@ -87,6 +90,8 @@ class AppRoutes {
       playlistDetails: (context) => PlaylistDetailsScreen(),
       categoryScreen: (context) => CategoryScreen(),
       categoryDetail: (context) => CategoryDetailScreen(),
+      boughtAlbumsScreenRoute: (context) => BoughtAlbumsScreen(),
+      boughtAlbumsDetails: (context) => BoughtAlbumsDetailsScreen()
     };
   }
 }

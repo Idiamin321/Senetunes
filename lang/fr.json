@@ -1,5 +1,5 @@
 {
-    "no_internet": "Pas d'internet",
+    "no_internet": "Vous n'êtes pas connecté à internet",
     "mode_String": "Activer le mode nuit",
     "account": "Votre compte",
     "sign_in": "Connexion",
@@ -86,5 +86,10 @@
     "enter_playlist_name": "donnez un nom pour votre playlist",
     "bought": "Déjà Achetés",
     "flutter_downloader_notification_started": "Télécharger Started",
-    "flutter_downloader_notification_in_progress": "Téléchargement en cours"
+    "flutter_downloader_notification_in_progress": "Téléchargement en cours",
+    "bought_albums": "Vos albums achetés",
+    "bought_albums_empty": "Les albums que vous achèterez apparaîtront ici",
+    "cart_empty": "Les albums que vous ajouterez dans votre panier apparaîtront ici",
+    "playlist_empty": "Les playlist que vous créerez apparaîtront ici",
+    "offline_message": "Écouter vos albums et musiques téléchargés"
  }

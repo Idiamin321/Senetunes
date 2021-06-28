@@ -19,7 +19,6 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
   final Map<String, dynamic> formData = {
     'firstname': null,
     'lastname': null,
-    // 'birthday': null,
     'email': null,
     'password': null
   };
@@ -172,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
                 titleText: Text($t(context, 'ops')),
                 messageText: Text(response),
               ).show(context)
-            : Navigator.pushNamed(context, AppRoutes.confirmScreenRoute);
+            : Navigator.pushReplacementNamed(context, AppRoutes.confirmScreenRoute);
       });
     } else {
       //   If all data are not valid then start auto validation.

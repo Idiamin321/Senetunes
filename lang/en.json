@@ -66,5 +66,10 @@
     "add_to_playlist": "Add to playlist",
     "create_playlist": "Create Playlist",
     "enter_playlist_name": "Enter playlist name",
-    "download_empty": "The music you download will appear here"
+    "download_empty": "The music you download will appear here",
+    "bought_albums": "Your purchased albums",
+    "bought_albums_empty": "The albums that you buy will appear here",
+    "playlist_empty": "Playlists you create will appear here",
+    "cart_empty": "Albums you add to your cart will appear here",
+    "offline_message": "Listen to your downloaded albums and music"
 }

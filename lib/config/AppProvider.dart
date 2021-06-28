@@ -25,6 +25,9 @@ import '../providers/PlaylistProvider.dart';
 
 List<SingleChildWidget> providers() {
   return [
+    ChangeNotifierProvider<AuthProvider>(
+      create: (context) => AuthProvider(),
+    ),
     ChangeNotifierProvider<PlayerProvider>(
       create: (_) => PlayerProvider(),
     ),
@@ -42,9 +45,6 @@ List<SingleChildWidget> providers() {
     ),
     ChangeNotifierProvider<UsersProvider>(
       create: (context) => UsersProvider(),
-    ),
-    ChangeNotifierProvider<AuthProvider>(
-      create: (context) => AuthProvider(),
     ),
     ChangeNotifierProvider<ThemeProvider>(
       create: (context) => ThemeProvider(),

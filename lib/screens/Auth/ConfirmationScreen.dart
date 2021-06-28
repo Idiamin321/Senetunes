@@ -25,7 +25,7 @@ class ConfirmationScreen extends StatelessWidget with BaseMixins {
                       TextStyle(fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRoutes.loginRoute);
+                  Navigator.pushReplacementNamed(context, AppRoutes.home);
                 })),
       ),
     );

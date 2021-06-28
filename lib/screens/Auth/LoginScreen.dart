@@ -7,6 +7,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_rekord_app/config/AppRoutes.dart';
 import 'package:flutter_rekord_app/config/AppValidation_rules.dart';
 import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
+import 'package:flutter_rekord_app/models/User.dart';
 import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:flutter_rekord_app/widgtes/Common/BaseBlocButton.dart';
 import 'package:flutter_rekord_app/widgtes/common/BaseAppIcon.dart';
@@ -73,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> with BaseMixins {
           messageText: Text(jsonMap['error']['message']['\$']),
         ).show(context);
       } else {
-        provider.setUser(jsonMap);
+        provider.setUser(User.fromJson(jsonMap));
         Navigator.pushReplacementNamed(context, AppRoutes.home);
       }
     }
@@ -136,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> with BaseMixins {
                               fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.registerRoute);
+                          Navigator.pushReplacementNamed(context, AppRoutes.registerRoute);
                           // Navigator.pushNamed(context, AppRoutes.webView,
                           //     arguments: Tuple2("Senetunes", "https://www.senetunes.com/fr/authentification?back=my-account"));
                         },

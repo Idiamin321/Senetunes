@@ -60,7 +60,9 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
   @override
   Widget build(BuildContext context) {
     downloadProvider = context.watch<DownloadProvider>();
-    tracks = downloadProvider.downloadSongs.where((element) => element.albumId == widget.downloadedAlbum.id).toList();
+    tracks = downloadProvider.downloadSongs
+        .where((element) => element.albumId == widget.downloadedAlbum.id)
+        .toList();
     return Container(
         padding: EdgeInsets.only(bottom: 0.0),
         child: tracks.length > 0
@@ -86,7 +88,9 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
                             ),
                             onTap: () {
                               setState(() {
-                                downloadProvider.removeSong(downloadProvider.returnSong(tracks[index]));
+                                downloadProvider.removeSong(
+                                    downloadProvider.returnSong(tracks[index]),
+                                    lastSong: tracks.length < 2);
                               });
                             }),
                       ),

@@ -4,13 +4,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_rekord_app/config/AppProvider.dart';
 import 'package:flutter_rekord_app/config/AppRoutes.dart';
 import 'package:flutter_rekord_app/config/AppTheme.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:flutter_rekord_app/providers/ThemeProvider.dart';
 import 'package:flutter_rekord_app/screens/Auth/LoginScreen.dart';
 import 'package:flutter_rekord_app/screens/exploreScreen.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/Applocalizations.dart';
 
@@ -22,12 +22,17 @@ void main() async {
   if (!status.isGranted) {
     await Permission.storage.request();
   }
+  bool loggedIn;
+  await SharedPreferences.getInstance()
+      .then((value) => value.getString('user') != null ? loggedIn = true : loggedIn = false);
 
-  runApp(RekordApp());
+  runApp(RekordApp(loggedIn));
 }
 
 class RekordApp extends StatelessWidget {
   // This widget is the root of your application.
+  RekordApp(this.loggedIn);
+  final bool loggedIn;
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -41,7 +46,7 @@ class RekordApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               routes: AppRoutes().routes(),
-              home: context.read<AuthProvider>().isLoggedIn ? ExploreScreen() : LoginScreen(),
+              home: loggedIn ? ExploreScreen() : LoginScreen(),
               themeMode: value.darkMode ? ThemeMode.light : ThemeMode.dark,
               // List all of the app's supported locales here
               supportedLocales: [

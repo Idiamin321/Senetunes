@@ -18,6 +18,10 @@ class AlbumProvider extends ChangeNotifier {
 
   List<Album> _allAlbums = <Album>[];
   List<Album> get allAlbums => _allAlbums;
+  List<Track> _allTracks = <Track>[];
+  List<Track> get allTracks => _allTracks;
+  Set<Album> _boughtAlbums = Set();
+  Set<Album> get boughtAlbums => _boughtAlbums;
   bool isLoaded = true;
 
   fetchAlbums() async {
@@ -54,9 +58,6 @@ class AlbumProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Track> _allTracks = <Track>[];
-  List<Track> get allTracks => _allTracks;
-
   List<Track> searchData(String trackName) {
     List<Track> searchedTracks = [];
     for (Track track in _allTracks) {
@@ -80,10 +81,16 @@ class AlbumProvider extends ChangeNotifier {
   }
 
   updateBoughtAlbums(Map<int, bool> boughtAlbums) async {
-    print(boughtAlbums);
+    isLoaded = false;
     for (var i = 0; i < _allAlbums.length; i++) {
-      print(_allAlbums[i].id);
-      _allAlbums[i].isBought = boughtAlbums.containsKey(_allAlbums[i].id);
+      if (boughtAlbums.containsKey(_allAlbums[i].id)) {
+        _allAlbums[i].isBought = true;
+        _boughtAlbums.add(_allAlbums[i]);
+      } else {
+        _allAlbums[i].isBought = false;
+      }
     }
+    isLoaded = true;
+    notifyListeners();
   }
 }
