@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseOverlay.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackCarousel/TrackCarouselTile.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+import 'package:senetunes/widgtes/common/BaseOverlay.dart';
+import 'package:senetunes/widgtes/track/TrackCarousel/TrackCarouselTile.dart';
 
 class TrackCarouselWidget extends StatefulWidget {
   final List<Track> tracks;
@@ -48,7 +48,9 @@ class _TrackCarouselWidgetState extends State<TrackCarouselWidget> {
             decoration: BoxDecoration(),
             child: BaseOverlay(
               child: track.albumInfo.media != null &&
-                      (track.albumInfo.media.cover != null || track.albumInfo.media.medium != null || track.albumInfo.media.thumbnail != null)
+                      (track.albumInfo.media.cover != null ||
+                          track.albumInfo.media.medium != null ||
+                          track.albumInfo.media.thumbnail != null)
                   ? BaseImage(
                       radius: 3,
                       overlay: false,

@@ -1,21 +1,21 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rekord_app/config/AppColors.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Album/AlbumFavouriteButton.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseConnectivity.dart';
-import 'package:flutter_rekord_app/widgtes/Common/DownloadButton.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackTile.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Album/AlbumFavouriteButton.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/DownloadButton.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
 
 class AlbumDetailScreen extends StatefulWidget {
   @override

@@ -1,5 +1,5 @@
 // import 'package:flutter/material.dart';
-// import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
+// import 'package:senetunes/providers/PlayerProvider.dart';
 //
 // import 'package:permission_handler/permission_handler.dart';
 // import 'package:provider/provider.dart';

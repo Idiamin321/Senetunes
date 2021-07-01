@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/Applocalizations.dart';
+import 'package:senetunes/config/Applocalizations.dart';
 
 mixin BaseMixins {
   String $t(BuildContext context, String key, {String value = ''}) {

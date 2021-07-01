@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
 
 class WidgetHeader extends StatelessWidget with BaseMixins {
   final String title;
@@ -17,10 +17,7 @@ class WidgetHeader extends StatelessWidget with BaseMixins {
         children: [
           Text(
             title,
-            style: Theme.of(context)
-                .primaryTextTheme
-                .headline3
-                .copyWith(fontSize: 12),
+            style: Theme.of(context).primaryTextTheme.headline3.copyWith(fontSize: 12),
           ),
           InkWell(
             onTap: () {
@@ -30,8 +27,10 @@ class WidgetHeader extends StatelessWidget with BaseMixins {
               padding: const EdgeInsets.only(right: 10, bottom: 3),
               child: Text(
                 $t(context, 'show_more'),
-                style: Theme.of(context).primaryTextTheme.headline3.copyWith(
-                    fontSize: 10, color: Theme.of(context).primaryColor),
+                style: Theme.of(context)
+                    .primaryTextTheme
+                    .headline3
+                    .copyWith(fontSize: 10, color: Theme.of(context).primaryColor),
               ),
             ),
           ),

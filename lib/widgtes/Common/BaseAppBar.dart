@@ -1,10 +1,10 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/screens/album/SearchScreen.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/screens/album/SearchScreen.dart';
 
 class BaseAppBar extends StatelessWidget {
   final bool darkMode;

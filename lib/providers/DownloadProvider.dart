@@ -8,14 +8,14 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Artist.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/BaseProvider.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/BaseProvider.dart';
 
 import 'AuthProvider.dart';
 

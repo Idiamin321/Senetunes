@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackBottomBar.dart';
+import 'package:senetunes/widgtes/track/TrackBottomBar.dart';
 
 class BaseMessageScreen extends StatelessWidget {
   final String title;

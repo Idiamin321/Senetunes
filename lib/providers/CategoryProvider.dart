@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_rekord_app/config/AppConfig.dart';
-import 'package:flutter_rekord_app/models/Category.dart';
 import 'package:http/http.dart' as http;
+import 'package:senetunes/config/AppConfig.dart';
+import 'package:senetunes/models/Category.dart';
 import 'package:xml2json/xml2json.dart';
 
 import '../models/Album.dart';

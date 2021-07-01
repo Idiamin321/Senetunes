@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/PlaylistProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlaylistProvider.dart';
 import 'package:toast/toast.dart';
 
 class PlaylistChoice extends StatefulWidget {

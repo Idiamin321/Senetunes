@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
 
 class BaseAuthCheck extends StatelessWidget {
   final Widget child;

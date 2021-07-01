@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/widgtes/common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/common/CustomCircularProgressIndicator.dart';
 
 class BaseBlockButton extends StatelessWidget {
   final String label;
@@ -24,8 +24,7 @@ class BaseBlockButton extends StatelessWidget {
         ? Container(
             width: double.infinity,
             child: FlatButton(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(_radius)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radius)),
               onPressed: () => onPressed(),
               child: Padding(
                 child: Text(

@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppColors.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Common/WidgetHeader.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Common/WidgetHeader.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 class AlbumsWidget extends StatelessWidget with BaseMixins {
   final List<Album> albums;

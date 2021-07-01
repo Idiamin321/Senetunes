@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuple/tuple.dart';
 

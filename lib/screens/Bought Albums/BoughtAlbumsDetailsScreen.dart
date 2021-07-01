@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScreenHeading.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackTile.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
 
 class BoughtAlbumsDetailsScreen extends StatefulWidget {
   @override

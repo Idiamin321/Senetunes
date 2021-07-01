@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Category.dart';
-import 'package:flutter_rekord_app/providers/CategoryProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Category/CategoryTile.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseConnectivity.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScaffold.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Category.dart';
+import 'package:senetunes/providers/CategoryProvider.dart';
+import 'package:senetunes/widgtes/Category/CategoryTile.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/BaseScaffold.dart';
 
 class CategoryScreen extends StatelessWidget with BaseMixins {
   final ScrollController scrollController = new ScrollController();
@@ -49,7 +49,8 @@ class CategoryScreen extends StatelessWidget with BaseMixins {
                   itemCount: p.categories.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: responsive(context, isSmallPhone: 2, isPhone: 2, isTablet: 4),
-                      childAspectRatio: responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
+                      childAspectRatio:
+                          responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
                   itemBuilder: (context, index) {
                     print(p.getCategoryMedium(p.categories[index]));
                     return _buildGridItem(context, p.categories[index]);

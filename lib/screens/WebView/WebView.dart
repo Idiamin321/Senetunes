@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/providers/DownloadProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Common/CustomCircularProgressIndicator.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/DownloadProvider.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
 import 'package:tuple/tuple.dart';
 
 class WebViewCart extends StatefulWidget {

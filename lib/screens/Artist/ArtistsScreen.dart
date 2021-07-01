@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/providers/ArtistProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Artist/ArtistCardForScreen.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScreenHeading.dart';
-import 'package:flutter_rekord_app/widgtes/Common/CustomCircularProgressIndicator.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/providers/ArtistProvider.dart';
+import 'package:senetunes/widgtes/Artist/ArtistCardForScreen.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
 
 class ArtistsScreen extends StatelessWidget with BaseMixins {
   const ArtistsScreen({Key key}) : super(key: key);

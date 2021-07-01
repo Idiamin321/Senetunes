@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
+import 'package:senetunes/models/Track.dart';
 
 class TrackTileActions extends StatelessWidget {
   final Track track;

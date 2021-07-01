@@ -1,4 +1,4 @@
-name: flutter_rekord_app
+name: senetunes
 description: A muisc flutter app.
 
 # The following line prevents the package from being accidentally published to
@@ -73,6 +73,7 @@ dev_dependencies:
   json_serializable: ^3.4.0
   flutter_native_splash: ^0.1.9
   flutter_launcher_icons:
+  change_app_package_name: ^0.1.3
   flutter_test:
     sdk: flutter
 

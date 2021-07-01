@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/DownloadProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/DownloadProvider.dart';
 
 class TrackTileActions extends StatelessWidget with BaseMixins {
   final bool isRemove;

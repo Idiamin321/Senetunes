@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
-import 'package:flutter_rekord_app/providers/ArtistProvider.dart';
-import 'package:flutter_rekord_app/providers/CategoryProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
+import 'package:senetunes/providers/ArtistProvider.dart';
+import 'package:senetunes/providers/CategoryProvider.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
 // Widget Name: Base Connectivity
 // @version: 1.0.0
 // @since: 1.0.0

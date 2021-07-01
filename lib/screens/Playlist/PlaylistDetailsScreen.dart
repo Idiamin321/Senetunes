@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/PlaylistProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScreenHeading.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackTile.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlaylistProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
 
 class PlaylistDetailsScreen extends StatefulWidget {
   @override

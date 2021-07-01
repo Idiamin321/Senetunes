@@ -1,4 +1,5 @@
-import 'package:flutter_rekord_app/models/Track.dart';
+import 'package:senetunes/models/Track.dart';
+
 // import 'package:json_annotation/json_annotation.dart';
 //
 import 'Media.dart';

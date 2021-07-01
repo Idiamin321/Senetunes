@@ -4,11 +4,11 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 import 'TrackPlayButton.dart';
 
@@ -92,7 +92,9 @@ class _TrackBottomBarState extends State<TrackBottomBar> with SingleTickerProvid
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(child: AutoSizeText(track.name, maxLines: 1, style: TextStyle(fontSize: 14))),
+                                  Expanded(
+                                      child: AutoSizeText(track.name,
+                                          maxLines: 1, style: TextStyle(fontSize: 14))),
                                   track?.artistInfo?.name != null
                                       ? Expanded(
                                           child: AutoSizeText(
@@ -114,7 +116,9 @@ class _TrackBottomBarState extends State<TrackBottomBar> with SingleTickerProvid
                                 IconButton(
                                   icon: Icon(SimpleLineIcons.control_rewind),
                                   iconSize: 20,
-                                  color: playerProvider.isFirstTrack() ? Theme.of(context).iconTheme.color : Theme.of(context).primaryColor,
+                                  color: playerProvider.isFirstTrack()
+                                      ? Theme.of(context).iconTheme.color
+                                      : Theme.of(context).primaryColor,
                                   onPressed: () {
                                     playerProvider.prev();
                                   },
@@ -130,7 +134,8 @@ class _TrackBottomBarState extends State<TrackBottomBar> with SingleTickerProvid
                                       : Theme.of(context).primaryColor,
                                   iconSize: 20,
                                   onPressed: () {
-                                    if (playerProvider.isLastTrack(playerProvider.currentIndex + 1)) return;
+                                    if (playerProvider.isLastTrack(playerProvider.currentIndex + 1))
+                                      return;
                                     playerProvider.next();
                                   },
                                 )

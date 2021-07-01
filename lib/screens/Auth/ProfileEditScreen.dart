@@ -3,13 +3,13 @@
 // import 'package:flushbar/flushbar.dart';
 // import 'package:flutter/material.dart';
 //
-// import 'package:flutter_rekord_app/config/AppValidation_rules.dart';
-// import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-// import 'package:flutter_rekord_app/models/User.dart';
-// import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-// import 'package:flutter_rekord_app/providers/UsersProvider.dart';
-// import 'package:flutter_rekord_app/widgtes/Common/ImageInput.dart';
-// import 'package:flutter_rekord_app/widgtes/common/BaseBlocButton.dart';
+// import 'package:senetunes/config/AppValidation_rules.dart';
+// import 'package:senetunes/mixins/BaseMixins.dart';
+// import 'package:senetunes/models/User.dart';
+// import 'package:senetunes/providers/AuthProvider.dart';
+// import 'package:senetunes/providers/UsersProvider.dart';
+// import 'package:senetunes/widgtes/Common/ImageInput.dart';
+// import 'package:senetunes/widgtes/common/BaseBlocButton.dart';
 //
 // import 'package:provider/provider.dart';
 //

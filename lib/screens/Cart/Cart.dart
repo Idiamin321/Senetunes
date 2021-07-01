@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Cart/CartTile.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/widgtes/Cart/CartTile.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
 import 'package:tuple/tuple.dart';
 
 class Cart extends StatefulWidget {

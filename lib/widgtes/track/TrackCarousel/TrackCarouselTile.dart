@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
 import '../TrackPlayButton.dart';
 

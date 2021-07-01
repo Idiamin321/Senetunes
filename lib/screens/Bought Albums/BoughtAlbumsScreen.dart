@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Album/AlbumTile.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScreenHeading.dart';
-import 'package:flutter_rekord_app/widgtes/Common/CustomCircularProgressIndicator.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
+import 'package:senetunes/widgtes/Album/AlbumTile.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
 
 class BoughtAlbumsScreen extends StatelessWidget with BaseMixins {
   @override

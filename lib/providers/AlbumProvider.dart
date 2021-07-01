@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Artist.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
 import 'package:http/http.dart' as http;
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/models/Track.dart';
 import 'package:xml2json/xml2json.dart';
 
 import '../config/AppConfig.dart';

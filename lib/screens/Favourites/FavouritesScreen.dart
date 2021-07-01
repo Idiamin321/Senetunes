@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/providers/FavoriteProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Artist/AlbumsList.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScreenHeading.dart';
-import 'package:flutter_rekord_app/widgtes/Common/CustomCircularProgressIndicator.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackTile.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/providers/FavoriteProvider.dart';
+import 'package:senetunes/widgtes/Artist/AlbumsList.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
 
 class FavouritesScreen extends StatelessWidget with BaseMixins {
   const FavouritesScreen({Key key}) : super(key: key);
@@ -97,7 +97,8 @@ class TrackContainer extends StatelessWidget with BaseMixins {
                 ? ListView.builder(
                     itemCount: favoriteProvider.favoriteTracks.length,
                     itemBuilder: (context, index) {
-                      Album album = new Album(name: 'Favourites', tracks: favoriteProvider.favoriteTracks);
+                      Album album =
+                          new Album(name: 'Favourites', tracks: favoriteProvider.favoriteTracks);
                       return TrackTile(
                         track: album.tracks[index],
                         index: index,

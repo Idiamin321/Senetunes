@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
 
 class AboutUs extends StatelessWidget {
   @override
@@ -10,7 +10,8 @@ class AboutUs extends StatelessWidget {
       fontStyle: FontStyle.italic,
       color: Theme.of(context).primaryColorDark,
     );
-    TextStyle normalStyle = TextStyle(fontSize: 18, decoration: TextDecoration.none, color: Theme.of(context).primaryColorDark);
+    TextStyle normalStyle = TextStyle(
+        fontSize: 18, decoration: TextDecoration.none, color: Theme.of(context).primaryColorDark);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
@@ -108,7 +109,9 @@ class AboutUs extends StatelessWidget {
                       TextSpan(
                           text:
                               'Avec les partenariats qui sont prévus avec les artistes et maisons de production Sénégalaise, SENETUNES revisitera le répertoire des morceaux qui ont marqué l’histoire de la musique Sénégalaise. Tous les internautes seront servis, du plus âgé au  plus jeunes.\n\n'),
-                      TextSpan(text: 'SENETUNES est ouvert à tous les artistes Sénégalais et cela sans exception.\n\n'),
+                      TextSpan(
+                          text:
+                              'SENETUNES est ouvert à tous les artistes Sénégalais et cela sans exception.\n\n'),
                     ],
                   ),
                 ),

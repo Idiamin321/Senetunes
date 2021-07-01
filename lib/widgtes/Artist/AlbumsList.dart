@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/widgtes/Album/AlbumFavouriteButton.dart';
-import 'package:flutter_rekord_app/widgtes/Album/AlbumTileActions.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseImage.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/widgtes/Album/AlbumFavouriteButton.dart';
+import 'package:senetunes/widgtes/Album/AlbumTileActions.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
 
 class AlbumsList extends StatelessWidget with BaseMixins {
   final List<Album> albums;

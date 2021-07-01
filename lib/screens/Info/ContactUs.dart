@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
 
 class ContactUs extends StatelessWidget {
   @override
@@ -10,7 +10,8 @@ class ContactUs extends StatelessWidget {
       fontStyle: FontStyle.italic,
       color: Theme.of(context).primaryColorDark,
     );
-    TextStyle normalStyle = TextStyle(fontSize: 18, decoration: TextDecoration.none, color: Theme.of(context).primaryColorDark);
+    TextStyle normalStyle = TextStyle(
+        fontSize: 18, decoration: TextDecoration.none, color: Theme.of(context).primaryColorDark);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
@@ -34,7 +35,8 @@ class ContactUs extends StatelessWidget {
                         text: 'Contactez nous\n',
                         style: titleStyle,
                       ),
-                      TextSpan(text: 'HENTECH , DAKAR, CITE MIXTA, ROUTE DE L\'AEROPORT, B27B22\n\n'),
+                      TextSpan(
+                          text: 'HENTECH , DAKAR, CITE MIXTA, ROUTE DE L\'AEROPORT, B27B22\n\n'),
                     ],
                   ),
                 ),

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Artist.dart';
-
-import 'package:flutter_rekord_app/screens/Artist/ArtistDetailScreen.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/screens/Artist/ArtistDetailScreen.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 class ArtistCard extends StatelessWidget with BaseMixins {
   final int index;
@@ -49,11 +47,8 @@ class ArtistCard extends StatelessWidget with BaseMixins {
               );
             }).toList(),
             onChanged: (_) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ArtistDetailScreen(artist: artist)));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ArtistDetailScreen(artist: artist)));
             },
           )),
     );

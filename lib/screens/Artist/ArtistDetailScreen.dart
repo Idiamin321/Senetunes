@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Artist.dart';
-import 'package:flutter_rekord_app/widgtes/Artist/AlbumsList.dart';
-import 'package:flutter_rekord_app/widgtes/Artist/TrackTileForArtist.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/widgtes/Artist/AlbumsList.dart';
+import 'package:senetunes/widgtes/Artist/TrackTileForArtist.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 class ArtistDetailScreen extends StatelessWidget with BaseMixins {
   final Artist artist;

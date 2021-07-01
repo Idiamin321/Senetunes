@@ -1,4 +1,4 @@
-package com.example.flutter_rekord_app
+package com.senetunes.senetunes
 
 import io.flutter.embedding.android.FlutterActivity
 

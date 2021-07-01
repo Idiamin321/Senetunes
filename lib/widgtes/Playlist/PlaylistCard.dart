@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/providers/PlaylistProvider.dart';
-import 'package:flutter_rekord_app/widgtes/ImagePreview.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/providers/PlaylistProvider.dart';
+import 'package:senetunes/widgtes/ImagePreview.dart';
 
 class PlaylistCard extends StatefulWidget {
   PlaylistCard({this.playlistName, this.playlistRemove});
@@ -69,7 +69,11 @@ class _PlaylistCardState extends State<PlaylistCard> {
               ),
               Expanded(
                   flex: 3,
-                  child: ImagePreview(images: playlist.map((e) => playlistProvider.findTrack(e, context).albumInfo.media.thumbnail).toList())),
+                  child: ImagePreview(
+                      images: playlist
+                          .map((e) =>
+                              playlistProvider.findTrack(e, context).albumInfo.media.thumbnail)
+                          .toList())),
             ],
           ),
         ),

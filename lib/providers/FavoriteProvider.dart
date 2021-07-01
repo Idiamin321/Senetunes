@@ -1,8 +1,7 @@
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/BaseProvider.dart';
-
 import 'package:localstorage/localstorage.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/BaseProvider.dart';
 
 const String trackLocalStorageSearch = 'TrackLocalStorageSearch';
 const String trackFavoriteList = 'TrackFavoriteList';
@@ -68,8 +67,7 @@ class FavoriteProvider extends BaseProvider {
     notifyListeners();
     LocalStorage localStorage = LocalStorage(trackLocalStorageSearch);
     await localStorage.ready;
-    List<Track> favoriteList =
-        (localStorage.getItem(trackFavoriteList) ?? []).map<Track>((item) {
+    List<Track> favoriteList = (localStorage.getItem(trackFavoriteList) ?? []).map<Track>((item) {
       return Track.fromJson(item);
     }).toList();
     LocalStorage albumStorage = LocalStorage(albumLocalStorageSearch);

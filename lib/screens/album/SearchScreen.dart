@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
-import 'package:flutter_rekord_app/widgtes/Search/SearchBox.dart';
-import 'package:flutter_rekord_app/widgtes/common/CustomCircularProgressIndicator.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackTile.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+import 'package:senetunes/widgtes/Search/SearchBox.dart';
+import 'package:senetunes/widgtes/common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreen({Key key}) : super(key: key);

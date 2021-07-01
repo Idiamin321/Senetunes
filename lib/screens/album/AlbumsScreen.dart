@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Album/AlbumTile.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseConnectivity.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScaffold.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
+import 'package:senetunes/widgtes/Album/AlbumTile.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/BaseScaffold.dart';
 
 class AlbumsScreen extends StatelessWidget with BaseMixins {
   final ScrollController scrollController = new ScrollController();
@@ -48,7 +48,8 @@ class AlbumsScreen extends StatelessWidget with BaseMixins {
                   itemCount: p.allAlbums.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: responsive(context, isSmallPhone: 2, isPhone: 2, isTablet: 4),
-                      childAspectRatio: responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
+                      childAspectRatio:
+                          responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
                   itemBuilder: (context, index) {
                     return _buildGridItem(context, p.allAlbums[index]);
                   },

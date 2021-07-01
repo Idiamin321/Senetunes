@@ -1,4 +1,4 @@
-// import 'package:flutter_rekord_app/models/Artist.dart';
+// import 'package:senetunes/models/Artist.dart';
 // import 'package:json_annotation/json_annotation.dart';
 //
 // import 'Album.dart';

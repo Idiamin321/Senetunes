@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/models/Artist.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
 class ArtistCircleAvatar extends StatelessWidget {
   final double height;
   final double width;
-  const ArtistCircleAvatar(
-      {Key key, @required this.artist, this.height, this.width})
+  const ArtistCircleAvatar({Key key, @required this.artist, this.height, this.width})
       : super(key: key);
 
   final Artist artist;

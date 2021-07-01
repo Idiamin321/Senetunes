@@ -1,4 +1,4 @@
-import 'package:flutter_rekord_app/models/Artist.dart';
+import 'package:senetunes/models/Artist.dart';
 
 import 'Media.dart';
 import 'Track.dart';

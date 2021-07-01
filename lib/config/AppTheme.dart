@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppColors.dart';
+import 'package:senetunes/config/AppColors.dart';
 
 class AppTheme {
   AppTheme._();

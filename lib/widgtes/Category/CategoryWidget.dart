@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Category.dart';
-import 'package:flutter_rekord_app/widgtes/Common/WidgetHeader.dart';
-import 'package:flutter_rekord_app/widgtes/ImagePreview.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Category.dart';
+import 'package:senetunes/widgtes/Common/WidgetHeader.dart';
+import 'package:senetunes/widgtes/ImagePreview.dart';
 
 class CategoryWidget extends StatelessWidget with BaseMixins {
   final List<Category> categories;
@@ -39,7 +39,12 @@ class CategoryWidget extends StatelessWidget with BaseMixins {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ImagePreview(
-                            images: [category.albums.firstWhere((e) => e.media.thumbnail != null).media.thumbnail],
+                            images: [
+                              category.albums
+                                  .firstWhere((e) => e.media.thumbnail != null)
+                                  .media
+                                  .thumbnail
+                            ],
                           ),
                           //  albumCard(album.media.thumbnail, 100, 100),
                           Padding(

@@ -1,7 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseImage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
 class ImageInput extends StatefulWidget {
   final Function onSelect;
@@ -33,8 +34,7 @@ class _ImageInputState extends State<ImageInput> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text("Pick an Image",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text("Pick an Image", style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(
                   height: 20.0,
                 ),

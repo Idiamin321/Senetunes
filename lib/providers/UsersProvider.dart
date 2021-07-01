@@ -1,7 +1,7 @@
-import 'package:flutter_rekord_app/models/User.dart';
-import 'package:flutter_rekord_app/providers/BaseProvider.dart';
 import 'dart:convert';
 
+import 'package:senetunes/models/User.dart';
+import 'package:senetunes/providers/BaseProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UsersProvider extends BaseProvider {

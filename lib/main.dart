@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_rekord_app/config/AppProvider.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/config/AppTheme.dart';
-import 'package:flutter_rekord_app/providers/ThemeProvider.dart';
-import 'package:flutter_rekord_app/screens/Auth/LoginScreen.dart';
-import 'package:flutter_rekord_app/screens/exploreScreen.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppProvider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/config/AppTheme.dart';
+import 'package:senetunes/providers/ThemeProvider.dart';
+import 'package:senetunes/screens/Auth/LoginScreen.dart';
+import 'package:senetunes/screens/exploreScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/Applocalizations.dart';

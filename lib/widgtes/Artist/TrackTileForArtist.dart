@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Artist.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
-import 'package:flutter_rekord_app/widgtes/Track/TrackTile.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+import 'package:senetunes/widgtes/Track/TrackTile.dart';
 
 class TrakTileForArtist extends StatelessWidget with BaseMixins {
   const TrakTileForArtist({

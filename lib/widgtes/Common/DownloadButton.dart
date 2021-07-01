@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rekord_app/config/AppColors.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/DownloadProvider.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/DownloadProvider.dart';
 
 import 'PopOverWidget.dart';
 
@@ -34,7 +34,8 @@ class DownloadButton extends StatelessWidget {
               popoverDirection: PopoverDirection.top);
         else if (album != null)
           await context.read<DownloadProvider>().downloadAlbum(album, context);
-        else if (track != null) await context.read<DownloadProvider>().downloadAudio(track, context);
+        else if (track != null)
+          await context.read<DownloadProvider>().downloadAudio(track, context);
       },
     );
   }

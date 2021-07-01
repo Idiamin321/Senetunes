@@ -1,14 +1,14 @@
-import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
-import 'package:flutter_rekord_app/providers/ArtistProvider.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/providers/CategoryProvider.dart';
-import 'package:flutter_rekord_app/providers/FavoriteProvider.dart';
-import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
-import 'package:flutter_rekord_app/providers/ThemeProvider.dart';
-import 'package:flutter_rekord_app/providers/UsersProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
+import 'package:senetunes/providers/ArtistProvider.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/CategoryProvider.dart';
+import 'package:senetunes/providers/FavoriteProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/providers/ThemeProvider.dart';
+import 'package:senetunes/providers/UsersProvider.dart';
 
 import '../providers/DownloadProvider.dart';
 import '../providers/PlaylistProvider.dart';

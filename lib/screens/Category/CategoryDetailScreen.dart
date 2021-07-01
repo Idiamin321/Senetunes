@@ -1,14 +1,14 @@
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Category.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Album/AlbumTile.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseConnectivity.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Category.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/widgtes/Album/AlbumTile.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
   @override
@@ -67,7 +67,10 @@ class _CategoryDetailScreen extends State<CategoryDetailScreen> with BaseMixins 
                                 height: 0,
                                 margin: EdgeInsets.only(bottom: 20),
                                 child: ExpandableText(category.description,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.primary, height: 1.5, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        height: 1.5,
+                                        fontSize: 12),
                                     expandText: $t(context, 'show_more'),
                                     collapseText: $t(
                                       context,

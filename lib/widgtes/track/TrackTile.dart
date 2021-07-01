@@ -1,14 +1,14 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/DownloadProvider.dart';
-import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackFavouriteButton.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackTileActions.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/DownloadProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/track/TrackFavouriteButton.dart';
+import 'package:senetunes/widgtes/track/TrackTileActions.dart';
 
 import 'TrackPlayButton.dart';
 

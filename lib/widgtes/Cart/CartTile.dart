@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppColors.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseImage.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
 import '../../providers/CartProvider.dart';
 

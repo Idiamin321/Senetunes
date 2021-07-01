@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/providers/PlaylistProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseScreenHeading.dart';
-import 'package:flutter_rekord_app/widgtes/Playlist/PlaylistCard.dart';
-import 'package:flutter_rekord_app/widgtes/Search/BaseMessageScreen.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/providers/PlaylistProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Playlist/PlaylistCard.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
 
 class PlaylistScreen extends StatelessWidget with BaseMixins {
   @override

@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_rekord_app/models/User.dart';
-import 'package:flutter_rekord_app/providers/BaseProvider.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:senetunes/models/User.dart';
+import 'package:senetunes/providers/BaseProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart';
 

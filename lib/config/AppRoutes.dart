@@ -8,25 +8,25 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/screens/Artist/ArtistDetailScreen.dart';
-import 'package:flutter_rekord_app/screens/Artist/ArtistsScreen.dart';
-import 'package:flutter_rekord_app/screens/Auth/ConfirmationScreen.dart';
-import 'package:flutter_rekord_app/screens/Auth/LoginScreen.dart';
-import 'package:flutter_rekord_app/screens/Auth/RegisterScreen.dart';
-import 'package:flutter_rekord_app/screens/Auth/UserAccountPage.dart';
-import 'package:flutter_rekord_app/screens/Bought%20Albums/BoughtAlbumsDetailsScreen.dart';
-import 'package:flutter_rekord_app/screens/Bought%20Albums/BoughtAlbumsScreen.dart';
-import 'package:flutter_rekord_app/screens/Download/DownloadDetailsScreen.dart';
-import 'package:flutter_rekord_app/screens/Info/AboutUs.dart';
-import 'package:flutter_rekord_app/screens/Info/ContactUs.dart';
-import 'package:flutter_rekord_app/screens/PlayerScreen.dart';
-import 'package:flutter_rekord_app/screens/Playlist/PlaylistDetailsScreen.dart';
-import 'package:flutter_rekord_app/screens/Playlist/PlaylistScreen.dart';
-import 'package:flutter_rekord_app/screens/WebView/WebView.dart';
-import 'package:flutter_rekord_app/screens/album/AlbumDetailScreen.dart';
-import 'package:flutter_rekord_app/screens/album/AlbumsScreen.dart';
-import 'package:flutter_rekord_app/screens/exploreScreen.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAuthCheck.dart';
+import 'package:senetunes/screens/Artist/ArtistDetailScreen.dart';
+import 'package:senetunes/screens/Artist/ArtistsScreen.dart';
+import 'package:senetunes/screens/Auth/ConfirmationScreen.dart';
+import 'package:senetunes/screens/Auth/LoginScreen.dart';
+import 'package:senetunes/screens/Auth/RegisterScreen.dart';
+import 'package:senetunes/screens/Auth/UserAccountPage.dart';
+import 'package:senetunes/screens/Bought%20Albums/BoughtAlbumsDetailsScreen.dart';
+import 'package:senetunes/screens/Bought%20Albums/BoughtAlbumsScreen.dart';
+import 'package:senetunes/screens/Download/DownloadDetailsScreen.dart';
+import 'package:senetunes/screens/Info/AboutUs.dart';
+import 'package:senetunes/screens/Info/ContactUs.dart';
+import 'package:senetunes/screens/PlayerScreen.dart';
+import 'package:senetunes/screens/Playlist/PlaylistDetailsScreen.dart';
+import 'package:senetunes/screens/Playlist/PlaylistScreen.dart';
+import 'package:senetunes/screens/WebView/WebView.dart';
+import 'package:senetunes/screens/album/AlbumDetailScreen.dart';
+import 'package:senetunes/screens/album/AlbumsScreen.dart';
+import 'package:senetunes/screens/exploreScreen.dart';
+import 'package:senetunes/widgtes/Common/BaseAuthCheck.dart';
 
 import '../screens/Cart/Cart.dart';
 import '../screens/Category/CategoryDetailScreen.dart';

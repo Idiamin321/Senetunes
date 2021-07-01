@@ -1,13 +1,13 @@
 import 'package:app_review/app_review.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-import 'package:flutter_rekord_app/providers/CartProvider.dart';
-import 'package:flutter_rekord_app/providers/ThemeProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Common/CustomCircularProgressIndicator.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/ThemeProvider.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
 
 import '../../widgtes/Common/BaseAppBar.dart';
 

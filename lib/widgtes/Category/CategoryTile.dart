@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Category.dart';
-import 'package:flutter_rekord_app/providers/CategoryProvider.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Category.dart';
+import 'package:senetunes/providers/CategoryProvider.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 class CategoryTile extends StatelessWidget with BaseMixins {
   final Category category;

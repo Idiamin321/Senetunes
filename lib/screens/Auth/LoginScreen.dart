@@ -4,14 +4,14 @@ import 'package:dio/dio.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/config/AppValidation_rules.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/User.dart';
-import 'package:flutter_rekord_app/providers/AuthProvider.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseBlocButton.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseAppIcon.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/config/AppValidation_rules.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/User.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseBlocButton.dart';
+import 'package:senetunes/widgtes/common/BaseAppIcon.dart';
 import 'package:xml2json/xml2json.dart';
 
 class LoginScreen extends StatefulWidget {

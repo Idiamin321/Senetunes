@@ -1,39 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/config/AppRoutes.dart';
-import 'package:flutter_rekord_app/models/Artist.dart';
-import 'package:flutter_rekord_app/screens/Artist/ArtistDetailScreen.dart';
-import 'package:flutter_rekord_app/widgtes/Common/WidgetHeader.dart';
-import 'package:flutter_rekord_app/widgtes/common/BaseImage.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/screens/Artist/ArtistDetailScreen.dart';
+import 'package:senetunes/widgtes/Common/WidgetHeader.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 class ArtistWidget extends StatelessWidget {
   final List<Artist> artists;
   final String title;
   ArtistWidget({this.artists, this.title});
 
-  _buildSliderItem(
-      BuildContext context, Artist artist, index, artists, height, width) {
+  _buildSliderItem(BuildContext context, Artist artist, index, artists, height, width) {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ArtistDetailScreen(artist: artist)));
+            context, MaterialPageRoute(builder: (context) => ArtistDetailScreen(artist: artist)));
       },
       child: Column(
         children: [
           Expanded(
             child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 child: Column(
                   children: [
-                    artist.media.thumbnail == null ? Container():
-                    BaseImage(
-                      imageUrl: artist.media.thumbnail,
-                      height: 60,
-                      width: 60,
-                      radius: 50,
-                    ),
+                    artist.media.thumbnail == null
+                        ? Container()
+                        : BaseImage(
+                            imageUrl: artist.media.thumbnail,
+                            height: 60,
+                            width: 60,
+                            radius: 50,
+                          ),
                     SizedBox(height: 10),
                     Text(
                       artist.name,
@@ -65,8 +62,7 @@ class ArtistWidget extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemCount: artists.length,
             itemBuilder: (context, index) {
-              return _buildSliderItem(
-                  context, artists[index], index, artists, height, width);
+              return _buildSliderItem(context, artists[index], index, artists, height, width);
             },
           ),
         ),

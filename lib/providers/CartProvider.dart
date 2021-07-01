@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
 
 import '../models/Album.dart';
 import 'AuthProvider.dart';

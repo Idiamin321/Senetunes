@@ -1,10 +1,10 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rekord_app/models/Album.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
 
 class TrackPlayButton extends StatelessWidget {
   final Function onPressed;
@@ -40,7 +40,8 @@ class TrackPlayButton extends StatelessWidget {
                           ),
                     onPressed: () => onPressed != null
                         ? onPressed()
-                        : p.handlePlayButton(album: album, track: track, index: index, context: context
+                        : p.handlePlayButton(
+                            album: album, track: track, index: index, context: context
                             //search results list
                             )),
           );

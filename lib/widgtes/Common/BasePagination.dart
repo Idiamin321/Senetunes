@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rekord_app/widgtes/common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/common/CustomCircularProgressIndicator.dart';
 
 class BasePagination extends StatelessWidget {
   final ScrollController scrollController;
@@ -7,14 +7,12 @@ class BasePagination extends StatelessWidget {
   final Function method;
   final bool loading;
 
-  BasePagination(
-      {this.scrollController, this.child, this.method, this.loading});
+  BasePagination({this.scrollController, this.child, this.method, this.loading});
 
   bool onNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification) {
       if (scrollController.position.maxScrollExtent > scrollController.offset &&
-          scrollController.position.maxScrollExtent - scrollController.offset <=
-              200 &&
+          scrollController.position.maxScrollExtent - scrollController.offset <= 200 &&
           !loading) {
         method();
       }

@@ -1,22 +1,22 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
-import 'package:flutter_rekord_app/models/Track.dart';
-import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
-import 'package:flutter_rekord_app/screens/Track/TrackDetailsScreen.dart';
-import 'package:flutter_rekord_app/widgtes/Album//AlbumTileActions.dart';
-import 'package:flutter_rekord_app/widgtes/Common/Animations/AnimationRotate.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
-import 'package:flutter_rekord_app/widgtes/Common/BaseImage.dart';
-import 'package:flutter_rekord_app/widgtes/Common/DownloadButton.dart';
-import 'package:flutter_rekord_app/widgtes/Common/PopOverWidget.dart';
-import 'package:flutter_rekord_app/widgtes/Playlist/PlaylistChoice.dart';
-import 'package:flutter_rekord_app/widgtes/PositionSeekWidget.dart';
-import 'package:flutter_rekord_app/widgtes/track/TrackFavouriteButton.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/screens/Track/TrackDetailsScreen.dart';
+import 'package:senetunes/widgtes/Album//AlbumTileActions.dart';
+import 'package:senetunes/widgtes/Common/Animations/AnimationRotate.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/widgtes/Common/DownloadButton.dart';
+import 'package:senetunes/widgtes/Common/PopOverWidget.dart';
+import 'package:senetunes/widgtes/Playlist/PlaylistChoice.dart';
+import 'package:senetunes/widgtes/PositionSeekWidget.dart';
+import 'package:senetunes/widgtes/track/TrackFavouriteButton.dart';
 
 class PlayerScreen extends StatefulWidget with BaseMixins {
   @override
