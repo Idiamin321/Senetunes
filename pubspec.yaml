@@ -99,5 +99,6 @@ flutter_native_splash:
 
 flutter_icons:
   image_path: assets/images/logo.png
+  image_path_ios: assets/images/logo_ios.png
   android: true
   ios: true
