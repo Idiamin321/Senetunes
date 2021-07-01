@@ -23,7 +23,6 @@ import '../widgtes/Common/BaseDrawer.dart';
 
 class ExploreScreen extends StatelessWidget with BaseMixins {
   final ScrollController scrollController = new ScrollController();
-
   void requestStorageAccess() async {
     var status = await Permission.storage.status;
     if (!status.isGranted) {
@@ -60,6 +59,7 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
         drawer: BaseDrawer(),
         body: BaseConnectivity(
           child: BaseScaffold(
+            isHome: true,
             isLoaded: albumProvider.isLoaded && artistProvider.isLoaded,
             // scrollController: scrollController,
             child: DefaultTabController(

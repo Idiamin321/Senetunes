@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_rekord_app/providers/AlbumProvider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -47,11 +48,10 @@ class CartProvider extends BaseProvider {
       );
       var body = jsonDecode(response.body);
       completed = body['status'];
+      print(completed);
       if (completed == 'completed') {
-        await boughtSuccessful(context, email);
+        await _boughtSuccessful(context, email);
       }
-
-      notifyListeners();
     }
   }
 
@@ -74,7 +74,6 @@ class CartProvider extends BaseProvider {
           "description": description
         },
         "store": {"name": "Senetunes"},
-        "custom_data": {"currency": "EUR"},
         "actions": {"callback_url": "http://www.magasin-le-choco.com/callback_url.php"}
       },
     );
@@ -95,7 +94,8 @@ class CartProvider extends BaseProvider {
     return request;
   }
 
-  boughtSuccessful(BuildContext context, String email) async {
+  _boughtSuccessful(BuildContext context, String email) async {
+    print("ASDAKLSDNASLDNALSDNASD");
     for (Album album in cart) {
       http.Response response;
       String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
@@ -120,10 +120,12 @@ class CartProvider extends BaseProvider {
       );
       print(response.body);
     }
+    request = null;
     clearCart();
     await context.read<AuthProvider>().fetchBoughtAlbums(context.read<AuthProvider>().user.email);
     await context
         .read<AlbumProvider>()
         .updateBoughtAlbums(context.read<AuthProvider>().boughtAlbumsIds);
+    notifyListeners();
   }
 }

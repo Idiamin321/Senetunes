@@ -75,7 +75,8 @@ class _LoginScreenState extends State<LoginScreen> with BaseMixins {
         ).show(context);
       } else {
         provider.setUser(User.fromJson(jsonMap));
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        Navigator.popAndPushNamed(context, AppRoutes.home);
+        // Navigator.pushReplacementNamed(context, AppRoutes.home);
       }
     }
   }

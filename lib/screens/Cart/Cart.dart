@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rekord_app/config/AppRoutes.dart';
 import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
+import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:flutter_rekord_app/providers/CartProvider.dart';
 import 'package:flutter_rekord_app/widgtes/Cart/CartTile.dart';
 import 'package:flutter_rekord_app/widgtes/Common/BaseAppBar.dart';
@@ -25,6 +26,8 @@ class _CartState extends State<Cart> with BaseMixins {
 
   @override
   Widget build(BuildContext context) {
+    cartProvider.getResponse(context, context.read<AuthProvider>().user.email);
+    print("here!");
     return Container(
       child: Scaffold(
         appBar: PreferredSize(
@@ -88,6 +91,7 @@ class _CartState extends State<Cart> with BaseMixins {
                           print(request);
                           if (request['response_code'] == '00') {
                             cartProvider.url = request['response_text'];
+                            Navigator.popAndPushNamed(context, AppRoutes.boughtAlbumsScreenRoute);
                             Navigator.pushNamed(context, AppRoutes.webView,
                                 arguments: Tuple2('Paydunya', cartProvider.url));
                           }

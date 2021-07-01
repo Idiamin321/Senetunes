@@ -12,7 +12,6 @@ import 'package:flutter_rekord_app/screens/Artist/ArtistDetailScreen.dart';
 import 'package:flutter_rekord_app/screens/Artist/ArtistsScreen.dart';
 import 'package:flutter_rekord_app/screens/Auth/ConfirmationScreen.dart';
 import 'package:flutter_rekord_app/screens/Auth/LoginScreen.dart';
-import 'package:flutter_rekord_app/screens/Auth/ProfileEditScreen.dart';
 import 'package:flutter_rekord_app/screens/Auth/RegisterScreen.dart';
 import 'package:flutter_rekord_app/screens/Auth/UserAccountPage.dart';
 import 'package:flutter_rekord_app/screens/Bought%20Albums/BoughtAlbumsDetailsScreen.dart';
@@ -44,7 +43,7 @@ class AppRoutes {
   static const player = '/player';
   static const loginRoute = '/loginRoute';
   static const registerRoute = '/registerRoute';
-  static const profileEditRoute = '/profileEditRoute';
+  // static const profileEditRoute = '/profileEditRoute';
   static const confirmScreenRoute = '/confirmScreenRoute';
   static const favourites = '/favourites';
   static const userAccountPage = '/userAccountPage';
@@ -76,7 +75,7 @@ class AppRoutes {
             redirect: ExploreScreen(),
             child: RegisterScreen(),
           ),
-      profileEditRoute: (context) => ProfileEditPage(),
+      // profileEditRoute: (context) => ProfileEditPage(),
       confirmScreenRoute: (context) => ConfirmationScreen(),
       favourites: (context) => FavouritesScreen(),
       userAccountPage: (context) => UserAccountPage(),

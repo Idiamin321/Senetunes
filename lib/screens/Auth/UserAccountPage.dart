@@ -52,13 +52,14 @@ class _UserAccountPageState extends State<UserAccountPage> with BaseMixins {
                     ),
                     child: provider.user != null
                         ? ListTile(
-                            title: Text(provider.user.firstName != null ? provider.user.firstName : ""),
+                            title: Text(
+                                provider.user.firstName != null ? provider.user.firstName : ""),
                             subtitle: Text(provider.user.email != null ? provider.user.email : ""),
-                            trailing: Icon(Icons.edit),
-                            onTap: () => Navigator.of(context).pushNamed(
-                              AppRoutes.profileEditRoute,
-                              arguments: provider.user.id, //user.id
-                            ),
+                            // trailing: Icon(Icons.edit),
+                            // onTap: () => Navigator.of(context).pushNamed(
+                            //   AppRoutes.profileEditRoute,
+                            //   arguments: provider.user.id, //user.id
+                            // ),
                           )
                         : Column(
                             children: <Widget>[
@@ -143,7 +144,8 @@ class _UserAccountPageState extends State<UserAccountPage> with BaseMixins {
                             Icons.download_sharp,
                             size: 22,
                           ),
-                          onTap: () => {Navigator.pushNamed(context, AppRoutes.downloadScreenRoute)},
+                          onTap: () =>
+                              {Navigator.pushNamed(context, AppRoutes.downloadScreenRoute)},
                         ),
                         ListTile(
                           title: Text($t(context, 'help')),

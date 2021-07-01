@@ -31,14 +31,17 @@ class _WebViewCartState extends State<WebViewCart> {
   @override
   void initState() {
     flutterWebViewPlugin = FlutterWebviewPlugin();
+    flutterWebViewPlugin.onProgressChanged.listen((event) {
+      setState(() {
+        cartProvider.getResponse(context, context.read<AuthProvider>().user.email);
+      });
+    });
     _onUrlChanged = flutterWebViewPlugin.onUrlChanged.listen((String url) async {
       canGoBack = await flutterWebViewPlugin.canGoBack();
       canGoForward = await flutterWebViewPlugin.canGoForward();
-      if (mounted) {
-        setState(() {
-          cartProvider.getResponse(context, context.read<AuthProvider>().user.email);
-        });
-      }
+      setState(() {
+        cartProvider.getResponse(context, context.read<AuthProvider>().user.email);
+      });
     });
     super.initState();
   }

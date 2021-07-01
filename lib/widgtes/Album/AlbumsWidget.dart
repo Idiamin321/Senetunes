@@ -4,6 +4,7 @@ import 'package:flutter_rekord_app/config/AppColors.dart';
 import 'package:flutter_rekord_app/config/AppRoutes.dart';
 import 'package:flutter_rekord_app/mixins/BaseMixins.dart';
 import 'package:flutter_rekord_app/models/Album.dart';
+import 'package:flutter_rekord_app/providers/AuthProvider.dart';
 import 'package:flutter_rekord_app/providers/CartProvider.dart';
 import 'package:flutter_rekord_app/providers/PlayerProvider.dart';
 import 'package:flutter_rekord_app/widgtes/Common/WidgetHeader.dart';
@@ -144,7 +145,55 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                     ),
                                   ),
                                   onPressed: () {
-                                    context.read<CartProvider>().addAlbum(album);
+                                    if (context.read<AuthProvider>().user == null)
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          backgroundColor:
+                                              Theme.of(context).scaffoldBackgroundColor,
+                                          title: Center(
+                                            child: Icon(
+                                              Icons.warning,
+                                              size: 30,
+                                              color: primary,
+                                            ),
+                                          ),
+                                          content: Text(
+                                            "Vous devez être connecté avant d'acheter un album",
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.popAndPushNamed(
+                                                    context, AppRoutes.loginRoute);
+                                              },
+                                              child: Text(
+                                                $t(
+                                                  context,
+                                                  'sign_in',
+                                                ),
+                                                textAlign: TextAlign.end,
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.popAndPushNamed(
+                                                    context, AppRoutes.registerRoute);
+                                              },
+                                              child: Text(
+                                                $t(
+                                                  context,
+                                                  'create_new_Account',
+                                                ),
+                                                textAlign: TextAlign.end,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    else
+                                      context.read<CartProvider>().addAlbum(album);
                                   },
                                 ),
                               )

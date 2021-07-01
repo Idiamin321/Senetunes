@@ -171,7 +171,8 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
                 titleText: Text($t(context, 'ops')),
                 messageText: Text(response),
               ).show(context)
-            : Navigator.pushReplacementNamed(context, AppRoutes.confirmScreenRoute);
+            : Navigator.popAndPushNamed(context, AppRoutes.confirmScreenRoute);
+        // Navigator.pushReplacementNamed(context, AppRoutes.confirmScreenRoute);
       });
     } else {
       //   If all data are not valid then start auto validation.

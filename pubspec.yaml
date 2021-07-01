@@ -59,6 +59,12 @@ dependencies:
   flutter_downloader: ^1.5.2
   archive: ^2.0.13
   xml:
+  firebase_core:
+  firebase_crashlytics:
+
+
+
+
 
 
 
