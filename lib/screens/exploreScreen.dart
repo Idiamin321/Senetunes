@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -48,6 +49,8 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
     }
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(onPressed: ()=>FirebaseCrashlytics.instance.crash()
+          ,),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: BaseAppBar(
