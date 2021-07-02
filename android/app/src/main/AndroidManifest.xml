@@ -11,7 +11,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Senetunes V2"
+        android:label="Senetunes"
         android:usesCleartextTraffic="true"
         android:extractNativeLibs="true"
         

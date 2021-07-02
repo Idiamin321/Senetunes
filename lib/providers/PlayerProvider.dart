@@ -185,6 +185,7 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
           _isTrackLoaded = false;
           notifyListeners();
           print(track.localPath);
+          print(track.playUrl);
           await player.open(Audio.file(track.localPath)).catchError((e) async => await player.open(
                 Audio.network(track.playUrl),
               ));
