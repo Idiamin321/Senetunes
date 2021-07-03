@@ -164,7 +164,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   addToDownloadSong(Track song) {
     print("added");
-    song.localPath = "${downloadDir.path}/${song.name}";
+    song.localPath = "${downloadDir.path}/${song.name}.mp3";
     _downloadSongs.add(song);
     _downloadedAlbums.add(song.albumInfo);
     _downloadedArtists.add(song.artistInfo);
@@ -328,7 +328,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
       _tasks.add(task);
       task.taskId = await FlutterDownloader.enqueue(
           url: task.track.playUrl,
-          fileName: task.track.name,
+          fileName: "${task.track.name}.mp3",
           savedDir: localPath,
           showNotification: true,
           openFileFromNotification: false);

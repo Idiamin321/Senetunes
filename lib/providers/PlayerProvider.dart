@@ -1,5 +1,9 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:dio/dio.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/config/AppRoutes.dart';
@@ -186,15 +190,24 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
           notifyListeners();
           print(track.localPath);
           print(track.playUrl);
-          await player.open(Audio.file(track.localPath)).catchError((e) async => await player.open(
-                Audio.network(track.playUrl),
+          final directory = await getTemporaryDirectory();
+          Dio dio = Dio();
+          await dio.download(track.playUrl, "${directory.path}/${track.playUrl}.mp3");
+          await player.open(Audio.file(track.localPath),showNotification: true).catchError((e) async => await player.open(
+                Audio.file("${directory.path}/${track.playUrl}.mp3"),showNotification: true,
               ));
           _isTrackLoaded = true;
           notifyListeners();
           setPlaying(album, index, track);
         }
-      } catch (t) {
+      } on PlatformException catch (t,stacktrace) {
         //mp3 unreachable
+        await FirebaseCrashlytics.instance.recordError(
+            t,
+            stacktrace,
+            reason: 'a fatal error',
+            // Pass in 'fatal' argument
+            printDetails: true);
       }
     } else {
       showDialog(

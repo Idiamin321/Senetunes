@@ -24,15 +24,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
+
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Required usage description for a Flutter dependency</string>
+	<string>Required usage for a Flutter dependency</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Required usage description for a Flutter dependency</string>
+	<string>Required usage for a Flutter dependency</string>
+
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -59,9 +56,14 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSAppTransportSecurity</key>
+
+
+    <key>NSAppTransportSecurity</key>
     <dict>
-        <key>NSAllowsArbitraryLoads</key><true/>
+           <key>NSAllowsArbitraryLoads</key> <true/>
+           <key>NSAllowsArbitraryLoadsForMedia</key> <true/>
+           <key>NSAllowsArbitraryLoadsInWebContent</key> <true/>
+           <key>NSAllowsLocalNetworking</key> <true/>
     </dict>
     <key>FDAllFilesDownloadedMessage</key>
         <string>Téléchargement complété</string>
