@@ -29,7 +29,8 @@
 	<string>Required usage for a Flutter dependency</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Required usage for a Flutter dependency</string>
-
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Required usage for a Flutter dependency</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
