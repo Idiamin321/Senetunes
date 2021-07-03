@@ -53,21 +53,21 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
     }
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: ()async {
-            try {
-              final directory = await getTemporaryDirectory();
-              Dio dio = Dio();
-              Response r = await dio.download("http://www.senetunes.com/download/17c456468621afde34d4a84cbf019ab88d331957", "${directory.path}/temp.mp3");
-              print(r.statusCode);
-              final player = AudioPlayer();
-              var duration = await player.setFilePath(
-                  "${directory.path}/temp.mp3");
-              await player.play();
-            } on PlayerException catch(e,t){
-              await FirebaseCrashlytics.instance.recordError(e, t);
-      }}
-        ),
+      //   floatingActionButton: FloatingActionButton(
+      //     onPressed: ()async {
+      //       try {
+      //         final directory = await getTemporaryDirectory();
+      //         Dio dio = Dio();
+      //         Response r = await dio.download("http://www.senetunes.com/download/17c456468621afde34d4a84cbf019ab88d331957", "${directory.path}/temp.mp3");
+      //         print(r.statusCode);
+      //         final player = AudioPlayer();
+      //         var duration = await player.setFilePath(
+      //             "${directory.path}/temp.mp3");
+      //         await player.play();
+      //       } on PlayerException catch(e,t){
+      //         await FirebaseCrashlytics.instance.recordError(e, t);
+      // }}
+      //   ),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: BaseAppBar(
