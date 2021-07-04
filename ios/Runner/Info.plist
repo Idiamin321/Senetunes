@@ -20,19 +20,39 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FDAllFilesDownloadedMessage</key>
+	<string>Téléchargement complété</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Required usage for a Flutter dependency</string>
+	<key>NSMicrophoneUsageDescription</key>
 	<string>Required usage for a Flutter dependency</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Required usage for a Flutter dependency</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Required usage for a Flutter dependency</string>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>audio</string>
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
@@ -57,16 +77,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-
-
-    <key>NSAppTransportSecurity</key>
-    <dict>
-           <key>NSAllowsArbitraryLoads</key> <true/>
-           <key>NSAllowsArbitraryLoadsForMedia</key> <true/>
-           <key>NSAllowsArbitraryLoadsInWebContent</key> <true/>
-           <key>NSAllowsLocalNetworking</key> <true/>
-    </dict>
-    <key>FDAllFilesDownloadedMessage</key>
-        <string>Téléchargement complété</string>
 </dict>
 </plist>

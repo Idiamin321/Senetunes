@@ -178,13 +178,13 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     List<Album> albums = _downloadedAlbums.toList();
     List<Artist> artists = _downloadedArtists.toList();
     await localStorage.setItem(trackDownloadList, _downloadSongs,
-        (Object x) => (x as List<Track>).map((e) => e.toJson()).toList());
+            (Object x) => (x as List<Track>).map((e) => e.toJson()).toList());
     await localStorage.ready;
     await localStorage.setItem(AlbumDownloadList, albums,
-        (Object x) => (x as List<Album>).map((e) => e.toJson()).toList());
+            (Object x) => (x as List<Album>).map((e) => e.toJson()).toList());
     await localStorage.ready;
     await localStorage.setItem(ArtistDownloadList, artists,
-        (Object x) => (x as List<Artist>).map((e) => e.toJson()).toList());
+            (Object x) => (x as List<Artist>).map((e) => e.toJson()).toList());
   }
 
   getDownloads() async {

@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +12,7 @@ import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/providers/AuthProvider.dart';
 import 'package:senetunes/providers/CategoryProvider.dart';
 import 'package:senetunes/providers/DownloadProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
 import 'package:senetunes/providers/PlaylistProvider.dart';
 import 'package:senetunes/widgtes/Album/AlbumsWidget.dart';
 import 'package:senetunes/widgtes/Artist/ArtistCarousel/ArtistWidget.dart';
@@ -40,6 +43,7 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
     ArtistProvider artistProvider = context.watch<ArtistProvider>();
     CategoryProvider categoryProvider = context.watch<CategoryProvider>();
     AuthProvider authProvider = context.watch<AuthProvider>();
+    PlayerProvider playerProvider = context.watch<PlayerProvider>();
     context.read<PlaylistProvider>().getPlaylists();
     requestStorageAccess();
     if (albumProvider.isLoaded && artistProvider.isLoaded) {
@@ -55,14 +59,36 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
       //   floatingActionButton: FloatingActionButton(
       //     onPressed: ()async {
       //       try {
-      //         final directory = await getTemporaryDirectory();
-      //         Dio dio = Dio();
-      //         Response r = await dio.download("http://www.senetunes.com/download/17c456468621afde34d4a84cbf019ab88d331957", "${directory.path}/temp.mp3");
-      //         print(r.statusCode);
-      //         final player = AudioPlayer();
-      //         var duration = await player.setFilePath(
-      //             "${directory.path}/temp.mp3");
-      //         await player.play();
+      //         var player = AudioPlayer();
+      //         // final directory = await getTemporaryDirectory();
+      //         // Dio dio = Dio();
+      //
+      //         // Response response = await dio.get(
+      //         //   url,
+      //         //   onReceiveProgress: (received,total){if (total != -1) {
+      //         //   print((received / total * 100).toStringAsFixed(0) + "%");
+      //         // }},
+      //         //   //Received data with List<int>
+      //         //   options: Options(
+      //         //       responseType: ResponseType.bytes,
+      //         //       followRedirects: true,
+      //         //       validateStatus: (status) {
+      //         //         return status < 500;
+      //         //       }),
+      //         // );
+      //         // var duration = await player.setFilePath(
+      //         //     "${directory.path}/temp.mp3");
+      //         // print(response.headers);
+      //         // File file = File("${directory.path}/temp.mp3");
+      //         // var raf = file.openSync(mode: FileMode.write);
+      //         // // response.data is List<int> type
+      //         // raf.writeFrom(response.data).asStream().listen((event) { player.play();});
+      //         var url = "http://www.senetunes.com/download/17c456468621afde34d4a84cbf019ab88d331957";;
+      //         WebSocketChannel.connect(
+      //           Uri.parse('wss://echo.websocket.org'),
+      //         );
+      //         // await raf.close();
+      //
       //       } on PlayerException catch(e,t){
       //         await FirebaseCrashlytics.instance.recordError(e, t);
       // }}
@@ -79,7 +105,7 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
         body: BaseConnectivity(
           child: BaseScaffold(
             isHome: true,
-            isLoaded: albumProvider.isLoaded && artistProvider.isLoaded,
+            isLoaded: albumProvider.isLoaded && artistProvider.isLoaded&&playerProvider.isLoaded,
             // scrollController: scrollController,
             child: DefaultTabController(
               length: 2,

@@ -11,14 +11,22 @@ import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Album.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/providers/CartProvider.dart';
-
+import 'dart:io';
 class PlayerProvider extends ChangeNotifier with BaseMixins {
   final AssetsAudioPlayer player = AssetsAudioPlayer();
+  var directory;
 
-  PlayerProvider() {
+  PlayerProvider(){
+    init();
+  }
+
+  init()async{
+    _isLoaded = false;
+    directory = await getTemporaryDirectory();
     player.playlistAudioFinished.listen((Playing playing) {
       next(action: false);
     });
+    _isLoaded = true;
   }
 
   Album _currentAlbum;
@@ -30,6 +38,8 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   Track _currentTrack;
   Track get currentTrack => _currentTrack;
 
+  bool _isLoaded = false;
+  bool get isLoaded => _isLoaded;
   bool _loopMode = false;
   bool get loopMode => _loopMode;
   bool _loopPlaylist = false;
@@ -156,7 +166,7 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   isTrackInProgress(Track track) {
     return player.isPlaying.value &&
         player.current.value != null &&
-        player.current.value.audio.assetAudioPath == track.playUrl;
+        player.current.value.audio.assetAudioPath == '${directory.path}/${track.playUrl}.mp3';
   }
 
   isLocalTrackInProgress(filePath) {
@@ -190,15 +200,44 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
           notifyListeners();
           print(track.localPath);
           print(track.playUrl);
-          final directory = await getTemporaryDirectory();
-          Dio dio = Dio();
-          await dio.download(track.playUrl, "${directory.path}/${track.playUrl}.mp3");
-          await player.open(Audio.file(track.localPath),showNotification: true).catchError((e) async => await player.open(
-                Audio.file("${directory.path}/${track.playUrl}.mp3"),showNotification: true,
-              ));
+          if(track.localPath != null)
+            await player.open(Audio.file(track.localPath),showNotification: true).catchError((e)=>print(e));
+          else {
+
+            Dio dio = Dio();
+            dio.download(track.playUrl, "${directory.path}/${track.playUrl}.mp3");
+            File("${directory.path}/${track.playUrl}.mp3").exists().asStream().listen((event) {
+              if(event)
+                player.open(
+                  Audio.file("${directory.path}/${track.playUrl}.mp3"),
+                  showNotification: true,
+                ).catchError((e) => print(e));
+            });
+            // Response response = await dio.get(
+            //   track.playUrl,
+            //   onReceiveProgress: (received,total){if (total != -1) {
+            //     print((received / total * 100).toStringAsFixed(0) + "%");
+            //   }},
+            //   //Received data with List<int>
+            //   options: Options(
+            //       responseType: ResponseType.bytes,
+            //       followRedirects: true,
+            //       validateStatus: (status) {
+            //         return status < 500;
+            //       }),
+            // );
+            // File file = File("${directory.path}/${track.playUrl}.mp3");
+            // var raf = file.openSync(mode: FileMode.write);
+            // // response.data is List<int> type
+            // raf.writeFromSync(response.data);
+            // print(file.path);
+
+            // await raf.close();
+          }
           _isTrackLoaded = true;
           notifyListeners();
           setPlaying(album, index, track);
+
         }
       } on PlatformException catch (t,stacktrace) {
         //mp3 unreachable
