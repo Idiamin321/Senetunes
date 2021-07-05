@@ -44,6 +44,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <key>UIFileSharingEnabled</key>
+    <true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Required usage for a Flutter dependency</string>
 	<key>NSMicrophoneUsageDescription</key>

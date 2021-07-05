@@ -263,49 +263,59 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   void initFlutterDownloader(List<Track> allTracks) async {
     tasks = await FlutterDownloader.loadTasks();
-    _tasks.addAll(tasks.map((e) {
-      Track track = allTracks.firstWhere((element) => element.name == e.filename);
-      if (track != null && e.progress != 100)
-        return _TaskInfo(track: track)
-          ..status = e.status
-          ..progress = e.progress
-          ..taskId = e.taskId;
-      else
-        return null;
-    }));
-    _tasks.removeWhere((element) => element == null);
+    try {
+      _tasks.addAll(tasks.map((e) {
+        Track track = allTracks.firstWhere((element) =>
+        element.name == e.filename);
+        if (track != null && e.progress != 100 && e.taskId != null)
+          return _TaskInfo(track: track)
+            ..status = e.status
+            ..progress = e.progress
+            ..taskId = e.taskId;
+        else
+          return null;
+      }));
+      _tasks.removeWhere((element) => element.taskId == null);
+    }catch(e){print(e);}
     _bindBackgroundIsolate();
     FlutterDownloader.registerCallback(downloadCallback);
   }
 
   void _bindBackgroundIsolate() {
     bool isSuccess = IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
-
+    print("isSuccess:$isSuccess");
     if (!isSuccess) {
       _unbindBackgroundIsolate();
       _bindBackgroundIsolate();
       return;
     }
     _port.listen((dynamic data) {
+      Future.delayed(Duration(seconds: 10),(){
       print('UI Isolate Callback: $data');
       String id = data[0];
+      id = id.replaceAll(" ", "");
       DownloadTaskStatus status = data[1];
       int progress = data[2];
       if (_tasks != null && _tasks.isNotEmpty) {
-        final task = _tasks.firstWhere((task) => task.taskId == id);
+        final task = _tasks.firstWhere((task) => task.taskId == id,orElse: ()=>null);
         if (task != null) {
           task.status = status;
           task.progress = progress;
-          if (status == DownloadTaskStatus.complete) {
-            addToDownloadSong(task.track);
-            _tasks.remove(task);
-          } else if (status == DownloadTaskStatus.failed) {
-            _retryDownload(_tasks[_tasks.indexWhere((element) => element.taskId == id)]);
-          }
-          notifyListeners();
+          Future.delayed(Duration(seconds:10),(){
+            if (task.status != null && task.status == DownloadTaskStatus.complete && task.taskId != null) {
+              addToDownloadSong(task.track);
+              _tasks.remove(task);
+            } else if (task.status != null && task.status == DownloadTaskStatus.failed && task.taskId != null) {
+              print("taskId:${_tasks.first.taskId}");
+              print("id:$id");
+              _retryDownload(_tasks[_tasks.indexWhere((element) => element.taskId == id)]);
+            }
+            notifyListeners();
+          });
+
         }
       }
-    });
+    });});
   }
 
   void _unbindBackgroundIsolate() {
@@ -323,21 +333,26 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     if (!hasExisted) {
       savedDir.create();
     }
-    print(_tasks);
-    if (!_tasks.any((element) => element.track.id == task.track.id)) {
+    if (_tasks.isEmpty || !_tasks.any((element) => element.track.id == task.track.id)) {
       _tasks.add(task);
       task.taskId = await FlutterDownloader.enqueue(
           url: task.track.playUrl,
           fileName: "${task.track.name}.mp3",
           savedDir: localPath,
           showNotification: true,
-          openFileFromNotification: false);
+          openFileFromNotification: false).catchError((e){
+            print("here");
+            e.toString();});
+      print(task.taskId);
     }
   }
 
   void _retryDownload(_TaskInfo task) async {
-    String newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
-    task.taskId = newTaskId;
+    Future.delayed(Duration(seconds: 10),() async {
+      String newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
+      task.taskId = newTaskId;
+    });
+
   }
 }
 

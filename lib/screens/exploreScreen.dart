@@ -113,33 +113,33 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
                 children: [
                   Expanded(
                     child: TabBar(tabs: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.home,
-                            size: MediaQuery.of(context).size.height * 0.03,
-                          ),
-                          Tab(
-                            child: Text(
+                      Tab(
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.home,
+                              size: MediaQuery.of(context).size.height * 0.03,
+                            ),
+                            Text(
                               $t(context, "home"),
                             ),
-                          ),
-                        ],
-                        mainAxisAlignment: MainAxisAlignment.center,
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                        ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.loop,
-                            size: MediaQuery.of(context).size.height * 0.03,
-                          ),
-                          Tab(
-                            child: Text(
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.loop,
+                              size: MediaQuery.of(context).size.height * 0.03,
+                            ),
+                            Text(
                               $t(context, "categories"),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ]),
                   ),
