@@ -13,7 +13,8 @@ class BaseScaffold extends StatefulWidget {
   _BaseScaffoldState createState() => _BaseScaffoldState();
 }
 
-class _BaseScaffoldState extends State<BaseScaffold> with SingleTickerProviderStateMixin {
+class _BaseScaffoldState extends State<BaseScaffold>
+    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,7 +28,9 @@ class _BaseScaffoldState extends State<BaseScaffold> with SingleTickerProviderSt
                     CustomCircularProgressIndicator(),
                     if (widget.isHome)
                       AutoSizeText(
-                          "Veuillez patienter quelques instants, nous préparons vos albums")
+                        "Veuillez patienter quelques instants, nous préparons vos albums",
+                        textAlign: TextAlign.center,
+                      )
                   ],
                 )
               : widget.child,

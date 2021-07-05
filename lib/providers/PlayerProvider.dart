@@ -11,16 +11,16 @@ import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Album.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/providers/CartProvider.dart';
-import 'dart:io';
+
 class PlayerProvider extends ChangeNotifier with BaseMixins {
   final AssetsAudioPlayer player = AssetsAudioPlayer();
   var directory;
 
-  PlayerProvider(){
+  PlayerProvider() {
     init();
   }
 
-  init()async{
+  init() async {
     _isLoaded = false;
     directory = await getTemporaryDirectory();
     player.playlistAudioFinished.listen((Playing playing) {
@@ -48,7 +48,7 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   bool get isTrackLoaded => _isTrackLoaded;
   int _currentIndex;
   int get currentIndex => _currentIndex;
-  bool _startedPlaying = false;
+  CancelToken _currentSongCancelToken;
   set currentAlbum(album) {
     _currentAlbum = album;
     notifyListeners();
@@ -86,7 +86,8 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
       setPlaying(_currentAlbum, 0, _currentAlbum.tracks[0]);
       play(0);
     } else if (!action && _loopMode && !_loopPlaylist) {
-      setPlaying(_currentAlbum, _currentIndex, _currentAlbum.tracks[_currentIndex]);
+      setPlaying(
+          _currentAlbum, _currentIndex, _currentAlbum.tracks[_currentIndex]);
       play(_currentIndex);
     } else {
       play(next);
@@ -167,7 +168,8 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   isTrackInProgress(Track track) {
     return player.isPlaying.value &&
         player.current.value != null &&
-        player.current.value.audio.assetAudioPath == '${directory.path}/${track.playUrl}.mp3';
+        player.current.value.audio.assetAudioPath ==
+            '${directory.path}/${track.playUrl}.mp3';
   }
 
   isLocalTrackInProgress(filePath) {
@@ -186,7 +188,6 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
     });
   }
 
-
   handlePlayButton({album, Track track, index, BuildContext context}) async {
     //Disable shuffling
     CartProvider cartProvider = context.read<CartProvider>();
@@ -195,46 +196,52 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
     setBuffering(index);
     if (album.isBought) {
       try {
-        if (isTrackInProgress(track) || isLocalTrackInProgress(track.localPath)) {
+        if (isTrackInProgress(track) ||
+            isLocalTrackInProgress(track.localPath)) {
           player.pause();
+          _currentSongCancelToken.cancel();
         } else {
           _isTrackLoaded = false;
+          _currentSongCancelToken = CancelToken();
           notifyListeners();
           print(track.localPath);
           print(track.playUrl);
-          if(track.localPath != null) {
-            await player.open(
-                Audio.file(track.localPath), showNotification: true)
+          if (track.localPath != null) {
+            await player
+                .open(Audio.file(track.localPath), showNotification: true)
                 .catchError((e) => print(e));
             _isTrackLoaded = true;
             notifyListeners();
             setPlaying(album, index, track);
-          }
-          else {
+          } else {
+            _isTrackLoaded = false;
+            notifyListeners();
             Dio dio = Dio();
-            dio.download(track.playUrl, "${directory.path}/${track.playUrl}.mp3",onReceiveProgress: (received,total) async{
-              if((received/total * 100 > 1 && received/total * 100 <2)) {
-                if(!isPlaying()){
+            dio.download(
+                track.playUrl, "${directory.path}/${track.playUrl}.mp3",
+                cancelToken: _currentSongCancelToken,
+                onReceiveProgress: (received, total) async {
+              if ((received / total * 100 > 9)) {
+                if (!_isTrackLoaded) {
                   print("downloading");
-                player.open(
-                  Audio.file("${directory.path}/${track.playUrl}.mp3"),
-                  showNotification: true,
-                ).catchError((e) => print(e));
-                _isTrackLoaded = true;
-                notifyListeners();
-                setPlaying(album, index, track);
+                  player
+                      .open(
+                          Audio.file("${directory.path}/${track.playUrl}.mp3"),
+                          showNotification: true,
+                          playInBackground: PlayInBackground.enabled)
+                      .catchError((e) => print(e));
+                  _isTrackLoaded = true;
+                  notifyListeners();
+                  setPlaying(album, index, track);
                 }
-              }
-              else
+              } else
                 _isTrackLoaded = false;
             });
           }
         }
-      } on PlatformException catch (t,stacktrace) {
+      } on PlatformException catch (t, stacktrace) {
         //mp3 unreachable
-        await FirebaseCrashlytics.instance.recordError(
-            t,
-            stacktrace,
+        await FirebaseCrashlytics.instance.recordError(t, stacktrace,
             reason: 'a fatal error',
             // Pass in 'fatal' argument
             printDetails: true);
@@ -290,7 +297,8 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
 
   String getTrackCover() {
     String image = '';
-    if (_currentTrack.albumInfo.media != null && _currentTrack.albumInfo.media.cover != null) {
+    if (_currentTrack.albumInfo.media != null &&
+        _currentTrack.albumInfo.media.cover != null) {
       image = _currentTrack.albumInfo.media.cover;
     } else {
       image = getTrackThumbnail();
