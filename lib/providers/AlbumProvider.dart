@@ -34,6 +34,7 @@ class AlbumProvider extends ChangeNotifier {
         headers: <String, String>{'authorization': basicAuth});
     if (albumResponse.statusCode == 200 && priceResponse.statusCode == 200) {
       var transformer = Xml2Json();
+
       transformer.parse(albumResponse.body);
 
       List<dynamic> b = jsonDecode(transformer.toBadgerfish())['albums']['album'];

@@ -48,6 +48,7 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   bool get isTrackLoaded => _isTrackLoaded;
   int _currentIndex;
   int get currentIndex => _currentIndex;
+  bool _startedPlaying = false;
   set currentAlbum(album) {
     _currentAlbum = album;
     notifyListeners();
@@ -185,6 +186,7 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
     });
   }
 
+
   handlePlayButton({album, Track track, index, BuildContext context}) async {
     //Disable shuffling
     CartProvider cartProvider = context.read<CartProvider>();
@@ -200,44 +202,33 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
           notifyListeners();
           print(track.localPath);
           print(track.playUrl);
-          if(track.localPath != null)
-            await player.open(Audio.file(track.localPath),showNotification: true).catchError((e)=>print(e));
+          if(track.localPath != null) {
+            await player.open(
+                Audio.file(track.localPath), showNotification: true)
+                .catchError((e) => print(e));
+            _isTrackLoaded = true;
+            notifyListeners();
+            setPlaying(album, index, track);
+          }
           else {
-
             Dio dio = Dio();
-            dio.download(track.playUrl, "${directory.path}/${track.playUrl}.mp3");
-            File("${directory.path}/${track.playUrl}.mp3").exists().asStream().listen((event) {
-              if(event)
+            dio.download(track.playUrl, "${directory.path}/${track.playUrl}.mp3",onReceiveProgress: (received,total) async{
+              if((received/total * 100 > 1 && received/total * 100 <2)) {
+                if(!isPlaying()){
+                  print("downloading");
                 player.open(
                   Audio.file("${directory.path}/${track.playUrl}.mp3"),
                   showNotification: true,
                 ).catchError((e) => print(e));
+                _isTrackLoaded = true;
+                notifyListeners();
+                setPlaying(album, index, track);
+                }
+              }
+              else
+                _isTrackLoaded = false;
             });
-            // Response response = await dio.get(
-            //   track.playUrl,
-            //   onReceiveProgress: (received,total){if (total != -1) {
-            //     print((received / total * 100).toStringAsFixed(0) + "%");
-            //   }},
-            //   //Received data with List<int>
-            //   options: Options(
-            //       responseType: ResponseType.bytes,
-            //       followRedirects: true,
-            //       validateStatus: (status) {
-            //         return status < 500;
-            //       }),
-            // );
-            // File file = File("${directory.path}/${track.playUrl}.mp3");
-            // var raf = file.openSync(mode: FileMode.write);
-            // // response.data is List<int> type
-            // raf.writeFromSync(response.data);
-            // print(file.path);
-
-            // await raf.close();
           }
-          _isTrackLoaded = true;
-          notifyListeners();
-          setPlaying(album, index, track);
-
         }
       } on PlatformException catch (t,stacktrace) {
         //mp3 unreachable
