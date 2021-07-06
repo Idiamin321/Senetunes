@@ -7,19 +7,22 @@ import 'package:dio/dio.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive/hive.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Album.dart';
 import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/models/DownloadTaskInfo.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/providers/BaseProvider.dart';
 
 import 'AuthProvider.dart';
 
-const String trackLocalDownloadStorageSearch = 'TrackLocalDownloadStorageSearch';
+const String trackLocalDownloadStorageSearch =
+    'TrackLocalDownloadStorageSearch';
 const String trackDownloadList = 'TrackDownloadList';
 const String AlbumDownloadList = 'AlbumDownloadList';
 const String ArtistDownloadList = 'ArtistDownloadList';
@@ -32,18 +35,20 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
     var timeParse = DateTime.parse(time);
 
-    var formattedtime = "${timeParse.hour}-${timeParse.minute}-${timeParse.second}";
+    var formattedtime =
+        "${timeParse.hour}-${timeParse.minute}-${timeParse.second}";
 
     finaltime = formattedtime.toString();
   }
 
-  List<_TaskInfo> queuedSongs = [];
-
   List<Track> _downloadSongs = [];
+
   List<Track> get downloadSongs => _downloadSongs;
   Set<Album> _downloadedAlbums = Set();
+
   Set<Album> get downloadedAlbums => _downloadedAlbums;
   Set<Artist> _downloadedArtists = Set();
+
   Set<Artist> get downloadedArtists => _downloadedArtists;
   var dio = Dio();
   bool isDownload = false;
@@ -51,6 +56,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   DownloadProvider() {
     getDownloads();
+    _bindBackgroundIsolate();
   }
 
   setDownloadSongs(List<Track> downloadSongs) {
@@ -60,9 +66,11 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   downloadAlbum(Album album, BuildContext context) async {
     if (album.isBought) {
-      if (!(album.tracks.fold(isDownloadSong(album.tracks[0]), (x, e) => x & isDownloadSong(e)))) {
+      if (!(album.tracks.fold(
+          isDownloadSong(album.tracks[0]), (x, e) => x & isDownloadSong(e)))) {
         Flushbar(
-          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          backgroundColor:
+              Theme.of(context).colorScheme.surface.withOpacity(0.8),
           icon: Icon(
             Icons.download_outlined,
             color: Theme.of(context).primaryColor,
@@ -76,7 +84,8 @@ class DownloadProvider extends BaseProvider with BaseMixins {
         await _downloadAlbum(album);
       } else {
         Flushbar(
-          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          backgroundColor:
+              Theme.of(context).colorScheme.surface.withOpacity(0.8),
           icon: Icon(
             Icons.warning_amber_outlined,
             color: Theme.of(context).primaryColor,
@@ -103,10 +112,14 @@ class DownloadProvider extends BaseProvider with BaseMixins {
   }
 
   downloadAudio(Track song, BuildContext context) async {
-    if (context.read<AuthProvider>().boughtAlbumsIds.containsKey(song.albumId)) {
+    if (context
+        .read<AuthProvider>()
+        .boughtAlbumsIds
+        .containsKey(song.albumId)) {
       if (!isDownloadSong(song)) {
         Flushbar(
-          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          backgroundColor:
+              Theme.of(context).colorScheme.surface.withOpacity(0.8),
           icon: Icon(
             Icons.download_outlined,
             color: Theme.of(context).primaryColor,
@@ -120,7 +133,8 @@ class DownloadProvider extends BaseProvider with BaseMixins {
         await _downloadAudio(song);
       } else {
         Flushbar(
-          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          backgroundColor:
+              Theme.of(context).colorScheme.surface.withOpacity(0.8),
           icon: Icon(
             Icons.warning_amber_outlined,
             color: Theme.of(context).primaryColor,
@@ -158,7 +172,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
       getCurrenttime();
       isDownload = true;
 
-      _requestDownload(_TaskInfo(track: song), downloadDir.path);
+      _enqueue(DownloadTaskInfo(track: song));
     }
   }
 
@@ -178,13 +192,13 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     List<Album> albums = _downloadedAlbums.toList();
     List<Artist> artists = _downloadedArtists.toList();
     await localStorage.setItem(trackDownloadList, _downloadSongs,
-            (Object x) => (x as List<Track>).map((e) => e.toJson()).toList());
+        (Object x) => (x as List<Track>).map((e) => e.toJson()).toList());
     await localStorage.ready;
     await localStorage.setItem(AlbumDownloadList, albums,
-            (Object x) => (x as List<Album>).map((e) => e.toJson()).toList());
+        (Object x) => (x as List<Album>).map((e) => e.toJson()).toList());
     await localStorage.ready;
     await localStorage.setItem(ArtistDownloadList, artists,
-            (Object x) => (x as List<Artist>).map((e) => e.toJson()).toList());
+        (Object x) => (x as List<Artist>).map((e) => e.toJson()).toList());
   }
 
   getDownloads() async {
@@ -193,16 +207,19 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     downloadDir = await getApplicationDocumentsDirectory();
     LocalStorage localStorage = LocalStorage(trackLocalDownloadStorageSearch);
     await localStorage.ready;
-    List<Track> downloadList = (localStorage.getItem(trackDownloadList) ?? []).map<Track>((item) {
+    List<Track> downloadList =
+        (localStorage.getItem(trackDownloadList) ?? []).map<Track>((item) {
       return Track.fromJson(item);
     }).toList();
     _downloadSongs = downloadList;
     await localStorage.ready;
-    _downloadedAlbums = (localStorage.getItem(AlbumDownloadList) ?? []).map<Album>((item) {
+    _downloadedAlbums =
+        (localStorage.getItem(AlbumDownloadList) ?? []).map<Album>((item) {
       return Album.fromJson(item);
     }).toSet();
     await localStorage.ready;
-    _downloadedArtists = (localStorage.getItem(ArtistDownloadList) ?? []).map<Artist>((item) {
+    _downloadedArtists =
+        (localStorage.getItem(ArtistDownloadList) ?? []).map<Artist>((item) {
       return Artist.fromJson(item);
     }).toSet();
     _linkDownloadedSongsToAlbums();
@@ -212,11 +229,11 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   void _linkDownloadedSongsToAlbums() {
     for (int i = 0; i < _downloadSongs.length; i++) {
-      _downloadSongs[i].albumInfo =
-          _downloadedAlbums.firstWhere((element) => element.id == _downloadSongs[i].albumId);
+      _downloadSongs[i].albumInfo = _downloadedAlbums
+          .firstWhere((element) => element.id == _downloadSongs[i].albumId);
       try {
-        _downloadSongs[i].artistInfo =
-            _downloadedArtists.firstWhere((element) => element.id == _downloadSongs[i].artistId);
+        _downloadSongs[i].artistInfo = _downloadedArtists
+            .firstWhere((element) => element.id == _downloadSongs[i].artistId);
       } catch (e, s) {
         print(s);
       }
@@ -242,7 +259,8 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     if (_downloadSongs.contains(song)) {
       Directory dir = Directory(returnPath(song));
       dir.deleteSync(recursive: true);
-      if (lastSong) _downloadedAlbums.removeWhere((element) => element.id == song.albumId);
+      if (lastSong)
+        _downloadedAlbums.removeWhere((element) => element.id == song.albumId);
       _downloadSongs.remove(song);
       saveSongData();
       notifyListeners();
@@ -256,115 +274,197 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     notifyListeners();
   }
 
-  //------------------------------------------Download Functions------------------------------------
-  ReceivePort _port = ReceivePort();
-  List<_TaskInfo> _tasks = [];
-  List<DownloadTask> tasks;
-
-  void initFlutterDownloader(List<Track> allTracks) async {
-    tasks = await FlutterDownloader.loadTasks();
-    try {
-      _tasks.addAll(tasks.map((e) {
-        Track track = allTracks.firstWhere((element) =>
-        element.name == e.filename);
-        if (track != null && e.progress != 100 && e.taskId != null)
-          return _TaskInfo(track: track)
-            ..status = e.status
-            ..progress = e.progress
-            ..taskId = e.taskId;
-        else
-          return null;
-      }));
-      _tasks.removeWhere((element) => element.taskId == null);
-    }catch(e){print(e);}
-    _bindBackgroundIsolate();
-    FlutterDownloader.registerCallback(downloadCallback);
+//------------------------------------------Download Functions------------------------------------
+  ReceivePort receivePort = ReceivePort();
+  SendPort sendPort;
+  SendPort logicPort;
+  void _unbindBackgroundIsolate() {
+    IsolateNameServer.removePortNameMapping('downloadIsolate');
   }
 
-  void _bindBackgroundIsolate() {
-    bool isSuccess = IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
-    print("isSuccess:$isSuccess");
+  _bindBackgroundIsolate() {
+    bool isSuccess = IsolateNameServer.registerPortWithName(
+        receivePort.sendPort, "downloadIsolate");
     if (!isSuccess) {
       _unbindBackgroundIsolate();
       _bindBackgroundIsolate();
       return;
     }
-    _port.listen((dynamic data) {
-      Future.delayed(Duration(seconds: 10),(){
-      print('UI Isolate Callback: $data');
-      String id = data[0];
-      id = id.replaceAll(" ", "");
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
-      if (_tasks != null && _tasks.isNotEmpty) {
-        final task = _tasks.firstWhere((task) => task.taskId == id,orElse: ()=>null);
-        if (task != null) {
-          task.status = status;
-          task.progress = progress;
-          Future.delayed(Duration(seconds:10),(){
-            if (task.status != null && task.status == DownloadTaskStatus.complete && task.taskId != null) {
-              addToDownloadSong(task.track);
-              _tasks.remove(task);
-            } else if (task.status != null && task.status == DownloadTaskStatus.failed && task.taskId != null) {
-              print("taskId:${_tasks.first.taskId}");
-              print("id:$id");
-              _retryDownload(_tasks[_tasks.indexWhere((element) => element.taskId == id)]);
-            }
-            notifyListeners();
-          });
-
-        }
+    sendPort = receivePort.sendPort;
+    logicPort = IsolateNameServer.lookupPortByName('downloader_send_port');
+    receivePort.listen((message) async {
+      DownloadTaskInfo downloadTaskInfo = message;
+      if (downloadTaskInfo.received >= downloadTaskInfo.total) {
+        print("done");
+        await FlutterLocalNotificationsPlugin()
+            .cancel(downloadTaskInfo.track.id);
+        addToDownloadSong(downloadTaskInfo.track);
+        await Future.delayed(const Duration(milliseconds: 200), () async {
+          var task = await _dequeue();
+          if (task != null) {
+            logicPort.send(task);
+          }
+        });
+      } else {
+        final AndroidNotificationDetails androidPlatformChannelSpecifics =
+            AndroidNotificationDetails('progress channel', 'progress channel',
+                'progress channel description',
+                channelShowBadge: false,
+                importance: Importance.min,
+                priority: Priority.min,
+                onlyAlertOnce: true,
+                playSound: false,
+                showProgress: true,
+                maxProgress: downloadTaskInfo.total,
+                progress: downloadTaskInfo.received);
+        final IOSNotificationDetails iosNotificationDetails =
+            IOSNotificationDetails(presentSound: false);
+        final NotificationDetails platformChannelSpecifics =
+            NotificationDetails(android: androidPlatformChannelSpecifics);
+        await FlutterLocalNotificationsPlugin().show(
+            downloadTaskInfo.track.id,
+            'Téléchargement en cours',
+            '${downloadTaskInfo.track.name}',
+            platformChannelSpecifics);
       }
-    });});
-  }
-
-  void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-  }
-
-  static void downloadCallback(String id, DownloadTaskStatus status, int progress) {
-    final SendPort send = IsolateNameServer.lookupPortByName('downloader_send_port');
-    send.send([id, status, progress]);
-  }
-
-  void _requestDownload(_TaskInfo task, String localPath) async {
-    final savedDir = Directory(localPath);
-    bool hasExisted = await savedDir.exists();
-    if (!hasExisted) {
-      savedDir.create();
-    }
-    if (_tasks.isEmpty || !_tasks.any((element) => element.track.id == task.track.id)) {
-      _tasks.add(task);
-      task.taskId = await FlutterDownloader.enqueue(
-          url: task.track.playUrl,
-          fileName: "${task.track.name}.mp3",
-          savedDir: localPath,
-          showNotification: true,
-          openFileFromNotification: false).catchError((e){
-            print("here");
-            e.toString();});
-      print(task.taskId);
-    }
-  }
-
-  void _retryDownload(_TaskInfo task) async {
-    Future.delayed(Duration(seconds: 10),() async {
-      String newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
-      task.taskId = newTaskId;
     });
+  }
 
+  Future<DownloadTaskInfo> _dequeue() async {
+    var _box = Hive.box('downloads');
+    List<DownloadTaskInfo> tasks =
+        List<DownloadTaskInfo>.from(_box.get("tasks", defaultValue: []));
+    if (tasks.isEmpty) return null;
+    var task = tasks.first;
+    tasks.remove(task);
+    await _box.put('tasks', tasks);
+    return task;
+  }
+
+  _enqueue(DownloadTaskInfo taskInfo) async {
+    var _box = Hive.box('downloads');
+    List<DownloadTaskInfo> tasks =
+        List<DownloadTaskInfo>.from(_box.get("tasks", defaultValue: []));
+    if (tasks.isEmpty) {
+      logicPort = IsolateNameServer.lookupPortByName('downloader_send_port');
+      logicPort.send(taskInfo);
+    } else {
+      tasks.add(taskInfo);
+      await _box.put('tasks', tasks);
+      tasks = _box.get("tasks", defaultValue: []);
+    }
+    print(tasks);
   }
 }
 
-class _TaskInfo {
-  final Track track;
-
-  String taskId;
-  int progress = 0;
-  DownloadTaskStatus status = DownloadTaskStatus.undefined;
-
-  _TaskInfo({this.track});
-}
+//   ReceivePort _port = ReceivePort();
+//   List<_TaskInfo> _tasks = [];
+//   List<DownloadTask> tasks;
+//
+//   void initFlutterDownloader(List<Track> allTracks) async {
+//     tasks = await FlutterDownloader.loadTasks();
+//     try {
+//       _tasks.addAll(tasks.map((e) {
+//         Track track = allTracks.firstWhere((element) =>
+//         element.name == e.filename);
+//         if (track != null && e.progress != 100 && e.taskId != null)
+//           return _TaskInfo(track: track)
+//             ..status = e.status
+//             ..progress = e.progress
+//             ..taskId = e.taskId;
+//         else
+//           return null;
+//       }));
+//       _tasks.removeWhere((element) => element.taskId == null);
+//     }catch(e){print(e);}
+//     _bindBackgroundIsolate();
+//     FlutterDownloader.registerCallback(downloadCallback);
+//   }
+//
+//   void _bindBackgroundIsolate() {
+//     bool isSuccess = IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
+//     print("isSuccess:$isSuccess");
+//     if (!isSuccess) {
+//       _unbindBackgroundIsolate();
+//       _bindBackgroundIsolate();
+//       return;
+//     }
+//     _port.listen((dynamic data) {
+//       Future.delayed(Duration(seconds: 10),(){
+//       print('UI Isolate Callback: $data');
+//       String id = data[0];
+//       id = id.replaceAll(" ", "");
+//       DownloadTaskStatus status = data[1];
+//       int progress = data[2];
+//       if (_tasks != null && _tasks.isNotEmpty) {
+//         final task = _tasks.firstWhere((task) => task.taskId == id,orElse: ()=>null);
+//         if (task != null) {
+//           task.status = status;
+//           task.progress = progress;
+//           Future.delayed(Duration(seconds:10),(){
+//             if (task.status != null && task.status == DownloadTaskStatus.complete && task.taskId != null) {
+//               addToDownloadSong(task.track);
+//               _tasks.remove(task);
+//             } else if (task.status != null && task.status == DownloadTaskStatus.failed && task.taskId != null) {
+//               print("taskId:${_tasks.first.taskId}");
+//               print("id:$id");
+//               _retryDownload(_tasks[_tasks.indexWhere((element) => element.taskId == id)]);
+//             }
+//             notifyListeners();
+//           });
+//
+//         }
+//       }
+//     });});
+//   }
+//
+//   void _unbindBackgroundIsolate() {
+//     IsolateNameServer.removePortNameMapping('downloader_send_port');
+//   }
+//
+//   static void downloadCallback(String id, DownloadTaskStatus status, int progress) {
+//     final SendPort send = IsolateNameServer.lookupPortByName('downloader_send_port');
+//     send.send([id, status, progress]);
+//   }
+//
+//   void _requestDownload(_TaskInfo task, String localPath) async {
+//     final savedDir = Directory(localPath);
+//     bool hasExisted = await savedDir.exists();
+//     if (!hasExisted) {
+//       savedDir.create();
+//     }
+//     if (_tasks.isEmpty || !_tasks.any((element) => element.track.id == task.track.id)) {
+//       _tasks.add(task);
+//       task.taskId = await FlutterDownloader.enqueue(
+//           url: task.track.playUrl,
+//           fileName: "${task.track.name}.mp3",
+//           savedDir: localPath,
+//           showNotification: true,
+//           openFileFromNotification: false).catchError((e){
+//             print("here");
+//             e.toString();});
+//       print(task.taskId);
+//     }
+//   }
+//
+//   void _retryDownload(_TaskInfo task) async {
+//     Future.delayed(Duration(seconds: 10),() async {
+//       String newTaskId = await FlutterDownloader.retry(taskId: task.taskId);
+//       task.taskId = newTaskId;
+//     });
+//
+//   }
+// }
+//
+// class _TaskInfo {
+//   final Track track;
+//
+//   String taskId;
+//   int progress = 0;
+//   DownloadTaskStatus status = DownloadTaskStatus.undefined;
+//
+//   _TaskInfo({this.track});
+// }
 
 // Future downloadFileTo({Dio dio, String url, String savePath, Function(int received, int total) progressFunction}) async {
 //   try {

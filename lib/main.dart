@@ -1,16 +1,20 @@
-import 'dart:async';
+import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppProvider.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/config/AppTheme.dart';
+import 'package:senetunes/models/DownloadTaskInfo.dart';
 import 'package:senetunes/providers/ThemeProvider.dart';
 import 'package:senetunes/screens/Auth/LoginScreen.dart';
 import 'package:senetunes/screens/exploreScreen.dart';
@@ -19,20 +23,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config/Applocalizations.dart';
 
 void main() async {
-
-    WidgetsFlutterBinding.ensureInitialized();
-    await GlobalConfiguration().loadFromAsset("config");
-    await FlutterDownloader.initialize(debug: true);
-    await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized();
+  await GlobalConfiguration().loadFromAsset("config");
+  await FlutterDownloader.initialize(debug: true);
+  await Firebase.initializeApp();
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+// initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  final IOSInitializationSettings initializationSettingsIOS =
+      IOSInitializationSettings();
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
+  );
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await Hive.initFlutter();
+  Hive.registerAdapter(DownloadTaskInfoAdapter());
+  await Hive.openBox('downloads');
 
   var status = await Permission.storage.status;
   if (!status.isGranted) {
-  await Permission.storage.request();
+    await Permission.storage.request();
   }
   bool loggedIn;
-  await SharedPreferences.getInstance()
-      .then((value) => value.getString('user') != null ? loggedIn = true : loggedIn = false);
+  await SharedPreferences.getInstance().then((value) =>
+      value.getString('user') != null ? loggedIn = true : loggedIn = false);
 
   runApp(RekordApp(loggedIn));
 }
@@ -72,7 +90,8 @@ class RekordApp extends StatelessWidget {
               ],
               // Returns a locale which will be used by the app
               localeResolutionCallback: (locale, supportedLocales) =>
-                  AppLocalizations(locale).localeResolutionCallback(supportedLocales),
+                  AppLocalizations(locale)
+                      .localeResolutionCallback(supportedLocales),
             );
           },
         ));

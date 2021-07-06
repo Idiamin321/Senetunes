@@ -1,17 +1,11 @@
-import 'dart:io';
-import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:dio/dio.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/providers/AuthProvider.dart';
 import 'package:senetunes/providers/CategoryProvider.dart';
-import 'package:senetunes/providers/DownloadProvider.dart';
+import 'package:senetunes/providers/DownloadLogic.dart';
 import 'package:senetunes/providers/PlayerProvider.dart';
 import 'package:senetunes/providers/PlaylistProvider.dart';
 import 'package:senetunes/widgtes/Album/AlbumsWidget.dart';
@@ -44,6 +38,8 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
     CategoryProvider categoryProvider = context.watch<CategoryProvider>();
     AuthProvider authProvider = context.watch<AuthProvider>();
     PlayerProvider playerProvider = context.watch<PlayerProvider>();
+    DownloadLogic downloadLogic = context.watch<DownloadLogic>();
+    downloadLogic.bindBackgroundIsolate();
     context.read<PlaylistProvider>().getPlaylists();
     requestStorageAccess();
     if (albumProvider.isLoaded && artistProvider.isLoaded) {
@@ -52,47 +48,46 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
       artistProvider.updateArtistsWithAlbums(albumProvider.allAlbums);
       categoryProvider.updateWithAlbumsAndArtists(
           albumProvider.allAlbums, artistProvider.allArtists);
-      context.read<DownloadProvider>().initFlutterDownloader(albumProvider.allTracks);
     }
     return SafeArea(
       child: Scaffold(
-      //   floatingActionButton: FloatingActionButton(
-      //     onPressed: ()async {
-      //       try {
-      //         var player = AudioPlayer();
-      //         // final directory = await getTemporaryDirectory();
-      //         // Dio dio = Dio();
-      //
-      //         // Response response = await dio.get(
-      //         //   url,
-      //         //   onReceiveProgress: (received,total){if (total != -1) {
-      //         //   print((received / total * 100).toStringAsFixed(0) + "%");
-      //         // }},
-      //         //   //Received data with List<int>
-      //         //   options: Options(
-      //         //       responseType: ResponseType.bytes,
-      //         //       followRedirects: true,
-      //         //       validateStatus: (status) {
-      //         //         return status < 500;
-      //         //       }),
-      //         // );
-      //         // var duration = await player.setFilePath(
-      //         //     "${directory.path}/temp.mp3");
-      //         // print(response.headers);
-      //         // File file = File("${directory.path}/temp.mp3");
-      //         // var raf = file.openSync(mode: FileMode.write);
-      //         // // response.data is List<int> type
-      //         // raf.writeFrom(response.data).asStream().listen((event) { player.play();});
-      //         var url = "http://www.senetunes.com/download/17c456468621afde34d4a84cbf019ab88d331957";;
-      //         WebSocketChannel.connect(
-      //           Uri.parse('wss://echo.websocket.org'),
-      //         );
-      //         // await raf.close();
-      //
-      //       } on PlayerException catch(e,t){
-      //         await FirebaseCrashlytics.instance.recordError(e, t);
-      // }}
-      //   ),
+        //   floatingActionButton: FloatingActionButton(
+        //     onPressed: ()async {
+        //       try {
+        //         var player = AudioPlayer();
+        //         // final directory = await getTemporaryDirectory();
+        //         // Dio dio = Dio();
+        //
+        //         // Response response = await dio.get(
+        //         //   url,
+        //         //   onReceiveProgress: (received,total){if (total != -1) {
+        //         //   print((received / total * 100).toStringAsFixed(0) + "%");
+        //         // }},
+        //         //   //Received data with List<int>
+        //         //   options: Options(
+        //         //       responseType: ResponseType.bytes,
+        //         //       followRedirects: true,
+        //         //       validateStatus: (status) {
+        //         //         return status < 500;
+        //         //       }),
+        //         // );
+        //         // var duration = await player.setFilePath(
+        //         //     "${directory.path}/temp.mp3");
+        //         // print(response.headers);
+        //         // File file = File("${directory.path}/temp.mp3");
+        //         // var raf = file.openSync(mode: FileMode.write);
+        //         // // response.data is List<int> type
+        //         // raf.writeFrom(response.data).asStream().listen((event) { player.play();});
+        //         var url = "http://www.senetunes.com/download/17c456468621afde34d4a84cbf019ab88d331957";;
+        //         WebSocketChannel.connect(
+        //           Uri.parse('wss://echo.websocket.org'),
+        //         );
+        //         // await raf.close();
+        //
+        //       } on PlayerException catch(e,t){
+        //         await FirebaseCrashlytics.instance.recordError(e, t);
+        // }}
+        //   ),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: BaseAppBar(
@@ -105,7 +100,9 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
         body: BaseConnectivity(
           child: BaseScaffold(
             isHome: true,
-            isLoaded: albumProvider.isLoaded && artistProvider.isLoaded&&playerProvider.isLoaded,
+            isLoaded: albumProvider.isLoaded &&
+                artistProvider.isLoaded &&
+                playerProvider.isLoaded,
             // scrollController: scrollController,
             child: DefaultTabController(
               length: 2,
@@ -148,7 +145,8 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
                     child: TabBarView(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
                           child: ListView(
                             children: [
                               TrackCarouselWidget(
@@ -178,11 +176,14 @@ class ExploreScreen extends StatelessWidget with BaseMixins {
                           physics: BouncingScrollPhysics(),
                           controller: scrollController,
                           itemCount: categoryProvider.categories.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount:
-                                  responsive(context, isSmallPhone: 2, isPhone: 2, isTablet: 4),
-                              childAspectRatio: responsive(context,
-                                  isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: responsive(context,
+                                      isSmallPhone: 2, isPhone: 2, isTablet: 4),
+                                  childAspectRatio: responsive(context,
+                                      isPhone: 0.8,
+                                      isSmallPhone: 0.8,
+                                      isTablet: 0.6)),
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {

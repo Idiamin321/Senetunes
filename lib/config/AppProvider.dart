@@ -5,6 +5,7 @@ import 'package:senetunes/providers/ArtistProvider.dart';
 import 'package:senetunes/providers/AuthProvider.dart';
 import 'package:senetunes/providers/CartProvider.dart';
 import 'package:senetunes/providers/CategoryProvider.dart';
+import 'package:senetunes/providers/DownloadLogic.dart';
 import 'package:senetunes/providers/FavoriteProvider.dart';
 import 'package:senetunes/providers/PlayerProvider.dart';
 import 'package:senetunes/providers/ThemeProvider.dart';
@@ -57,6 +58,9 @@ List<SingleChildWidget> providers() {
     ),
     ChangeNotifierProvider<DownloadProvider>(
       create: (context) => DownloadProvider(),
+    ),
+    ChangeNotifierProvider<DownloadLogic>(
+      create: (context) => DownloadLogic(),
     ),
     ChangeNotifierProvider<PlaylistProvider>(
       create: (context) => PlaylistProvider(),
