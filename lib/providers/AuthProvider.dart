@@ -77,9 +77,10 @@ class AuthProvider extends BaseProvider {
   fetchBoughtAlbums(String email) async {
     isLoaded = false;
     notifyListeners();
-    String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+    String basicAuth = 'Basic ' +
+        base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
     http.Response response = await http.get(
-      "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?filter[userEmail]=$email&display=full",
+      "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?filter[userEmail]=$email&display=full",
       headers: <String, String>{
         'authorization': basicAuth,
         'content-type': "text/xml;charset=utf-8"
@@ -151,7 +152,8 @@ class AuthProvider extends BaseProvider {
     // final response = await post(formData);
 
     http.Response response;
-    String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+    String basicAuth = 'Basic ' +
+        base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
 
     String xml = """<?xml version="1.0" encoding="UTF-8"?>
 <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -164,7 +166,7 @@ class AuthProvider extends BaseProvider {
 </customer>
 </prestashop>""";
     response = await http.post(
-      "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/customers?schema=blank",
+      "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/customers?schema=blank",
       headers: <String, String>{
         'authorization': basicAuth,
         'content-type': "text/xml;charset=utf-8"
@@ -175,8 +177,9 @@ class AuthProvider extends BaseProvider {
     isLoaded = true;
     notifyListeners();
     if (response.statusCode == 201) {
-      var customer =
-          XmlDocument.parse(response.body).getElement("prestashop").getElement("customer");
+      var customer = XmlDocument.parse(response.body)
+          .getElement("prestashop")
+          .getElement("customer");
       Map<String, dynamic> user = {
         "id": customer.getElement('id').text,
         "email": customer.getElement('email').text,

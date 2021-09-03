@@ -74,7 +74,9 @@ class CartProvider extends BaseProvider {
           "description": description
         },
         "store": {"name": "Senetunes"},
-        "actions": {"callback_url": "http://www.magasin-le-choco.com/callback_url.php"}
+        "actions": {
+          "callback_url": "http://www.magasin-le-choco.com/callback_url.php"
+        }
       },
     );
 
@@ -98,7 +100,8 @@ class CartProvider extends BaseProvider {
     print("ASDAKLSDNASLDNALSDNASD");
     for (Album album in cart) {
       http.Response response;
-      String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+      String basicAuth = 'Basic ' +
+          base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
       String xml = """<?xml version="1.0" encoding="UTF-8"?>
 <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
 <albums>
@@ -111,7 +114,7 @@ class CartProvider extends BaseProvider {
 </albums>
 </prestashop>""";
       response = await http.post(
-        "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?schema=blank",
+        "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?schema=blank",
         headers: <String, String>{
           'authorization': basicAuth,
           'content-type': "text/xml;charset=utf-8"
@@ -122,7 +125,9 @@ class CartProvider extends BaseProvider {
     }
     request = null;
     clearCart();
-    await context.read<AuthProvider>().fetchBoughtAlbums(context.read<AuthProvider>().user.email);
+    await context
+        .read<AuthProvider>()
+        .fetchBoughtAlbums(context.read<AuthProvider>().user.email);
     await context
         .read<AlbumProvider>()
         .updateBoughtAlbums(context.read<AuthProvider>().boughtAlbumsIds);

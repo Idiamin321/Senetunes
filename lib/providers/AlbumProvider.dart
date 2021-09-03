@@ -27,19 +27,22 @@ class AlbumProvider extends ChangeNotifier {
   fetchAlbums() async {
     isLoaded = false;
     notifyListeners();
-    String basicAuth = 'Basic ' + base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
+    String basicAuth = 'Basic ' +
+        base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
     http.Response albumResponse = await http.get('${AppConfig.API}/album/list');
     http.Response priceResponse = await http.get(
-        "http://ec2-15-237-94-117.eu-west-3.compute.amazonaws.com/senetunesproduction/api/products?display=[id,price]&output_format=JSON",
+        "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/products?display=[id,price]&output_format=JSON",
         headers: <String, String>{'authorization': basicAuth});
     if (albumResponse.statusCode == 200 && priceResponse.statusCode == 200) {
       var transformer = Xml2Json();
 
       transformer.parse(albumResponse.body);
 
-      List<dynamic> b = jsonDecode(transformer.toBadgerfish())['albums']['album'];
+      List<dynamic> b =
+          jsonDecode(transformer.toBadgerfish())['albums']['album'];
       Map<int, double> prices = Map();
-      (jsonDecode(priceResponse.body)['products'] as List<dynamic>).forEach((element) {
+      (jsonDecode(priceResponse.body)['products'] as List<dynamic>)
+          .forEach((element) {
         prices[element['id']] = double.parse(element['price']);
       });
       for (dynamic a in b) {
@@ -62,7 +65,8 @@ class AlbumProvider extends ChangeNotifier {
   List<Track> searchData(String trackName) {
     List<Track> searchedTracks = [];
     for (Track track in _allTracks) {
-      if (track.name.toLowerCase().contains(trackName.toLowerCase())) searchedTracks.add(track);
+      if (track.name.toLowerCase().contains(trackName.toLowerCase()))
+        searchedTracks.add(track);
     }
     return searchedTracks;
   }
@@ -70,12 +74,12 @@ class AlbumProvider extends ChangeNotifier {
   updateTracksAndAlbumsWithArtists(List<Artist> artists) async {
     if (!_updated) {
       for (var i = 0; i < _allTracks.length; i++) {
-        _allTracks[i].artistInfo =
-            artists[artists.indexWhere((element) => element.id == _allTracks[i].artistId)];
+        _allTracks[i].artistInfo = artists[artists
+            .indexWhere((element) => element.id == _allTracks[i].artistId)];
       }
       for (var i = 0; i < _allAlbums.length; i++) {
-        _allAlbums[i].artistInfo =
-            artists[artists.indexWhere((element) => element.id == _allAlbums[i].artistId)];
+        _allAlbums[i].artistInfo = artists[artists
+            .indexWhere((element) => element.id == _allAlbums[i].artistId)];
       }
       _updated = true;
     }
