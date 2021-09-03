@@ -53,7 +53,7 @@ class DownloadProvider extends BaseProvider with BaseMixins {
   var dio = Dio();
   bool isDownload = false;
   Directory downloadDir;
-
+  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   DownloadProvider() {
     getDownloads();
     _bindBackgroundIsolate();
@@ -293,11 +293,30 @@ class DownloadProvider extends BaseProvider with BaseMixins {
     sendPort = receivePort.sendPort;
     logicPort = IsolateNameServer.lookupPortByName('downloader_send_port');
     receivePort.listen((message) async {
+      var _box = Hive.box('downloads');
       DownloadTaskInfo downloadTaskInfo = message;
       if (downloadTaskInfo.received >= downloadTaskInfo.total) {
         print("done");
+        await _box.delete(downloadTaskInfo.track.albumId.toString());
         await FlutterLocalNotificationsPlugin()
             .cancel(downloadTaskInfo.track.id);
+        final AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails('progress channel', 'progress channel',
+            'progress channel description',
+            channelShowBadge: false,
+            importance: Importance.min,
+            priority: Priority.min,
+            onlyAlertOnce: true,
+            playSound: false,);
+        final IOSNotificationDetails iosNotificationDetails =
+        IOSNotificationDetails(presentSound: false,threadIdentifier: downloadTaskInfo.track.albumId.toString());
+        final NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics,iOS: iosNotificationDetails);
+        await _flutterLocalNotificationsPlugin.show(
+            downloadTaskInfo.track.id,
+            'Téléchargement complété',
+            '${downloadTaskInfo.track.name}',
+            platformChannelSpecifics);
         addToDownloadSong(downloadTaskInfo.track);
         await Future.delayed(const Duration(milliseconds: 200), () async {
           var task = await _dequeue();
@@ -306,6 +325,9 @@ class DownloadProvider extends BaseProvider with BaseMixins {
           }
         });
       } else {
+
+        if(_box.get(downloadTaskInfo.track.albumId.toString(),defaultValue: true) || Platform.isAndroid){
+          await _box.put(downloadTaskInfo.track.albumId.toString(), false);
         final AndroidNotificationDetails androidPlatformChannelSpecifics =
             AndroidNotificationDetails('progress channel', 'progress channel',
                 'progress channel description',
@@ -318,15 +340,15 @@ class DownloadProvider extends BaseProvider with BaseMixins {
                 maxProgress: downloadTaskInfo.total,
                 progress: downloadTaskInfo.received);
         final IOSNotificationDetails iosNotificationDetails =
-            IOSNotificationDetails(presentSound: false);
+            IOSNotificationDetails(presentSound: false,threadIdentifier: downloadTaskInfo.track.albumId.toString());
         final NotificationDetails platformChannelSpecifics =
-            NotificationDetails(android: androidPlatformChannelSpecifics);
-        await FlutterLocalNotificationsPlugin().show(
+            NotificationDetails(android: androidPlatformChannelSpecifics,iOS: iosNotificationDetails);
+        await _flutterLocalNotificationsPlugin.show(
             downloadTaskInfo.track.id,
             'Téléchargement en cours',
             '${downloadTaskInfo.track.name}',
             platformChannelSpecifics);
-      }
+      }}
     });
   }
 
