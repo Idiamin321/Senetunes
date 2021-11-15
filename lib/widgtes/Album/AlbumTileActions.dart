@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/models/Track.dart';
 
 class TrackTileActions extends StatelessWidget {
@@ -6,6 +7,7 @@ class TrackTileActions extends StatelessWidget {
   final String title;
   final Function route;
   final Widget child;
+
   TrackTileActions({Key key, this.child, this.title, this.route, this.track});
 
   @override
@@ -24,7 +26,12 @@ class TrackTileActions extends StatelessWidget {
       itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
         PopupMenuItem<String>(
           value: 'details',
-          child: Text('$title'),
+          child: Text(
+            '$title',
+            style: TextStyle(
+              color: primary,
+            ),
+          ),
         ),
       ],
     );

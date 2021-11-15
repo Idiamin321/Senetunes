@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class SearchBox extends StatefulWidget {
   final Function onSearch;
   final String placeholder;
+
   SearchBox({this.onSearch, this.placeholder});
+
   @override
   _SearchBoxState createState() => _SearchBoxState();
 }
@@ -14,6 +18,7 @@ class SearchBox extends StatefulWidget {
 class _SearchBoxState extends State<SearchBox> {
   final _searchQuery = new TextEditingController();
   Timer _debounce;
+
   @override
   void initState() {
     super.initState();
@@ -37,21 +42,47 @@ class _SearchBoxState extends State<SearchBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Container(
-        decoration: BoxDecoration(color: Theme.of(context).cardColor.withOpacity(0.5), borderRadius: BorderRadius.circular(3)),
-        child: Padding(
+    return
+      // Padding(
+      // child:
+      Container(
+        decoration: BoxDecoration(
+          // color: Theme.of(context).cardColor.withOpacity(0.5),
+          color: barColor,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        // child: Padding(
+        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: TextField(
+                  autofocus: true,
+                  textAlignVertical: TextAlignVertical.center,
                   onChanged: widget.onSearch,
                   controller: _searchQuery,
+                  style:  TextStyle(color: Colors.white70),
                   decoration: InputDecoration(
-                    icon: Icon(EvilIcons.search),
-                    hintText: widget.placeholder == null ? 'Recherche...' : widget.placeholder,
+                    prefixIcon: Icon(
+                      EvilIcons.search,
+                      color: Colors.white70,
+                    ),
+                    suffixIcon: InkWell(
+                      onTap: (){
+                        FocusScope.of(context).requestFocus(new FocusNode());
+                        Navigator.of(context).pop();
+                      },
+                      child:Icon(
+                      EvilIcons.close,
+                      color: primary,
+                    ),),
+                    hintText: widget.placeholder == null
+                        ? 'Recherche...'
+                        : widget.placeholder,
+                    hintStyle: TextStyle(color: Colors.white70),
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
                   ),
@@ -59,8 +90,8 @@ class _SearchBoxState extends State<SearchBox> {
               ),
             ],
           ),
-        ),
-      ),
+      //   ),
+      // ),
     );
   }
 }

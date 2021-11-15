@@ -1,9 +1,11 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:senetunes/config/AppColors.dart';
+
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Album.dart';
@@ -15,7 +17,9 @@ import 'package:senetunes/widgtes/common/BaseImage.dart';
 class AlbumTile extends StatelessWidget with BaseMixins {
   final Album album;
   final bool downloadScreen;
+
   AlbumTile({this.album, this.downloadScreen});
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -23,91 +27,106 @@ class AlbumTile extends StatelessWidget with BaseMixins {
 
     return Container(
       width: width,
-      height: 100,
-      margin: EdgeInsets.all(10),
+      // height: 100,
+      margin: EdgeInsets.only(left: 10,right:10,top:10),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
-            flex: 3,
-            child: Stack(
-              children: [
+            flex: 8,
+            child:
+            // Row(mainAxisAlignment: MainAxisAlignment.center,
+            //   mainAxisSize: MainAxisSize.max,
+            //   children: [
                 BaseImage(
                   heroId: album?.id,
                   imageUrl: album?.media?.thumbnail,
-                  height: height * 0.2,
-                  width: responsive(context, isTablet: 170.0, isPhone: 150.0, isSmallPhone: 135.0),
+                  height: 250,
+                  width: responsive(context,
+                      isTablet: 170.0, isPhone: 180.0, isSmallPhone: 135.0),
                   radius: 5.0,
                 ),
-                Positioned(
-                  right: 0,
-                  bottom: 10,
-                  child: PlayerBuilder.isPlaying(
-                    player: context.watch<PlayerProvider>().player,
-                    builder: (context, isPlaying) {
-                      return downloadScreen != null && downloadScreen == true
-                          ? Container()
-                          : IconButton(
-                              icon: Icon(
-                                isPlaying &&
-                                        album.id == context.watch<PlayerProvider>().currentAlbum.id
-                                    ? AntDesign.pausecircleo
-                                    : AntDesign.playcircleo,
-                                size: 30,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              onPressed: () {
-                                context.read<PlayerProvider>().handlePlayButton(
-                                    album: album,
-                                    track: album.tracks[0],
-                                    index: 0,
-                                    context: context);
-                              },
-                            );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            //     Positioned(
+            //       right: 0,
+            //       bottom: 10,
+            //       child: PlayerBuilder.isPlaying(
+            //         player: context.watch<PlayerProvider>().player,
+            //         builder: (context, isPlaying) {
+            //           return downloadScreen != null && downloadScreen == true
+            //               ? Container()
+            //               : IconButton(
+            //                   icon: Icon(
+            //                     isPlaying &&
+            //                             album.id ==
+            //                                 context
+            //                                     .watch<PlayerProvider>()
+            //                                     .currentAlbum
+            //                                     .id
+            //                         ? AntDesign.pausecircleo
+            //                         : AntDesign.playcircleo,
+            //                     size: 30,
+            //                     color: Theme.of(context).primaryColor,
+            //                   ),
+            //                   onPressed: () {
+            //                     context.read<PlayerProvider>().handlePlayButton(
+            //                         album: album,
+            //                         track: album.tracks[0],
+            //                         index: 0,
+            //                         context: context);
+            //                   },
+            //                 );
+            //         },
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: 5, bottom: 5),
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: Text(
-                  "${album?.name}",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                ),
+          Expanded(flex:3,
+            child: Container(
+              // color: Colors.red,height: 90,
+              // padding: EdgeInsets.only(top:5, bottom: 0),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "${album?.name}",maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w500, color: white),
               ),
             ),
           ),
           Expanded(
+            flex:2,
             child: Row(
               mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (downloadScreen == null || downloadScreen == false)
                   Text(
                     '${album.tracks.length} sons',
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 12,
+                      color:Colors.white70,
                     ),
                   ),
-                SizedBox(width: 20),
+                // SizedBox(width: 5),
                 if (!album.isBought)
+                // if(true)
                   if (downloadScreen == null || downloadScreen == false)
                     Container(
-                      height: 30,
-                      width: width * 0.2,
+                      height: 35,
+                      width: width * 0.20,
+
                       child: ElevatedButton(
                         style: ButtonStyle(
-                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero),
+                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.symmetric(vertical: 0,horizontal: 2)),
                           backgroundColor:
                               MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
                         ),
                         child: Container(
-                          margin: EdgeInsets.all(5),
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          margin: EdgeInsets.symmetric(vertical: 2),
                           child: Column(
                             children: [
                               Expanded(
@@ -116,8 +135,8 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                                   child: Text(
                                     "Ajouter au panier",
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
+                                      color: white,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ),
@@ -129,7 +148,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                                     "${album.price} €",
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 10,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ),
@@ -153,6 +172,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                                 content: Text(
                                   "Vous devez être connecté avant d'acheter un album",
                                   textAlign: TextAlign.center,
+                                  style:TextStyle(color:Colors.black)
                                 ),
                                 actions: [
                                   TextButton(
@@ -165,6 +185,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                                         'sign_in',
                                       ),
                                       textAlign: TextAlign.end,
+                                      style:TextStyle(color:primary)
                                     ),
                                   ),
                                   TextButton(
@@ -177,6 +198,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                                         'create_new_Account',
                                       ),
                                       textAlign: TextAlign.end,
+                                      style:TextStyle(color:primary)
                                     ),
                                   ),
                                 ],
@@ -190,6 +212,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
               ],
             ),
           ),
+          SizedBox(height:15),
         ],
       ),
     );

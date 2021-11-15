@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
@@ -11,6 +11,7 @@ class ConfirmationScreen extends StatelessWidget with BaseMixins {
   Widget build(BuildContext context) {
     return Container(
       child: Scaffold(
+      backgroundColor: background,
         body: BaseMessageScreen(
             title: $t(context, 'register_title'),
             icon: Icons.check_box,

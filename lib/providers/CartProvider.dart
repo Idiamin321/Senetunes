@@ -2,15 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/providers/AlbumProvider.dart';
 
 import '../models/Album.dart';
 import 'AuthProvider.dart';
 import 'BaseProvider.dart';
 
-class CartProvider extends BaseProvider {
+class CartProvider extends BaseProvider with BaseMixins {
   List<Album> cart = [];
   String url;
   Map<String, dynamic> request;
@@ -96,8 +99,28 @@ class CartProvider extends BaseProvider {
     return request;
   }
 
+  int isBought = 0;
+
   _boughtSuccessful(BuildContext context, String email) async {
     print("ASDAKLSDNASLDNALSDNASD");
+    if (isBought == 0) isBought = 1;
+
+    if (isBought == 1) {
+      // ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
+      //   content: new Text(
+      //     $t(context, 'album_purchase_success'),
+      //     style: TextStyle(color: Colors.white),
+      //     textAlign: TextAlign.center,
+      //   ),
+      //   margin: EdgeInsets.only(bottom: 25, left: 25, right: 25),
+      //   backgroundColor: Colors.black,
+      //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      //   behavior: SnackBarBehavior.floating,
+      //   duration: Duration(seconds: 5),
+      // ));
+      Fluttertoast.showToast(msg: $t(context, 'album_purchase_success'));
+      isBought = -1;
+    }
     for (Album album in cart) {
       http.Response response;
       String basicAuth = 'Basic ' +
@@ -124,6 +147,7 @@ class CartProvider extends BaseProvider {
       print(response.body);
     }
     request = null;
+
     clearCart();
     await context
         .read<AuthProvider>()

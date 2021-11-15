@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/providers/AuthProvider.dart';
 

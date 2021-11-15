@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 
 class BaseBlur extends StatelessWidget {
   @override

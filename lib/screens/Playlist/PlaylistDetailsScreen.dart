@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Album.dart';
@@ -19,22 +19,27 @@ class _PlaylistDetailsScreenState extends State<PlaylistDetailsScreen> with Base
     String playlistName = ModalRoute.of(context).settings.arguments;
     print(context.read<PlaylistProvider>().playlists);
     return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: background,
+      // //backgroundColor: Theme.of(context).cardColor,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
-        child: BaseAppBar(
-          isHome: false,
-        ),
+        preferredSize: const Size.fromHeight(100),
+      child:BaseScreenHeading(
+        title: playlistName,
+        centerTitle: false,
+        isBack: true,
+      ),
+      //   child: BaseAppBar(
+      //     isHome: false,
+      //   ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BaseScreenHeading(
-            title: playlistName,
-          ),
           Expanded(
             child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: background,
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              // color: Theme.of(context).scaffoldBackgroundColor,
               child: TrackContainer(playlistName),
             ),
           ),
@@ -72,6 +77,7 @@ class _TrackContainerState extends State<TrackContainer> with BaseMixins {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: background,
         padding: EdgeInsets.only(bottom: 0.0),
         child: playlistProvider.playlists[widget.playlistName].length > 0
             ? ListView.builder(

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
 
@@ -9,7 +9,7 @@ class PopOverWidget {
       showPopover(
         radius: 10,
         direction: popoverDirection,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        //backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         context: context,
         bodyBuilder: (context) {
           globalConfiguration.updateValue(key, false);

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/widgtes/common/CustomCircularProgressIndicator.dart';
 
 class BaseBlockButton extends StatelessWidget {
@@ -23,13 +23,14 @@ class BaseBlockButton extends StatelessWidget {
     return isLoaded
         ? Container(
             width: double.infinity,
+            height:60,
             child: FlatButton(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radius)),
               onPressed: () => onPressed(),
               child: Padding(
                 child: Text(
-                  label,
-                  style: TextStyle(fontSize: 14.0, color: textColor),
+                  label,textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18.0, color: textColor),
                 ),
                 padding: EdgeInsets.all(15.0),
               ),

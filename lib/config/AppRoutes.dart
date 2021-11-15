@@ -7,7 +7,7 @@
  *  
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/screens/Artist/ArtistDetailScreen.dart';
 import 'package:senetunes/screens/Artist/ArtistsScreen.dart';
 import 'package:senetunes/screens/Auth/ConfirmationScreen.dart';
@@ -17,6 +17,7 @@ import 'package:senetunes/screens/Auth/UserAccountPage.dart';
 import 'package:senetunes/screens/Bought%20Albums/BoughtAlbumsDetailsScreen.dart';
 import 'package:senetunes/screens/Bought%20Albums/BoughtAlbumsScreen.dart';
 import 'package:senetunes/screens/Download/DownloadDetailsScreen.dart';
+import 'package:senetunes/screens/Favourites/MyFavouritesScreen.dart';
 import 'package:senetunes/screens/Info/AboutUs.dart';
 import 'package:senetunes/screens/Info/ContactUs.dart';
 import 'package:senetunes/screens/PlayerScreen.dart';
@@ -25,6 +26,7 @@ import 'package:senetunes/screens/Playlist/PlaylistScreen.dart';
 import 'package:senetunes/screens/WebView/WebView.dart';
 import 'package:senetunes/screens/album/AlbumDetailScreen.dart';
 import 'package:senetunes/screens/album/AlbumsScreen.dart';
+import 'package:senetunes/screens/downloadPlayerScreen.dart';
 import 'package:senetunes/screens/exploreScreen.dart';
 import 'package:senetunes/widgtes/Common/BaseAuthCheck.dart';
 
@@ -46,6 +48,7 @@ class AppRoutes {
   // static const profileEditRoute = '/profileEditRoute';
   static const confirmScreenRoute = '/confirmScreenRoute';
   static const favourites = '/favourites';
+  static const myfavourites = '/Myfavourites';
   static const userAccountPage = '/userAccountPage';
   static const cart = '/cart';
   static const webView = '/webView';
@@ -59,12 +62,14 @@ class AppRoutes {
   static const categoryDetail = '/categoryDetail';
   static const boughtAlbumsScreenRoute = '/boughtAlbumsScreenRoute';
   static const boughtAlbumsDetails = '/boughtAlbumsDetails';
+  static const downloadPlayer = '/downloadPlayer';
   Map<String, WidgetBuilder> routes() {
     return {
       home: (context) => ExploreScreen(),
       albums: (context) => AlbumsScreen(),
       albumDetail: (context) => AlbumDetailScreen(),
       player: (context) => PlayerScreen(),
+      downloadPlayer: (context) => DownloadPlayerScreen(),
       artists: (context) => ArtistsScreen(),
       artist: (context) => ArtistDetailScreen(),
       loginRoute: (context) => BaseAuthCheck(
@@ -78,6 +83,7 @@ class AppRoutes {
       // profileEditRoute: (context) => ProfileEditPage(),
       confirmScreenRoute: (context) => ConfirmationScreen(),
       favourites: (context) => FavouritesScreen(),
+      myfavourites: (context) => MyFavouritesScreen(),
       userAccountPage: (context) => UserAccountPage(),
       cart: (context) => Cart(),
       webView: (context) => WebViewCart(),

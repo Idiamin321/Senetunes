@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
 import 'package:senetunes/widgtes/track/TrackBottomBar.dart';
 
 class BaseMessageScreen extends StatelessWidget {
@@ -10,9 +14,12 @@ class BaseMessageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
+      backgroundColor: background,
+      body:Center(
+        // children: [
+          child:Container(
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            alignment: Alignment.center,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -29,6 +36,7 @@ class BaseMessageScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14.0,
+                        color:white
                       )),
                 SizedBox(height: 10.0),
                 if (subtitle != null)
@@ -40,18 +48,18 @@ class BaseMessageScreen extends StatelessWidget {
                 SizedBox(
                   height: 20.0,
                 ),
-                if (child != null) child,
+                if (child != null) Center(child:child,),
               ],
             ),
           ),
-          Positioned(
-            bottom: 0.0,
-            left: 0.0,
-            height: 50,
-            right: 0.0,
-            child: TrackBottomBar(),
-          ),
-        ],
+          // Positioned(
+          //   bottom: 0.0,
+          //   left: 0.0,
+          //   height: 55,
+          //   right: 0.0,
+          //   child: TrackBottomBar(),
+          // ),
+      //   ],
       ),
     );
   }

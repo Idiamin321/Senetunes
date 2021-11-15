@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/widgtes/common/CustomCircularProgressIndicator.dart';
 
 class BasePagination extends StatelessWidget {

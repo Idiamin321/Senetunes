@@ -1,5 +1,7 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
@@ -18,7 +20,9 @@ class TrackTile extends StatefulWidget {
   final Track track;
   final int index;
   final List<Track> tracks;
-  TrackTile({this.track, this.index, this.isDownloadTile, this.album, this.tracks});
+
+  TrackTile(
+      {this.track, this.index, this.isDownloadTile, this.album, this.tracks});
 
   @override
   _TrackTileState createState() => _TrackTileState();
@@ -32,59 +36,101 @@ class _TrackTileState extends State<TrackTile> with BaseMixins {
     return PlayerBuilder.isPlaying(
       player: p.player,
       builder: (context, isPlaying) {
-        return Column(children: <Widget>[
-          ListTile(
-            onTap: () {
-              p.setBuffering(widget.index);
-              p.isTrackInProgress(widget.track) || p.isLocalTrackInProgress(widget.track.localPath)
-                  ? Navigator.of(context).pushNamed(AppRoutes.player)
-                  : p.handlePlayButton(
-                      track: widget.track,
-                      index: widget.index,
-                      album: widget.album,
-                      context: context,
-                    );
-            },
-            title: Text(
-              widget.track.name,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-            ),
-            subtitle: widget?.track?.artistInfo?.name == null
-                ? Container()
-                : Text(
-                    widget.track.artistInfo.name,
-                    style: TextStyle(color: Theme.of(context).colorScheme.primaryVariant),
+        return Container(
+          color: background,
+          margin: EdgeInsets.symmetric(horizontal: 0),
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                tileColor: Colors.black,
+                onTap: () {
+                  p.setBuffering(widget.index);
+                  p.isTrackInProgress(widget.track) ||
+                          p.isLocalTrackInProgress(widget.track.localPath)
+                      ? Navigator.of(context).pushNamed(AppRoutes.player)
+                      : p.handlePlayButton(
+                          track: widget.track,
+                          index: widget.index,
+                          album: widget.album,
+                          context: context,
+                        );
+                },
+                title: Text(
+                  widget.track.name,
+                  maxLines: 2,
+                  style: TextStyle(
+                    // color: Theme.of(context).colorScheme.primary,
+                    color: white,
+                    fontWeight: FontWeight.w600,
                   ),
-            leading: TrackPlayButton(
-              track: widget.track,
-              index: widget.index,
-              album: widget.album,
-            ),
-            trailing: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TrackFavouriteButton(
-                    track: widget.track,
-                    iconSize: 14.0,
-                  ),
-                  if (!downloadProvider.isDownloadSong(widget.track))
-                    TrackTileActions(
-                      child: Icon(
-                        Icons.more_vert,
-                        color: Theme.of(context).primaryColor,
+                ),
+                subtitle: widget?.track?.artistInfo?.name == null
+                    ? null
+                    : Text(
+                        widget.track.artistInfo.name,
+                        maxLines: 1,
+                        style: TextStyle(
+                            // color: Theme.of(context).colorScheme.primaryVariant
+                            color: Colors.white70,
+                            fontSize: 11),
                       ),
-                      track: widget.track,
-                      title: $t(context, 'view_detail'),
-                      isRemove: widget.isDownloadTile == null ? false : widget.isDownloadTile,
-                    ),
-                ]),
+                leading: TrackPlayButton(
+                  track: widget.track,
+                  index: widget.index,
+                  album: widget.album,
+                ),
+                trailing: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TrackFavouriteButton(
+                        track: widget.track,
+                        iconSize: 20.0,
+                      ),
+                      if (!downloadProvider.isDownloadSong(widget.track))
+                        TrackTileActions(
+                          // child: Icon(
+                          //   Icons.more_vert,
+                          //   color: Theme.of(context).primaryColor,
+                          // ),
+                          child: widget.isDownloadTile == null
+                              ? SvgPicture.asset(
+                                  "assets/icons/svg/download.svg",
+                                  height: 20,
+                                  color: Colors.white70,
+                                )
+                              : Icon(Icons.close, color: Colors.white70),
+                          track: widget.track,
+                          title: $t(context, 'download'),
+                          isRemove: false,
+                          // isRemove: widget.isDownloadTile == null
+                          //     ? false
+                          //     : widget.isDownloadTile,
+                        )
+                      else
+                        TrackTileActions(
+                          child: Icon(
+                            Icons.close,
+                            color: Colors.white70,
+                          ),
+                          track: widget.track,
+                          title: $t(context, 'remove'),
+                          isRemove: true,
+                        ),
+                    ]),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 15),
+                child: Divider(
+                  height: 0,
+                  // color: Theme.of(context).cardColor,
+                  color: white,
+                ),
+              ),
+            ],
           ),
-          Divider(
-            color: Theme.of(context).cardColor,
-          ), //
-        ]);
+        );
       },
     );
   }

@@ -44,7 +44,7 @@ class PlaylistProvider extends BaseProvider {
     playlistsNames = result.item1;
     playlists = result.item2;
     List<String> temp = playlists[playlistName] ?? [];
-    temp.add(track.name);
+    temp.add(track.name??"");
     playlists[playlistName] = temp;
     update(playlistsNames, playlists);
     notifyListeners();
@@ -100,6 +100,6 @@ class PlaylistProvider extends BaseProvider {
         }
       }
     }
-    return null;
+    return Track();
   }
 }

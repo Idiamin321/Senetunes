@@ -1,7 +1,7 @@
 // import 'dart:io';
 //
-// import 'package:flushbar/flushbar.dart';
-// import 'package:flutter/material.dart';
+// import 'package:another_flushbar/flushbar.dart';
+// import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 //
 // import 'package:senetunes/config/AppValidation_rules.dart';
 // import 'package:senetunes/mixins/BaseMixins.dart';
@@ -58,7 +58,7 @@
 //       if (response.statusCode == 200) {
 //         return Flushbar(
 //           backgroundColor:
-//               Theme.of(context).colorScheme.surface.withOpacity(0.8),
+//               barColor.withOpacity(0.95),
 //           icon: Icon(
 //             Icons.check_circle_outline,
 //             color: Colors.greenAccent,
@@ -78,6 +78,7 @@
 //
 //   _buildPageContent(BuildContext context, UsersProvider provider) {
 //     var scaffold = Scaffold(
+//       backgroundColor: background,
 //       extendBodyBehindAppBar: true,
 //       appBar: AppBar(
 //         centerTitle: true,

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:senetunes/widgtes/Common/BaseImage.dart';
 

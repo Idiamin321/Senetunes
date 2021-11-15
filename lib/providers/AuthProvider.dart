@@ -19,7 +19,7 @@ class AuthProvider extends BaseProvider {
   // Items List
 
   bool isLoaded = true;
-  bool _isLoggedIn;
+  bool _isLoggedIn=false;
   bool inputerror = false;
   String errorMsg;
   bool check = true;
@@ -155,7 +155,8 @@ class AuthProvider extends BaseProvider {
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
 
-    String xml = """<?xml version="1.0" encoding="UTF-8"?>
+    String xml =
+        """<?xml version="1.0" encoding="UTF-8"?>
 <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
 <customer>
 	<passwd><![CDATA[${formData['passwd']}]]></passwd>

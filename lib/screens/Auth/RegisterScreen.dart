@@ -1,8 +1,12 @@
-import 'package:flushbar/flushbar.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppConfig.dart';
+
 import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/config/AppTheme.dart';
 import 'package:senetunes/config/AppValidation_rules.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/providers/AuthProvider.dart';
@@ -28,9 +32,19 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
 
   Widget _buildFirstNameField() {
     return TextFormField(
-      decoration: InputDecoration(
-        labelText: $t(context, 'f_name'),
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/Nom.svg",
+            color: primary,
+          ),
+        ),
       ),
+      // decoration: InputDecoration(
+      //   labelText: $t(context, 'f_name'),
+      // ),
       validator: (value) => AppValidation(context).validateName(value),
       onSaved: (String value) {
         formData['firstname'] = value;
@@ -40,9 +54,19 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
 
   Widget _buildLastNameField() {
     return TextFormField(
-      decoration: InputDecoration(
-        labelText: $t(context, 'l_name'),
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/Nom.svg",
+            color: primary,
+          ),
+        ),
       ),
+      // decoration: InputDecoration(
+      //   labelText: $t(context, 'l_name'),
+      // ),
       validator: (value) => AppValidation(context).validateName(value),
       onSaved: (String value) {
         formData['lastname'] = value;
@@ -91,7 +115,17 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
 
   Widget _buildEmailField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: $t(context, 'email')),
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 20),
+          child: SvgPicture.asset(
+            "assets/icons/svg/email.svg",
+            color: primary,
+          ),
+        ),
+      ),
+      // decoration: InputDecoration(labelText: $t(context, 'email')),
       validator: (value) => AppValidation(context).validateEmail(value),
       onSaved: (String value) {
         formData['email'] = value;
@@ -102,9 +136,33 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
   Widget _buildPasswordField() {
     return TextFormField(
       key: passKey,
-      decoration: InputDecoration(labelText: $t(context, 'password', value: 'Password')),
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/padlock.svg",
+            color: primary,
+          ),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            hidePass
+                ? Icons.remove_red_eye_outlined
+                : Icons.visibility_off_outlined,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() {
+              hidePass = !hidePass;
+            });
+          },
+        ),
+      ),
+      // decoration: InputDecoration(
+      //     labelText: $t(context, 'password', value: 'Password')),
       validator: (value) => AppValidation(context).validatePassword(value),
-      obscureText: true,
+      obscureText: hidePass,
       onSaved: (String value) {
         formData['passwd'] = value;
       },
@@ -113,18 +171,32 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
 
   bool _termsChecked = false;
   bool errorShow = true;
+  bool hidePass = true;
+  bool hideConfirmPass = true;
+
   Widget _buildTermsCheck() {
     return Padding(
       padding: const EdgeInsets.only(left: 5.0),
-      child: CheckboxListTile(
-        activeColor: Theme.of(context).primaryColor,
-        title: Text($t(
-          context,
-          'terms',
-        )),
-        controlAffinity: ListTileControlAffinity.leading,
-        value: _termsChecked,
-        onChanged: (bool value) => setState(() => _termsChecked = value),
+      child: ListTile(
+        leading: Checkbox(
+          activeColor: Theme.of(context).primaryColor,
+          side: BorderSide(
+            color: Colors.white,
+            width: 1,
+          ),
+          // shape: RoundedRectangleBorder(
+          //   side:
+          // ),
+          value: _termsChecked,
+          onChanged: (bool value) => setState(() => _termsChecked = value),
+        ),
+        // controlAffinity: ListTileControlAffinity.leading,
+        title: Text(
+            $t(
+              context,
+              'terms',
+            ),
+            style: TextStyle(color: white)),
         subtitle: !errorShow
             ? Text(
                 $t(
@@ -141,14 +213,38 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
 
   Widget _buildConfirmPasswordField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: $t(context, 'cnfrm_account')),
-      validator: (value) =>
-          AppValidation(context).validateConfirmPassword(value, passKey.currentState.value),
-      obscureText: true,
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/padlock.svg",
+            color: primary,
+          ),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            hideConfirmPass
+                ? Icons.remove_red_eye_outlined
+                : Icons.visibility_off_outlined,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() {
+              hideConfirmPass = !hideConfirmPass;
+            });
+          },
+        ),
+      ),
+      // decoration: InputDecoration(labelText: $t(context, 'cnfrm_account')),
+      validator: (value) => AppValidation(context)
+          .validateConfirmPassword(value, passKey.currentState.value),
+      obscureText: hideConfirmPass,
     );
   }
 
   _submit(BuildContext context, AuthProvider provider) {
+    FocusScope.of(context).requestFocus(new FocusNode());
     setState(() {
       errorShow = _termsChecked;
     });
@@ -161,15 +257,16 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
       provider.singUpWithEmail(formData).then((response) {
         response != null
             ? Flushbar(
-                backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+                backgroundColor: barColor.withOpacity(0.95),
                 icon: Icon(
                   Icons.error_outline,
                   color: Theme.of(context).primaryColor,
                 ),
                 duration: Duration(seconds: 3),
                 flushbarPosition: FlushbarPosition.TOP,
-                titleText: Text($t(context, 'ops')),
-                messageText: Text(response),
+                titleText:
+                    Text($t(context, 'ops'), style: TextStyle(color: white)),
+                messageText: Text(response, style: TextStyle(color: white)),
               ).show(context)
             : Navigator.popAndPushNamed(context, AppRoutes.confirmScreenRoute);
         // Navigator.pushReplacementNamed(context, AppRoutes.confirmScreenRoute);
@@ -186,23 +283,24 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
     var provider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
+      backgroundColor: background,
       resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).iconTheme.color,
-          ),
-        ),
-        title: Text(
-          $t(context, 'create_new_Account'),
-          style: TextStyle(color: primary),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //     onPressed: () => Navigator.pop(context),
+      //     icon: Icon(
+      //       Icons.arrow_back,
+      //       color: Theme.of(context).iconTheme.color,
+      //     ),
+      //   ),
+      //   title: Text(
+      //     $t(context, 'create_new_Account'),
+      //     style: TextStyle(color: primary),
+      //   ),
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      // ),
       body: Container(
         height: media.height,
         child: Stack(
@@ -211,50 +309,162 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(media.height / 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 90,
-                        ),
-                        BaseAppIcon(
-                          width: media.width * 0.5,
-                        ),
-                        SizedBox(
-                          height: 50,
-                        ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Stack(children: [
                         Container(
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                _buildFirstNameField(),
-                                _buildLastNameField(),
-                                // _buildBirthDayPicker(),
-                                _buildEmailField(),
-                                _buildPasswordField(),
-                                _buildConfirmPasswordField(),
-                              ],
+                          width: double.infinity,
+                          height: 261,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              fit: BoxFit.contain,
+                              image: ExactAssetImage(
+                                AppConfig.TOP_BACKGROUND,
+                              ),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          // color: Colors.red,
+                        ),
+                        Positioned.fill(
+                          child:
+                              Container(color: Color.fromRGBO(18, 18, 18, 0.7)),
+                        ),
+                        Align(
+                          child: Container(
+                            width: 220,
+                            height: 261,
+                            child: Image.asset(
+                              AppConfig.APP_LOGO,
+                              fit: BoxFit.contain,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ]),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          $t(context, 'create_new_Account'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              fontSize: 20),
+                        ),
+                      ),
+                      // SizedBox(
+                      //   height: 90,
+                      // ),
+                      // BaseAppIcon(
+                      //   width: media.width * 0.5,
+                      // ),
+
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: media.height / 20,
+                            horizontal: media.height / 40),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'f_name'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildFirstNameField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'l_name'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildLastNameField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'email'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              // _buildBirthDayPicker(),
+                              _buildEmailField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'password'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildPasswordField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'cnfrm_account'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildConfirmPasswordField(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  // ),
+
                   _buildTermsCheck(),
+
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: media.height / 20, vertical: 20),
+                    padding: EdgeInsets.symmetric(
+                        vertical: 20, horizontal: media.height / 40),
+                    // padding: EdgeInsets.symmetric(
+                    //     horizontal: media.height / 20, vertical: 20),
                     child: BaseBlockButton(
-                      isLoaded: provider.check,
+                      isLoaded: provider.isLoaded,
                       color: Theme.of(context).primaryColor,
                       label: $t(context, 'create_new_Account'),
                       textColor: Colors.white,
+                      radius: 100,
                       onPressed: () => _submit(context, provider),
                     ),
                   ),

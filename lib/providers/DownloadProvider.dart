@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:dio/dio.dart';
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
 import 'package:localstorage/localstorage.dart';
@@ -66,47 +67,50 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   downloadAlbum(Album album, BuildContext context) async {
     if (album.isBought) {
+
       if (!(album.tracks.fold(
           isDownloadSong(album.tracks[0]), (x, e) => x & isDownloadSong(e)))) {
         Flushbar(
-          backgroundColor:
-              Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          backgroundColor:barColor.withOpacity(0.95),
+              // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.download_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'download_msg')),
-          messageText: Text($t(context, 'download_sub')),
+          titleText: Text($t(context, 'download_msg'),style:TextStyle(color:white)),
+          messageText: Text($t(context, 'download_sub'),style:TextStyle(color:white)),
         ).show(context);
         notifyListeners();
         await _downloadAlbum(album);
       } else {
         Flushbar(
           backgroundColor:
-              Theme.of(context).colorScheme.surface.withOpacity(0.8),
+              barColor.withOpacity(0.95),
+              // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.warning_amber_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'ops')),
-          messageText: Text($t(context, 'already_download')),
+          titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
+          messageText: Text($t(context, 'already_download'),style:TextStyle(color:white)),
         ).show(context);
       }
     } else {
       Flushbar(
-        backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+        backgroundColor: barColor.withOpacity(0.95),
+        // backgroundColor: barColor.withOpacity(0.95),
         icon: Icon(
           Icons.error_outline,
           color: Theme.of(context).primaryColor,
         ),
         duration: Duration(seconds: 13),
         flushbarPosition: FlushbarPosition.TOP,
-        titleText: Text($t(context, 'ops')),
-        messageText: Text($t(context, 'did_not_buy')),
+        titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
+        messageText: Text($t(context, 'did_not_buy'),style:TextStyle(color:white)),
       ).show(context);
     }
   }
@@ -118,44 +122,45 @@ class DownloadProvider extends BaseProvider with BaseMixins {
         .containsKey(song.albumId)) {
       if (!isDownloadSong(song)) {
         Flushbar(
-          backgroundColor:
-              Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          backgroundColor:barColor.withOpacity(0.95),
+              // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.download_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'download_msg')),
-          messageText: Text($t(context, 'download_sub')),
+          titleText: Text($t(context, 'download_msg',),style:TextStyle(color:white)),
+          messageText: Text($t(context, 'download_sub'),style:TextStyle(color:white)),
         ).show(context);
         notifyListeners();
         await _downloadAudio(song);
       } else {
         Flushbar(
-          backgroundColor:
-              Theme.of(context).colorScheme.surface.withOpacity(0.8),
+          backgroundColor:barColor.withOpacity(0.95),
+              // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.warning_amber_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'ops')),
-          messageText: Text($t(context, 'already_download')),
+          titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
+          messageText: Text($t(context, 'already_download'),style:TextStyle(color:white)),
         ).show(context);
       }
     } else {
       Flushbar(
-        backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+        backgroundColor: barColor.withOpacity(0.95),
+        // backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.9),
         icon: Icon(
           Icons.error_outline,
           color: Theme.of(context).primaryColor,
         ),
         duration: Duration(seconds: 13),
         flushbarPosition: FlushbarPosition.TOP,
-        titleText: Text($t(context, 'ops')),
-        messageText: Text($t(context, 'did_not_buy')),
+        titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
+        messageText: Text($t(context, 'did_not_buy'),style:TextStyle(color:white)),
       ).show(context);
     }
   }
@@ -242,6 +247,8 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   isDownloadSong(Track song) {
     _downloadSongs.contains(song);
+    // log("00000000000");
+    // log(_downloadSongs.map((e) => e.id).toList().contains(song.id).toString());
     return _downloadSongs.map((e) => e.id).toList().contains(song.id);
   }
 
@@ -250,8 +257,8 @@ class DownloadProvider extends BaseProvider with BaseMixins {
   }
 
   Track returnSong(Track song) {
-    print(song.id);
-    print(_downloadSongs.map((e) => e.id).toList());
+    // print(song.id);
+    // print(_downloadSongs.map((e) => e.id).toList());
     return _downloadSongs[_downloadSongs.indexOf(song)];
   }
 

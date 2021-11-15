@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Track.dart';
@@ -23,19 +23,22 @@ class TrackTileActions extends StatelessWidget with BaseMixins {
     DownloadProvider downloadProvider = Provider.of<DownloadProvider>(context);
 
     return PopupMenuButton<String>(
+      // color: background,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: child,
       onSelected: (String value) {
         if (value == 'download') {
           downloadProvider.downloadAudio(track, context);
         }
         if (value == 'remove') {
-          downloadProvider.removeSong(downloadProvider.returnSong(track));
+          downloadProvider.removeSong(track);
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
         PopupMenuItem<String>(
-          value: 'download',
-          child: Text($t(context, 'downloading')),
+          value: !isRemove || isRemove==null?'download':'remove',
+          child: Text($t(context, !isRemove || isRemove==null?'downloading':'remove'),
+              style:TextStyle(color:primary)),
         )
       ],
     );

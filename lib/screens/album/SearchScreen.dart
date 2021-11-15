@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:provider/provider.dart';
+
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/providers/AlbumProvider.dart';
@@ -27,8 +28,11 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
   Widget build(BuildContext context) {
     AlbumProvider albumProvider = Provider.of<AlbumProvider>(context);
 
-    return Scaffold(
-      body: SafeArea(
+    return
+      Scaffold(
+      backgroundColor: background,
+      body:
+      SafeArea(
         child: Center(
           child: Column(
             children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 
 class PositionSeekWidget extends StatefulWidget {
   final Duration currentPosition;
@@ -18,6 +19,7 @@ class PositionSeekWidget extends StatefulWidget {
 class _PositionSeekWidgetState extends State<PositionSeekWidget> {
   Duration _visibleValue;
   bool listenOnlyUserInterraction = false;
+
   double get percent => widget.duration.inMilliseconds == 0
       ? 0
       : _visibleValue.inMilliseconds / widget.duration.inMilliseconds;
@@ -38,47 +40,68 @@ class _PositionSeekWidgetState extends State<PositionSeekWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-            width: 40,
-            child: Text(durationToString(widget.currentPosition)),
-          ),
-          if (widget.duration != null)
-            Expanded(
-              child: Slider(
-                activeColor: Theme.of(context).primaryColor,
-                min: 0,
-                max: widget.duration.inMilliseconds.toDouble(),
-                value: percent * widget.duration.inMilliseconds.toDouble(),
-                onChangeEnd: (newValue) {
-                  setState(() {
-                    listenOnlyUserInterraction = false;
-                    widget.seekTo(_visibleValue);
-                  });
-                },
-                onChangeStart: (_) {
-                  setState(() {
-                    listenOnlyUserInterraction = true;
-                  });
-                },
-                onChanged: (newValue) {
-                  setState(() {
-                    final to = Duration(milliseconds: newValue.floor());
-                    _visibleValue = to;
-                  });
-                },
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            if (widget.duration != null)
+              Expanded(
+                child: Slider(
+                  activeColor: Theme.of(context).primaryColor,
+                  min: 0,
+                  max: widget.duration.inMilliseconds.toDouble(),
+                  value: percent * widget.duration.inMilliseconds.toDouble(),
+                  onChangeEnd: (newValue) {
+                    setState(() {
+                      listenOnlyUserInterraction = false;
+                      widget.seekTo(_visibleValue);
+                    });
+                  },
+                  onChangeStart: (_) {
+                    setState(() {
+                      listenOnlyUserInterraction = true;
+                    });
+                  },
+                  onChanged: (newValue) {
+                    setState(() {
+                      final to = Duration(milliseconds: newValue.floor());
+                      _visibleValue = to;
+                    });
+                  },
+                ),
               ),
-            ),
-          SizedBox(
-            width: 40,
-            child: Text(durationToString(widget.duration)),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 60,
+                child: Text(
+                  durationToString(
+                    widget.currentPosition,
+                  ),
+                  style: TextStyle(color: white),
+                ),
+              ),
+              SizedBox(
+                width: 60,
+                child: Text(
+                  durationToString(widget.duration),
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: white,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

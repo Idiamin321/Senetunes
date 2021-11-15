@@ -5,12 +5,15 @@ import 'package:http/http.dart' as http;
 import 'package:senetunes/models/Album.dart';
 import 'package:senetunes/models/Artist.dart';
 import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/widgtes/Search/SearchBox.dart';
 import 'package:xml2json/xml2json.dart';
 
 import '../config/AppConfig.dart';
 
 class AlbumProvider extends ChangeNotifier {
   AlbumProvider() {
+    toSearch = false;
+    selectedIndex = 0;
     fetchAlbums();
   }
 
@@ -24,9 +27,37 @@ class AlbumProvider extends ChangeNotifier {
   Set<Album> get boughtAlbums => _boughtAlbums;
   bool isLoaded = true;
 
+  int selectedIndex = 0;
+  bool toSearch = false;
+  Widget searchWidget;
+  String searchKeyword = "";
+  List<Track> searchedTracks = [];
+
+  gotoSearch(val) {
+    toSearch = val;
+    if (toSearch) {
+      searchWidget = SearchBox(
+        onSearch: (s) {
+          // setState(() {
+          searchKeyword = s;
+          // });
+          // if (s.length > 0) {
+          searchedTracks = searchData(s);
+          // }
+        },
+      );
+    }
+    notifyListeners();
+  }
+
+  changeNav(val) {
+    selectedIndex = val;
+    notifyListeners();
+  }
+
   fetchAlbums() async {
     isLoaded = false;
-    notifyListeners();
+    // notifyListeners();
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
     http.Response albumResponse = await http.get('${AppConfig.API}/album/list');
@@ -87,6 +118,7 @@ class AlbumProvider extends ChangeNotifier {
 
   updateBoughtAlbums(Map<int, bool> boughtAlbums) async {
     isLoaded = false;
+    notifyListeners();
     for (var i = 0; i < _allAlbums.length; i++) {
       if (boughtAlbums.containsKey(_allAlbums[i].id)) {
         _allAlbums[i].isBought = true;

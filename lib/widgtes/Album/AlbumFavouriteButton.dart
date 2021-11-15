@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
@@ -17,14 +17,14 @@ class AlbumFavouriteButton extends StatelessWidget with BaseMixins {
   @override
   Widget build(BuildContext context) {
     FavoriteProvider favouriteProvider = Provider.of(context);
-    return GestureDetector(
-        child: Icon(
+    return IconButton(
+        icon: Icon(
           favouriteProvider.isFavouitedAlbum(album) ? AntDesign.heart : AntDesign.hearto,
           size: iconSize,
           color: activeColor(context, favouriteProvider.isFavouitedAlbum(album),
-              iconColor: Theme.of(context).primaryColor),
+              iconColor: Colors.white70),
         ),
-        onTap: () {
+        onPressed: () {
           if (GlobalConfiguration().getValue('favFirst'))
             PopOverWidget(
                 key: 'favFirst',

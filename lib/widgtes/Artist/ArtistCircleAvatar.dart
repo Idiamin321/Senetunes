@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/models/Artist.dart';
 import 'package:senetunes/widgtes/Common/BaseImage.dart';
 

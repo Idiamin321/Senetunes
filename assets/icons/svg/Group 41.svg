@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="31" height="26.094" viewBox="0 0 31 26.094">
+  <g id="Group_41" data-name="Group 41" transform="translate(-314 -52)">
+    <g id="shopping-cart" transform="translate(314 57)">
+      <path id="Path_4" data-name="Path 4" d="M7.732,14.063H20.484a.7.7,0,0,0,.676-.51l2.813-9.844a.7.7,0,0,0-.676-.9H6.111L5.608.551A.7.7,0,0,0,4.922,0H.7a.7.7,0,0,0,0,1.406H4.358L6.9,12.83a2.109,2.109,0,0,0,.838,4.045h12.75a.7.7,0,1,0,0-1.406H7.734a.7.7,0,0,1,0-1.406ZM22.365,4.219l-2.411,8.438H8.3L6.423,4.219Zm0,0" fill="#e0e0e0"/>
+      <path id="Path_5" data-name="Path 5" d="M150,362.109A2.109,2.109,0,1,0,152.109,360,2.112,2.112,0,0,0,150,362.109Zm2.109-.7a.7.7,0,1,1-.7.7A.7.7,0,0,1,152.109,361.406Zm0,0" transform="translate(-142.969 -343.125)" fill="#e0e0e0"/>
+      <path id="Path_6" data-name="Path 6" d="M362,362.109A2.109,2.109,0,1,0,364.109,360,2.112,2.112,0,0,0,362,362.109Zm2.109-.7a.7.7,0,1,1-.7.7A.7.7,0,0,1,364.109,361.406Zm0,0" transform="translate(-345.031 -343.125)" fill="#e0e0e0"/>
+    </g>
+    <g id="Group_40" data-name="Group 40" transform="translate(1 -6)">
+      <circle id="Ellipse_2" data-name="Ellipse 2" cx="7" cy="7" r="7" transform="translate(330 58)" fill="#ab1017"/>
+      <text id="_2" data-name="2" transform="translate(335 68)" fill="#fff" font-size="8" font-family="Montserrat-Regular, Montserrat"><tspan x="0" y="0">2</tspan></text>
+    </g>
+  </g>
+</svg>

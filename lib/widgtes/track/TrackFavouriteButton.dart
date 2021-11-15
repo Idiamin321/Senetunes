@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
@@ -22,6 +22,7 @@ class TrackFavouriteButton extends StatelessWidget with BaseMixins {
     return IconButton(
         icon: Icon(
           favouriteProvider.isFavouitedTrack(track) ? AntDesign.heart : AntDesign.hearto,
+          color: favouriteProvider.isFavouitedTrack(track) ? primary :Colors.white70,
         ),
         iconSize: iconSize,
         color: activeColor(context, favouriteProvider.isFavouitedTrack(track)),

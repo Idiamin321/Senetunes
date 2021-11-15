@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 
 class CustomCircularProgressIndicator extends StatelessWidget {
   final double size;
@@ -12,13 +12,15 @@ class CustomCircularProgressIndicator extends StatelessWidget {
       child: Material(
         elevation: 0,
         borderRadius: BorderRadius.circular(100),
-        color: Theme.of(context).colorScheme.surface,
+        // color: Theme.of(context).colorScheme.surface,
+        color: barColor,
         child: Container(
           height: size,
           width: size,
-          padding: EdgeInsets.all(7),
+          color:background,
+          padding: EdgeInsets.all(8),
           child: CircularProgressIndicator(
-            strokeWidth: 2,
+            strokeWidth: 3,
             valueColor: AlwaysStoppedAnimation<Color>(_color),
           ),
         ),

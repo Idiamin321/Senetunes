@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
@@ -9,9 +9,10 @@ class TrackDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: background,
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        //backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: SingleChildScrollView(
         child: Column(

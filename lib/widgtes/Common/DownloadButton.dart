@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
-import 'package:senetunes/config/AppColors.dart';
+
 import 'package:senetunes/models/Album.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/providers/DownloadProvider.dart';
@@ -11,20 +13,16 @@ import 'package:senetunes/providers/DownloadProvider.dart';
 import 'PopOverWidget.dart';
 
 class DownloadButton extends StatelessWidget {
-  const DownloadButton({Key key, @required this.context, this.album, this.track});
+  const DownloadButton(
+      {Key key, @required this.context, this.album, this.track});
   final Album album;
   final BuildContext context;
   final Track track;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        Foundation.download,
-        size: 30,
-        color: primary,
-      ),
-      onPressed: () async {
+    return InkWell(
+      onTap: () async {
         if (GlobalConfiguration().getValue('downloadFirst'))
           PopOverWidget(
               key: 'downloadFirst',
@@ -37,6 +35,11 @@ class DownloadButton extends StatelessWidget {
         else if (track != null)
           await context.read<DownloadProvider>().downloadAudio(track, context);
       },
+      child: SvgPicture.asset(
+        "assets/icons/svg/download.svg",
+        height: 30,
+        color: primary,
+      ),
     );
   }
 }

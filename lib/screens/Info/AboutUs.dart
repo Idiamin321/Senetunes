@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
 
-class AboutUs extends StatelessWidget {
+class AboutUs extends StatelessWidget with BaseMixins{
   @override
   Widget build(BuildContext context) {
     TextStyle titleStyle = TextStyle(
@@ -13,11 +15,19 @@ class AboutUs extends StatelessWidget {
     TextStyle normalStyle = TextStyle(
         fontSize: 18, decoration: TextDecoration.none, color: Theme.of(context).primaryColorDark);
     return Scaffold(
+      backgroundColor: background,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
-        child: BaseAppBar(
-          isHome: false,
-        ),
+        preferredSize: const Size.fromHeight(100),
+        child:BaseScreenHeading(
+            title:$t(
+              context,
+              'who_is_senetunes',
+            ),
+          centerTitle: false,isBack: true,
+        )
+        // child: BaseAppBar(
+        //   isHome: false,
+        // ),
       ),
       body: Theme(
         data: Theme.of(context),
@@ -34,6 +44,7 @@ class AboutUs extends StatelessWidget {
               //   ),
               // ),
               Card(
+                color: background,
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -54,6 +65,7 @@ class AboutUs extends StatelessWidget {
                 ),
               ),
               Card(
+                color: background,
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -74,6 +86,7 @@ class AboutUs extends StatelessWidget {
                 ),
               ),
               Card(
+                color: background,
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -94,6 +107,7 @@ class AboutUs extends StatelessWidget {
                 ),
               ),
               Card(
+                color: background,
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(

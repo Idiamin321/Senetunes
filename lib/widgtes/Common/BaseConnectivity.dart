@@ -1,4 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +10,7 @@ import 'package:senetunes/providers/AlbumProvider.dart';
 import 'package:senetunes/providers/ArtistProvider.dart';
 import 'package:senetunes/providers/CategoryProvider.dart';
 import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+
 // Widget Name: Base Connectivity
 // @version: 1.0.0
 // @since: 1.0.0
@@ -15,6 +18,7 @@ import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
 
 class BaseConnectivity extends StatefulWidget {
   final Widget child;
+
   const BaseConnectivity({Key key, this.child}) : super(key: key);
 
   @override
@@ -23,6 +27,7 @@ class BaseConnectivity extends StatefulWidget {
 
 class _BaseConnectivityState extends State<BaseConnectivity> with BaseMixins {
   bool wasOffline = false;
+
   @override
   Widget build(BuildContext context) {
     return OfflineBuilder(
@@ -45,18 +50,28 @@ class _BaseConnectivityState extends State<BaseConnectivity> with BaseMixins {
             : BaseMessageScreen(
                 icon: Icons.perm_scan_wifi,
                 title: $t(context, 'no_internet'),
-                child: TextButton.icon(
-                    icon: Icon(
-                      EvilIcons.arrow_right,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    label: Text(
-                      $t(context, 'offline_message'),
-                      style: TextStyle(
-                          fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.downloadScreenRoute);
+                child: InkWell(
+                    child: Wrap(
+                        alignment: WrapAlignment.center,runAlignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                      Icon(
+                        EvilIcons.arrow_right,
+                        color: Theme.of(context).primaryColor,
+                        size: 20,
+                      ),
+                      AutoSizeText(
+                        $t(context, 'offline_message'),
+                        softWrap: true,
+                        maxLines: 2,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            color: Theme.of(context).primaryColor),
+                      ),
+                    ]),
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, AppRoutes.downloadScreenRoute);
                     }),
               );
       },

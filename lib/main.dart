@@ -1,8 +1,7 @@
 import 'dart:ui';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -17,17 +16,19 @@ import 'package:senetunes/config/AppTheme.dart';
 import 'package:senetunes/models/DownloadTaskInfo.dart';
 import 'package:senetunes/providers/ThemeProvider.dart';
 import 'package:senetunes/screens/Auth/LoginScreen.dart';
+import 'package:senetunes/screens/Auth/WelcomeScreen.dart';
 import 'package:senetunes/screens/exploreScreen.dart';
+import 'package:senetunes/widgtes/Common/BaseDrawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/Applocalizations.dart';
+import 'screens/Auth/SplashScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GlobalConfiguration().loadFromAsset("config");
   await FlutterDownloader.initialize(debug: true);
-  await Firebase.initializeApp();
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
@@ -72,7 +73,7 @@ class RekordApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               routes: AppRoutes().routes(),
-              home: loggedIn ? ExploreScreen() : LoginScreen(),
+              home: loggedIn ? ExploreScreen() : WelcomeScreen(),
               themeMode: value.darkMode ? ThemeMode.light : ThemeMode.dark,
               // List all of the app's supported locales here
               supportedLocales: [

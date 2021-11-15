@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Artist.dart';
 import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
@@ -17,10 +17,13 @@ class TrakTileForArtist extends StatelessWidget with BaseMixins {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Container(
+        // Expanded(
+        //   child:
+          Container(
             child: artist.tracks != null
                 ? ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
                     itemCount: artist?.tracks?.length,
                     itemBuilder: (context, index) {
                       return TrackTile(
@@ -37,7 +40,7 @@ class TrakTileForArtist extends StatelessWidget with BaseMixins {
                     subtitle: $t(context, 'msg_no_tracks'),
                   ),
           ),
-        )
+        // ),
       ],
     );
   }

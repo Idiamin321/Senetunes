@@ -1,5 +1,6 @@
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
@@ -8,6 +9,7 @@ import 'package:senetunes/providers/CartProvider.dart';
 import 'package:senetunes/widgtes/Album/AlbumTile.dart';
 import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
 import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
 import 'package:senetunes/widgtes/common/BaseImage.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
@@ -15,7 +17,8 @@ class CategoryDetailScreen extends StatefulWidget {
   _CategoryDetailScreen createState() => _CategoryDetailScreen();
 }
 
-class _CategoryDetailScreen extends State<CategoryDetailScreen> with BaseMixins {
+class _CategoryDetailScreen extends State<CategoryDetailScreen>
+    with BaseMixins {
   double heightScreen;
   double paddingBottom;
   double width;
@@ -24,7 +27,10 @@ class _CategoryDetailScreen extends State<CategoryDetailScreen> with BaseMixins 
         fit: StackFit.expand,
         children: <Widget>[
           BaseImage(
-            imageUrl: category.albums.firstWhere((e) => e.media.cover != null)?.media?.cover,
+            imageUrl: category.albums
+                .firstWhere((e) => e.media.cover != null)
+                ?.media
+                ?.cover,
             height: heightScreen,
             width: width,
             radius: 0,
@@ -39,56 +45,91 @@ class _CategoryDetailScreen extends State<CategoryDetailScreen> with BaseMixins 
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Container(
                 height: heightScreen / 2.5,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   children: [
+                    // Expanded(
+                    //   child: Row(
+                    //     children: [
+                    //       Expanded(
+                    //         flex: 3,
+                    //         child: Text(
+                    //           category.name,
+                    //           style: TextStyle(
+                    //               fontSize: 24, fontWeight: FontWeight.w500),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // if (category.description != null)
+                    //   Expanded(
+                    //     child: Container(
+                    //       height: 100,
+                    //       child: ListView(
+                    //         children: [
+                    //           Container(
+                    //             width: width,
+                    //             height: 0,
+                    //             margin: EdgeInsets.only(bottom: 20),
+                    //             child: ExpandableText(category.description,
+                    //                 style: TextStyle(
+                    //                     color: Theme.of(context)
+                    //                         .colorScheme
+                    //                         .primary,
+                    //                     height: 1.5,
+                    //                     fontSize: 12),
+                    //                 expandText: $t(context, 'show_more'),
+                    //                 collapseText: $t(
+                    //                   context,
+                    //                   'show_less',
+                    //                 ),
+                    //                 maxLines: 4,
+                    //                 linkColor: Theme.of(context).primaryColor),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                  Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Text(
+                      flex: 3,
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
                               category.name,
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (category.description != null)
-                      Expanded(
-                        child: Container(
-                          height: 100,
-                          child: ListView(
-                            children: [
-                              Container(
-                                width: width,
-                                height: 0,
-                                margin: EdgeInsets.only(bottom: 20),
-                                child: ExpandableText(category.description,
-                                    style: TextStyle(
-                                        color: Theme.of(context).colorScheme.primary,
-                                        height: 1.5,
-                                        fontSize: 12),
-                                    expandText: $t(context, 'show_more'),
-                                    collapseText: $t(
-                                      context,
-                                      'show_less',
-                                    ),
-                                    maxLines: 4,
-                                    linkColor: Theme.of(context).primaryColor),
+                              softWrap: true,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                // color: white,
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
+                            ),
+                            // Text(
+                            //   "${category.description??""}",
+                            //   softWrap: true,
+                            //   style: TextStyle(
+                            //     fontSize: 12,
+                            //     fontWeight: FontWeight.w500,
+                            //     // color: Colors.white70,
+                            //   ),
+                            // ),
+                          ]),
+                    ),
                   ],
                 ),
-              ),
+              ]),
             ),
           ),
-        ],
+          )],
       );
 
   @override
@@ -102,30 +143,53 @@ class _CategoryDetailScreen extends State<CategoryDetailScreen> with BaseMixins 
     Category category = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
+      backgroundColor: background,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100),
+        child: BaseScreenHeading(
+          title: $t(context, 'categories'),
+          centerTitle: true,
+          isBack: true,
+        ),
+      ),
       body: BaseConnectivity(
-        child: CustomScrollView(
+        child:Container(
+          margin: EdgeInsets.symmetric(horizontal: 15),
+          child: CustomScrollView(
           slivers: <Widget>[
-            SliverAppBar(
-              leading: BaseAppBar(
-                isHome: false,
-              ).leadingIcon(
-                isCart: false,
-                isHome: false,
-                cartLength: context.watch<CartProvider>().cart.length,
-                context: context,
-              ),
-              expandedHeight: heightScreen / 3.0,
-              pinned: true,
-              floating: false,
-              elevation: 1,
-              snap: false,
-              actions: <Widget>[],
-              flexibleSpace: FlexibleSpaceBar(
-                background: _buildContent(category),
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                    height: heightScreen/4,
+                    child: _buildContent(category),
+                  ),
+                ],
               ),
             ),
+            // SliverAppBar(
+            // leading: BaseAppBar(
+            //   isHome: false,
+            // ).leadingIcon(
+            //   isCart: false,
+            //   isHome: false,
+            //   cartLength: context.watch<CartProvider>().cart.length,
+            //   context: context,
+            // ),
+            // expandedHeight: heightScreen / 3.0,
+            // pinned: true,
+            // floating: false,
+            // elevation: 1,
+            // snap: false,
+            // actions: <Widget>[],
+            // flexibleSpace: FlexibleSpaceBar(
+            //   background: _buildContent(category),
+            // ),
+            // ),
             SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+              gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   return InkWell(
@@ -144,7 +208,7 @@ class _CategoryDetailScreen extends State<CategoryDetailScreen> with BaseMixins 
               ),
             ),
           ],
-        ),
+        ),),
       ),
     );
   }
