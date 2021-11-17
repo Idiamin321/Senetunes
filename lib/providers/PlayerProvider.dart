@@ -258,7 +258,8 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
         //mp3 unreachable
         print(t);
       }
-    } else {
+    }
+    else {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

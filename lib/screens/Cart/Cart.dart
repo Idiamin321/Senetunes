@@ -30,12 +30,15 @@ class _CartState extends State<Cart> with BaseMixins {
     cartProvider = context.watch<CartProvider>();
   }
 
+
   double total = 0.0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +58,29 @@ class _CartState extends State<Cart> with BaseMixins {
       total = double.parse(total.toStringAsFixed(2));
     });
     return Scaffold(
+      floatingActionButton: cartProvider.showPopMessage ? InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, AppRoutes.boughtAlbumsScreenRoute);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: primary,
+            borderRadius: BorderRadius.circular(100),
+          ),
+          margin: EdgeInsets.only(
+            left: 50,
+            right: 20,
+            top: 10,
+            bottom: track != null ? 60 : 10,
+          ),
+          height: 60,
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: Text("Go to the bought Albums",
+              style: TextStyle(
+                  color: white, fontSize: 18, fontWeight: FontWeight.w600)),
+        ),
+      ) : Container(),
       backgroundColor: background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),

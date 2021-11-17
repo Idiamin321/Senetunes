@@ -102,6 +102,20 @@ class AlbumProvider extends ChangeNotifier {
     return searchedTracks;
   }
 
+  List<Album> searchAlbums(String albumName) {
+    List<Album> searchedAlbums = [];
+    for (Album album in _allAlbums) {
+      //print(album.name);
+      if (album.name.toLowerCase().contains(albumName.toLowerCase()))
+        {
+          searchedAlbums.add(album);
+          print(album.name);
+        }
+
+    }
+    return searchedAlbums;
+  }
+
   updateTracksAndAlbumsWithArtists(List<Artist> artists) async {
     if (!_updated) {
       for (var i = 0; i < _allTracks.length; i++) {

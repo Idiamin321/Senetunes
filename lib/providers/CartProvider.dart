@@ -18,6 +18,7 @@ class CartProvider extends BaseProvider with BaseMixins {
   String url;
   Map<String, dynamic> request;
   String completed;
+  bool showPopMessage = false;
 
   void addAlbum(Album album) {
     if (!cart.contains(album)) {
@@ -119,6 +120,7 @@ class CartProvider extends BaseProvider with BaseMixins {
       //   duration: Duration(seconds: 5),
       // ));
       Fluttertoast.showToast(msg: $t(context, 'album_purchase_success'));
+      showPopMessage = true;
       isBought = -1;
     }
     for (Album album in cart) {

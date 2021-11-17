@@ -62,6 +62,8 @@ class BaseScreenHeading extends StatelessWidget {
                   isBack != null && isBack
                       ? InkWell(
                           onTap: () {
+                            CartProvider cartProvider = Provider.of<CartProvider>(context, listen: false);
+                            cartProvider.showPopMessage == true ? cartProvider.showPopMessage = false : false;
                             Navigator.of(context).pop();
                           },
                           child: SvgPicture.asset(

@@ -44,10 +44,10 @@ class _TrackTileState extends State<TrackTile> with BaseMixins {
               ListTile(
                 tileColor: Colors.black,
                 onTap: () {
-                  p.setBuffering(widget.index);
+                   p.setBuffering(widget.index);
                   p.isTrackInProgress(widget.track) ||
-                          p.isLocalTrackInProgress(widget.track.localPath)
-                      ? Navigator.of(context).pushNamed(AppRoutes.player)
+                          p.isLocalTrackInProgress(widget.track.localPath) ?
+                  Navigator.of(context).pushNamed(AppRoutes.player)
                       : p.handlePlayButton(
                           track: widget.track,
                           index: widget.index,

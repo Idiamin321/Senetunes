@@ -50,6 +50,7 @@ class BaseImage extends StatelessWidget {
         height: height,
         imageBuilder: (context, imageProvider) => Container(
           decoration: BoxDecoration(
+            color: Colors.black,
             borderRadius: BorderRadius.all(Radius.circular(radius != null ? radius : 15)),
             image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
           ),
