@@ -22,11 +22,13 @@ class ArtistProvider extends ChangeNotifier {
     isLoaded = false;
     notifyListeners();
 
-    http.Response response = await http.get("${AppConfig.API}/artist/list");
+    http.Response response =
+        await http.get(Uri.parse("${AppConfig.API}/artist/list"));
     if (response.statusCode == 200) {
       var transformer = Xml2Json();
       transformer.parse(response.body);
-      List<dynamic> b = jsonDecode(transformer.toBadgerfish())['artists']['artist'];
+      List<dynamic> b =
+          jsonDecode(transformer.toBadgerfish())['artists']['artist'];
       for (dynamic artist in b) {
         _allArtists.add(Artist.fromJson(artist as Map<String, dynamic>));
       }
@@ -44,9 +46,10 @@ class ArtistProvider extends ChangeNotifier {
           _allArtists[i].albums = [];
           _allArtists[i].tracks = [];
           _allArtists[i].albums.addAll(albumsMatch);
-          _allArtists[i]
-              .tracks
-              .addAll(albumsMatch.map((e) => e.tracks).expand((element) => element).toList());
+          _allArtists[i].tracks.addAll(albumsMatch
+              .map((e) => e.tracks)
+              .expand((element) => element)
+              .toList());
         }
       }
       _updated = true;

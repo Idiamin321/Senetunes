@@ -7,7 +7,8 @@ import 'dart:ui';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
 import 'package:localstorage/localstorage.dart';
@@ -54,7 +55,8 @@ class DownloadProvider extends BaseProvider with BaseMixins {
   var dio = Dio();
   bool isDownload = false;
   Directory downloadDir;
-  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   DownloadProvider() {
     getDownloads();
     _bindBackgroundIsolate();
@@ -67,36 +69,37 @@ class DownloadProvider extends BaseProvider with BaseMixins {
 
   downloadAlbum(Album album, BuildContext context) async {
     if (album.isBought) {
-
       if (!(album.tracks.fold(
           isDownloadSong(album.tracks[0]), (x, e) => x & isDownloadSong(e)))) {
         Flushbar(
-          backgroundColor:barColor.withOpacity(0.95),
-              // barColor.withOpacity(0.95),
+          backgroundColor: barColor.withOpacity(0.95),
+          // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.download_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'download_msg'),style:TextStyle(color:white)),
-          messageText: Text($t(context, 'download_sub'),style:TextStyle(color:white)),
+          titleText:
+              Text($t(context, 'download_msg'), style: TextStyle(color: white)),
+          messageText:
+              Text($t(context, 'download_sub'), style: TextStyle(color: white)),
         ).show(context);
         notifyListeners();
         await _downloadAlbum(album);
       } else {
         Flushbar(
-          backgroundColor:
-              barColor.withOpacity(0.95),
-              // barColor.withOpacity(0.95),
+          backgroundColor: barColor.withOpacity(0.95),
+          // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.warning_amber_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
-          messageText: Text($t(context, 'already_download'),style:TextStyle(color:white)),
+          titleText: Text($t(context, 'ops'), style: TextStyle(color: white)),
+          messageText: Text($t(context, 'already_download'),
+              style: TextStyle(color: white)),
         ).show(context);
       }
     } else {
@@ -109,8 +112,9 @@ class DownloadProvider extends BaseProvider with BaseMixins {
         ),
         duration: Duration(seconds: 13),
         flushbarPosition: FlushbarPosition.TOP,
-        titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
-        messageText: Text($t(context, 'did_not_buy'),style:TextStyle(color:white)),
+        titleText: Text($t(context, 'ops'), style: TextStyle(color: white)),
+        messageText:
+            Text($t(context, 'did_not_buy'), style: TextStyle(color: white)),
       ).show(context);
     }
   }
@@ -122,31 +126,38 @@ class DownloadProvider extends BaseProvider with BaseMixins {
         .containsKey(song.albumId)) {
       if (!isDownloadSong(song)) {
         Flushbar(
-          backgroundColor:barColor.withOpacity(0.95),
-              // barColor.withOpacity(0.95),
+          backgroundColor: barColor.withOpacity(0.95),
+          // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.download_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'download_msg',),style:TextStyle(color:white)),
-          messageText: Text($t(context, 'download_sub'),style:TextStyle(color:white)),
+          titleText: Text(
+              $t(
+                context,
+                'download_msg',
+              ),
+              style: TextStyle(color: white)),
+          messageText:
+              Text($t(context, 'download_sub'), style: TextStyle(color: white)),
         ).show(context);
         notifyListeners();
         await _downloadAudio(song);
       } else {
         Flushbar(
-          backgroundColor:barColor.withOpacity(0.95),
-              // barColor.withOpacity(0.95),
+          backgroundColor: barColor.withOpacity(0.95),
+          // barColor.withOpacity(0.95),
           icon: Icon(
             Icons.warning_amber_outlined,
             color: Theme.of(context).primaryColor,
           ),
           duration: Duration(seconds: 5),
           flushbarPosition: FlushbarPosition.TOP,
-          titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
-          messageText: Text($t(context, 'already_download'),style:TextStyle(color:white)),
+          titleText: Text($t(context, 'ops'), style: TextStyle(color: white)),
+          messageText: Text($t(context, 'already_download'),
+              style: TextStyle(color: white)),
         ).show(context);
       }
     } else {
@@ -159,8 +170,9 @@ class DownloadProvider extends BaseProvider with BaseMixins {
         ),
         duration: Duration(seconds: 13),
         flushbarPosition: FlushbarPosition.TOP,
-        titleText: Text($t(context, 'ops'),style:TextStyle(color:white)),
-        messageText: Text($t(context, 'did_not_buy'),style:TextStyle(color:white)),
+        titleText: Text($t(context, 'ops'), style: TextStyle(color: white)),
+        messageText:
+            Text($t(context, 'did_not_buy'), style: TextStyle(color: white)),
       ).show(context);
     }
   }
@@ -308,17 +320,23 @@ class DownloadProvider extends BaseProvider with BaseMixins {
         await FlutterLocalNotificationsPlugin()
             .cancel(downloadTaskInfo.track.id);
         final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails('progress channel', 'progress channel',
-            'progress channel description',
-            channelShowBadge: false,
-            importance: Importance.min,
-            priority: Priority.min,
-            onlyAlertOnce: true,
-            playSound: false,);
+            AndroidNotificationDetails(
+          'progress channel',
+          'progress channel',
+          channelShowBadge: false,
+          importance: Importance.min,
+          priority: Priority.min,
+          onlyAlertOnce: true,
+          playSound: false,
+        );
         final IOSNotificationDetails iosNotificationDetails =
-        IOSNotificationDetails(presentSound: false,threadIdentifier: downloadTaskInfo.track.albumId.toString());
+            IOSNotificationDetails(
+                presentSound: false,
+                threadIdentifier: downloadTaskInfo.track.albumId.toString());
         final NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics,iOS: iosNotificationDetails);
+            NotificationDetails(
+                android: androidPlatformChannelSpecifics,
+                iOS: iosNotificationDetails);
         await _flutterLocalNotificationsPlugin.show(
             downloadTaskInfo.track.id,
             'Téléchargement complété',
@@ -332,30 +350,35 @@ class DownloadProvider extends BaseProvider with BaseMixins {
           }
         });
       } else {
-
-        if(_box.get(downloadTaskInfo.track.albumId.toString(),defaultValue: true) || Platform.isAndroid){
+        if (_box.get(downloadTaskInfo.track.albumId.toString(),
+                defaultValue: true) ||
+            Platform.isAndroid) {
           await _box.put(downloadTaskInfo.track.albumId.toString(), false);
-        final AndroidNotificationDetails androidPlatformChannelSpecifics =
-            AndroidNotificationDetails('progress channel', 'progress channel',
-                'progress channel description',
-                channelShowBadge: false,
-                importance: Importance.min,
-                priority: Priority.min,
-                onlyAlertOnce: true,
-                playSound: false,
-                showProgress: true,
-                maxProgress: downloadTaskInfo.total,
-                progress: downloadTaskInfo.received);
-        final IOSNotificationDetails iosNotificationDetails =
-            IOSNotificationDetails(presentSound: false,threadIdentifier: downloadTaskInfo.track.albumId.toString());
-        final NotificationDetails platformChannelSpecifics =
-            NotificationDetails(android: androidPlatformChannelSpecifics,iOS: iosNotificationDetails);
-        await _flutterLocalNotificationsPlugin.show(
-            downloadTaskInfo.track.id,
-            'Téléchargement en cours',
-            '${downloadTaskInfo.track.name}',
-            platformChannelSpecifics);
-      }}
+          final AndroidNotificationDetails androidPlatformChannelSpecifics =
+              AndroidNotificationDetails('progress channel', 'progress channel',
+                  channelShowBadge: false,
+                  importance: Importance.min,
+                  priority: Priority.min,
+                  onlyAlertOnce: true,
+                  playSound: false,
+                  showProgress: true,
+                  maxProgress: downloadTaskInfo.total,
+                  progress: downloadTaskInfo.received);
+          final IOSNotificationDetails iosNotificationDetails =
+              IOSNotificationDetails(
+                  presentSound: false,
+                  threadIdentifier: downloadTaskInfo.track.albumId.toString());
+          final NotificationDetails platformChannelSpecifics =
+              NotificationDetails(
+                  android: androidPlatformChannelSpecifics,
+                  iOS: iosNotificationDetails);
+          await _flutterLocalNotificationsPlugin.show(
+              downloadTaskInfo.track.id,
+              'Téléchargement en cours',
+              '${downloadTaskInfo.track.name}',
+              platformChannelSpecifics);
+        }
+      }
     });
   }
 

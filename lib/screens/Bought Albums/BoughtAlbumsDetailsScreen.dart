@@ -27,6 +27,7 @@ class _BoughtAlbumsDetailsScreenState extends State<BoughtAlbumsDetailsScreen>
     final PlayerProvider playerProvider =
         Provider.of<PlayerProvider>(context, listen: false);
     Track track;
+    boughtAlbum.tracks.map((e) => {e.displayedName});
     return Scaffold(
       backgroundColor: background,
       appBar: PreferredSize(
@@ -45,20 +46,21 @@ class _BoughtAlbumsDetailsScreenState extends State<BoughtAlbumsDetailsScreen>
         child: Padding(
           padding: EdgeInsets.only(
               left: 10, right: 10, bottom: track != null ? 80 : 0),
-          child:Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Container(
-                color: background,
-                // margin: EdgeInsets.only(
-                //     left: 10, right: 10),
-                // color: Theme.of(context).scaffoldBackgroundColor,
-                child: TrackContainer(boughtAlbum),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  color: background,
+                  // margin: EdgeInsets.only(
+                  //     left: 10, right: 10),
+                  // color: Theme.of(context).scaffoldBackgroundColor,
+                  child: TrackContainer(boughtAlbum),
+                ),
               ),
-            ),
-          ],
-        ),),
+            ],
+          ),
+        ),
       ),
     );
   }

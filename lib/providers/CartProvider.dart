@@ -42,7 +42,7 @@ class CartProvider extends BaseProvider with BaseMixins {
       var url =
           'https://app.paydunya.com/sandbox-api/v1/checkout-invoice/confirm/${request['token']}';
       var response = await http.get(
-        url,
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'PAYDUNYA-MASTER-KEY': 'PbGPDHfX-nCK1-jXjH-2ifY-EDdkAgpWvL8W',
@@ -85,7 +85,7 @@ class CartProvider extends BaseProvider with BaseMixins {
     );
 
     var response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
         'PAYDUNYA-MASTER-KEY': 'PbGPDHfX-nCK1-jXjH-2ifY-EDdkAgpWvL8W',
@@ -139,7 +139,8 @@ class CartProvider extends BaseProvider with BaseMixins {
 </albums>
 </prestashop>""";
       response = await http.post(
-        "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?schema=blank",
+        Uri.parse(
+            "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?schema=blank"),
         headers: <String, String>{
           'authorization': basicAuth,
           'content-type': "text/xml;charset=utf-8"

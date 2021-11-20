@@ -1,13 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppProvider.dart';
@@ -23,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/Applocalizations.dart';
 import 'screens/Auth/SplashScreen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

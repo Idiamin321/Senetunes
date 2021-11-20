@@ -38,7 +38,9 @@ class Track {
               ? json['id']
               : int.parse(json['id']['\$']),
       name: json['name'] is String ? json['name'] : json['name']['\$'],
-      displayedName: json['displayedName'] is String ? json['displayedName'] : json['displayedName']['\$'],
+      displayedName: json['displayedName'] is String
+          ? json['displayedName']
+          : json['displayedName']['\$'],
       description: json['description'] == null
           ? null
           : json['description'] is String
@@ -49,8 +51,11 @@ class Track {
           : json['trackNumber'] is int
               ? json['trackNumber']
               : int.parse(json['trackNumber']['\$']),
-      fileName: json['fileName'] is String ? json['fileName'] : json['fileName']['\$'],
-      playUrl: json['playUrl'] is String ? json['playUrl'] : json['playUrl']['\$'],
+      fileName: json['fileName'] is String
+          ? json['fileName']
+          : json['fileName']['\$'],
+      playUrl:
+          json['playUrl'] is String ? json['playUrl'] : json['playUrl']['\$'],
       albumId: json['albumInfo'] == null
           ? null
           : json['albumInfo']['@albumId'] == null

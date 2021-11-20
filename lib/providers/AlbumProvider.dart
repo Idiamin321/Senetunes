@@ -60,9 +60,11 @@ class AlbumProvider extends ChangeNotifier {
     // notifyListeners();
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
-    http.Response albumResponse = await http.get('${AppConfig.API}/album/list');
+    http.Response albumResponse =
+        await http.get(Uri.parse('${AppConfig.API}/album/list'));
     http.Response priceResponse = await http.get(
-        "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/products?display=[id,price]&output_format=JSON",
+        Uri.parse(
+            "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/products?display=[id,price]&output_format=JSON"),
         headers: <String, String>{'authorization': basicAuth});
     if (albumResponse.statusCode == 200 && priceResponse.statusCode == 200) {
       var transformer = Xml2Json();
@@ -80,6 +82,7 @@ class AlbumProvider extends ChangeNotifier {
         Album album = Album.fromJson(a as Map<String, dynamic>);
         for (Track track in album.tracks) {
           track.albumInfo = album;
+          print("TRACK: ${track.displayedName}");
         }
         album.price = prices[album.id];
         _allAlbums.add(album);
@@ -106,12 +109,10 @@ class AlbumProvider extends ChangeNotifier {
     List<Album> searchedAlbums = [];
     for (Album album in _allAlbums) {
       //print(album.name);
-      if (album.name.toLowerCase().contains(albumName.toLowerCase()))
-        {
-          searchedAlbums.add(album);
-          print(album.name);
-        }
-
+      if (album.name.toLowerCase().contains(albumName.toLowerCase())) {
+        searchedAlbums.add(album);
+        print(album.name);
+      }
     }
     return searchedAlbums;
   }

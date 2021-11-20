@@ -19,7 +19,7 @@ class AuthProvider extends BaseProvider {
   // Items List
 
   bool isLoaded = true;
-  bool _isLoggedIn=false;
+  bool _isLoggedIn = false;
   bool inputerror = false;
   String errorMsg;
   bool check = true;
@@ -50,7 +50,7 @@ class AuthProvider extends BaseProvider {
     isLoaded = false;
     notifyListeners();
     var status = await Permission.storage.status;
-    if (status.isUndetermined || status.isDenied) {
+    if (status.isPermanentlyDenied || status.isDenied) {
       await Permission.storage.request();
     }
     final _prefs = await SharedPreferences.getInstance();
@@ -80,7 +80,8 @@ class AuthProvider extends BaseProvider {
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
     http.Response response = await http.get(
-      "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?filter[userEmail]=$email&display=full",
+      Uri.parse(
+          "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/order_supplier?filter[userEmail]=$email&display=full"),
       headers: <String, String>{
         'authorization': basicAuth,
         'content-type': "text/xml;charset=utf-8"
@@ -167,7 +168,9 @@ class AuthProvider extends BaseProvider {
 </customer>
 </prestashop>""";
     response = await http.post(
-      "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/customers?schema=blank",
+      Uri.parse(
+        "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/customers?schema=blank",
+      ),
       headers: <String, String>{
         'authorization': basicAuth,
         'content-type': "text/xml;charset=utf-8"

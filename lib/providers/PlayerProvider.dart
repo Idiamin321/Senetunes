@@ -16,19 +16,19 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   final AssetsAudioPlayer player = AssetsAudioPlayer();
   var directory;
 
-  bool isLoading=true;
+  bool isLoading = true;
   PlayerProvider() {
     init();
   }
 
   init() async {
     _isLoaded = false;
-    isLoading=true;
+    isLoading = true;
     directory = await getTemporaryDirectory();
     player.playlistAudioFinished.listen((Playing playing) {
       next(action: false);
     });
-    isLoading=true;
+    isLoading = true;
     _isLoaded = true;
   }
 
@@ -49,17 +49,19 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   bool get loopPlaylist => _loopPlaylist;
   bool _isTrackLoaded = true;
   bool get isTrackLoaded => _isTrackLoaded;
-  int _currentIndex=-1;
+  int _currentIndex = -1;
   int get currentIndex => _currentIndex;
   CancelToken _currentSongCancelToken;
   set currentAlbum(album) {
     _currentAlbum = album;
     notifyListeners();
   }
+
   set currentTrack(track) {
     _currentTrack = track;
     notifyListeners();
   }
+
   int _sessionId;
   int get sessionId => _sessionId;
 
@@ -70,7 +72,7 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   }
 
   playOrPause() async {
-    isLoading=false;
+    isLoading = false;
     try {
       await player.playOrPause();
     } catch (t) {}
@@ -160,15 +162,41 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   /// Play track and set current track index
   ///
   play(index) async {
+    print('\n\nPLAY PLAY PLAY\n\n');
     player.stop();
     try {
       _currentTrack = _currentAlbum.tracks[index];
       notifyListeners();
-      await player.open(
-        Audio.network(_currentAlbum.tracks[index].playUrl),
-      );
+      Dio dio = Dio();
+      dio.download(_currentAlbum.tracks[index].playUrl,
+          "${directory.path}/${_currentAlbum.tracks[index].playUrl}.mp3",
+          cancelToken: _currentSongCancelToken,
+          onReceiveProgress: (received, total) async {
+        if ((received / total * 100 > 9)) {
+          if (!_isTrackLoaded) {
+            print("downloading");
+            player
+                .open(
+                    Audio.file(
+                        "${directory.path}/${_currentAlbum.tracks[index].playUrl}.mp3"),
+                    showNotification: true,
+                    playInBackground: PlayInBackground.enabled)
+                .catchError((e) => print(e));
+            _isTrackLoaded = true;
+            notifyListeners();
+            setPlaying(_currentAlbum, index, _currentAlbum.tracks[index]);
+          }
+        } else
+          _isTrackLoaded = false;
+      });
+      // await player.open(Audio.network(
+      //     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"));
+      // await player.open(
+      //   Audio.network(_currentAlbum.tracks[index].playUrl),
+      // );
       _currentIndex = index;
     } catch (t) {
+      print('HERE: $t');
       //mp3 unreachable
     }
   }
@@ -201,8 +229,9 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
   }
 
   handlePlayButton({album, Track track, index, BuildContext context}) async {
+    print('\n\nHANDLE PLAY BUTTON\n\n');
     //Disable shuffling
-    isLoading=false;
+    isLoading = false;
     CartProvider cartProvider = context.read<CartProvider>();
     _shuffled = false;
 
@@ -222,7 +251,8 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
           print(track.playUrl);
           if (track.localPath != null) {
             print("in ifff");
-            await player.open(Audio.file(track.localPath), showNotification: true)
+            await player
+                .open(Audio.file(track.localPath), showNotification: true)
                 .catchError((e) => print(e));
             _isTrackLoaded = true;
             notifyListeners();
@@ -258,8 +288,7 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
         //mp3 unreachable
         print(t);
       }
-    }
-    else {
+    } else {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -292,11 +321,13 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
     }
     notifyListeners();
   }
-  handleDownloadPlayButton({album, Track track, index, BuildContext context}) async {
+
+  handleDownloadPlayButton(
+      {album, Track track, index, BuildContext context}) async {
     //Disable shuffling
     CartProvider cartProvider = context.read<CartProvider>();
     _shuffled = false;
-    _currentIndex=index;
+    _currentIndex = index;
     setBuffering(index);
 
     if (album.isBought) {
@@ -313,7 +344,11 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
           print(track.playUrl);
           if (track.localPath != null) {
             print("in ifff");
-            await player.open(Audio.file(track.localPath), showNotification: true,)
+            await player
+                .open(
+                  Audio.file(track.localPath),
+                  showNotification: true,
+                )
                 .catchError((e) => print(e));
             _isTrackLoaded = true;
             // notifyListeners();
@@ -327,22 +362,22 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
                 track.playUrl, "${directory.path}/${track.playUrl}.mp3",
                 cancelToken: _currentSongCancelToken,
                 onReceiveProgress: (received, total) async {
-                  if ((received / total * 100 > 9)) {
-                    if (!_isTrackLoaded) {
-                      print("downloading");
-                      player
-                          .open(
+              if ((received / total * 100 > 9)) {
+                if (!_isTrackLoaded) {
+                  print("downloading");
+                  player
+                      .open(
                           Audio.file("${directory.path}/${track.playUrl}.mp3"),
                           showNotification: true,
                           playInBackground: PlayInBackground.enabled)
-                          .catchError((e) => print(e));
-                      _isTrackLoaded = true;
-                      notifyListeners();
-                      setPlaying(album, index, track);
-                    }
-                  } else
-                    _isTrackLoaded = false;
-                });
+                      .catchError((e) => print(e));
+                  _isTrackLoaded = true;
+                  notifyListeners();
+                  setPlaying(album, index, track);
+                }
+              } else
+                _isTrackLoaded = false;
+            });
           }
         }
       } on PlatformException catch (t, stacktrace) {
