@@ -11,18 +11,19 @@ import 'package:senetunes/models/Artist.dart';
 import 'package:senetunes/providers/AuthProvider.dart';
 import 'package:senetunes/providers/CartProvider.dart';
 import 'package:senetunes/providers/PlayerProvider.dart';
-import 'package:senetunes/widgtes/Artist/TrackTileForArtist.dart';
-import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
-import 'package:senetunes/widgtes/Common/WidgetHeader.dart';
-import 'package:senetunes/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/widgets/Artist/TrackTileForArtist.dart';
+import 'package:senetunes/widgets/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgets/Common/WidgetHeader.dart';
+import 'package:senetunes/widgets/Common/BaseImage.dart';
 
 class ArtistDetailScreen extends StatelessWidget with BaseMixins {
-  final Artist artist;
-
-  const ArtistDetailScreen({super.key, required this.artist});
+  const ArtistDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final Artist artist =
+        ModalRoute.of(context)!.settings.arguments as Artist;
+
     return Scaffold(
       backgroundColor: background,
       appBar: PreferredSize(
@@ -67,8 +68,8 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                     .textTheme
                                     .titleLarge
                                     ?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                             ],
                           ),
@@ -91,7 +92,7 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                         flex: 2,
                                         child: Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                           children: [
                                             Text(
                                               "Acheté",
@@ -115,7 +116,7 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                       child: InkWell(
                                         onTap: () {
                                           final playerProvider =
-                                          context.read<PlayerProvider>();
+                                              context.read<PlayerProvider>();
                                           playerProvider.currentAlbum = album;
 
                                           Navigator.of(context).pushNamed(
@@ -126,9 +127,9 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             BaseImage(
                                               imageUrl: album.media?.medium,
@@ -139,7 +140,7 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                             Expanded(
                                               child: Padding(
                                                 padding:
-                                                const EdgeInsets.symmetric(
+                                                    const EdgeInsets.symmetric(
                                                   vertical: 4,
                                                 ),
                                                 child: AutoSizeText(
@@ -147,7 +148,7 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                                   softWrap: true,
                                                   maxLines: 1,
                                                   overflow:
-                                                  TextOverflow.ellipsis,
+                                                      TextOverflow.ellipsis,
                                                   maxFontSize: 14,
                                                   minFontSize: 14,
                                                   style: const TextStyle(
@@ -169,84 +170,87 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                           child: ElevatedButton(
                                             style: ButtonStyle(
                                               padding:
-                                              MaterialStateProperty.all<
-                                                  EdgeInsetsGeometry>(
-                                                  EdgeInsets.zero),
+                                                  MaterialStateProperty.all<
+                                                      EdgeInsetsGeometry>(
+                                                EdgeInsets.zero,
+                                              ),
                                               backgroundColor:
-                                              MaterialStateProperty.all<
-                                                  Color>(Theme.of(context)
-                                                  .primaryColor),
+                                                  MaterialStateProperty.all<
+                                                      Color>(
+                                                Theme.of(context).primaryColor,
+                                              ),
                                             ),
                                             onPressed: () {
                                               if (context
-                                                  .read<AuthProvider>()
-                                                  .user ==
+                                                      .read<AuthProvider>()
+                                                      .user ==
                                                   null) {
                                                 showDialog(
                                                   context: context,
                                                   builder: (context) =>
                                                       AlertDialog(
-                                                        backgroundColor:
+                                                    backgroundColor:
                                                         Theme.of(context)
                                                             .scaffoldBackgroundColor,
-                                                        title: const Center(
-                                                          child: Icon(
-                                                            Icons.warning,
-                                                            size: 30,
-                                                            color: primary,
-                                                          ),
-                                                        ),
-                                                        content: const Text(
-                                                          "Vous devez être connecté avant d'acheter un album",
-                                                          textAlign:
-                                                          TextAlign.center,
-                                                          style: TextStyle(
-                                                              color: Colors.black),
-                                                        ),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator
-                                                                  .popAndPushNamed(
-                                                                context,
-                                                                AppRoutes
-                                                                    .loginRoute,
-                                                              );
-                                                            },
-                                                            child: Text(
-                                                              $t(context, 'sign_in'),
-                                                              textAlign:
-                                                              TextAlign.end,
-                                                              style:
-                                                              const TextStyle(
-                                                                  color:
-                                                                  primary),
-                                                            ),
-                                                          ),
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator
-                                                                  .popAndPushNamed(
-                                                                context,
-                                                                AppRoutes
-                                                                    .registerRoute,
-                                                              );
-                                                            },
-                                                            child: Text(
-                                                              $t(
-                                                                context,
-                                                                'create_new_Account',
-                                                              ),
-                                                              textAlign:
-                                                              TextAlign.end,
-                                                              style:
-                                                              const TextStyle(
-                                                                  color:
-                                                                  primary),
-                                                            ),
-                                                          ),
-                                                        ],
+                                                    title: const Center(
+                                                      child: Icon(
+                                                        Icons.warning,
+                                                        size: 30,
+                                                        color: primary,
                                                       ),
+                                                    ),
+                                                    content: const Text(
+                                                      "Vous devez être connecté avant d'acheter un album",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.black),
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator
+                                                              .popAndPushNamed(
+                                                            context,
+                                                            AppRoutes
+                                                                .loginRoute,
+                                                          );
+                                                        },
+                                                        child: Text(
+                                                          $t(context, 'sign_in'),
+                                                          textAlign:
+                                                              TextAlign.end,
+                                                          style:
+                                                              const TextStyle(
+                                                                  color:
+                                                                      primary),
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator
+                                                              .popAndPushNamed(
+                                                            context,
+                                                            AppRoutes
+                                                                .registerRoute,
+                                                          );
+                                                        },
+                                                        child: Text(
+                                                          $t(
+                                                            context,
+                                                            'create_new_Account',
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.end,
+                                                          style:
+                                                              const TextStyle(
+                                                                  color:
+                                                                      primary),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 );
                                               } else {
                                                 context
@@ -259,7 +263,8 @@ class ArtistDetailScreen extends StatelessWidget with BaseMixins {
                                               margin: const EdgeInsets.all(5),
                                               child: Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
+                                                    CrossAxisAlignment
+                                                        .stretch,
                                                 children: [
                                                   const Expanded(
                                                     child: FittedBox(
