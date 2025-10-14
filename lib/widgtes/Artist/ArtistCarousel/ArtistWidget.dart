@@ -15,6 +15,9 @@ class ArtistWidget extends StatelessWidget {
 
   _buildSliderItem(
       BuildContext context, Artist artist, index, artists, height, width) {
+    print(artist.media.thumbnail);
+    print(artist.media.medium);
+    print(artist.media.cover);
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -33,13 +36,16 @@ class ArtistWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              artist.media.thumbnail == null
-                  ? Container()
-                  : BaseImage(
-                      imageUrl: artist.media.thumbnail,
-                      height: 120,
-                      width: 120,
-                      radius: 100,
+              Container(
+                      width: 120.0,
+                      height: 120.0,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(artist.media.cover)),
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
+                        color: Colors.redAccent,
+                      ),
                     ),
               SizedBox(height: 10),
               Expanded(

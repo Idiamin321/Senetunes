@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/models/Artist.dart';
 import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
 class ArtistCircleAvatar extends StatelessWidget {
   final double height;
   final double width;
-  const ArtistCircleAvatar({Key key, @required this.artist, this.height, this.width})
+  const ArtistCircleAvatar(
+      {Key key, @required this.artist, this.height, this.width})
       : super(key: key);
 
   final Artist artist;
@@ -18,7 +20,7 @@ class ArtistCircleAvatar extends StatelessWidget {
       child: CircleAvatar(
         child: ClipOval(
             child: BaseImage(
-          imageUrl: artist.media.thumbnail,
+          imageUrl: artist.media.medium,
         )),
       ),
     );

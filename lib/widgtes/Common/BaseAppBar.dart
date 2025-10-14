@@ -2,7 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senetunes/config/AppColors.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppConfig.dart';
 import 'package:senetunes/config/AppRoutes.dart';
@@ -16,7 +16,7 @@ class BaseAppBar extends StatelessWidget {
   final String logoPath;
   final bool isHome;
 
-  const BaseAppBar({Key key, this.logoPath, this.darkMode, this.isHome: false})
+  const BaseAppBar({Key key, this.logoPath, this.darkMode, this.isHome = false})
       : super(key: key);
 
   Widget leadingIcon(
@@ -35,7 +35,7 @@ class BaseAppBar extends StatelessWidget {
               ),
               child: IconButton(
                 icon: Icon(
-                  isHome != null && isHome ? Icons.menu : Icons.arrow_back,
+                  isHome ? Icons.menu : Icons.arrow_back,
                   color: Colors.black,
                   // color: Theme.of(context).iconTheme.color,
                 ),

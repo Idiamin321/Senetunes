@@ -1,13 +1,12 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:xml2json/xml2json.dart';
+
 import 'package:senetunes/models/Album.dart';
 import 'package:senetunes/models/Artist.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/widgtes/Search/SearchBox.dart';
-import 'package:xml2json/xml2json.dart';
-
 import '../config/AppConfig.dart';
 
 class AlbumProvider extends ChangeNotifier {
@@ -19,121 +18,121 @@ class AlbumProvider extends ChangeNotifier {
 
   static bool _updated = false;
 
-  List<Album> _allAlbums = <Album>[];
+  final List<Album> _allAlbums = <Album>[];
   List<Album> get allAlbums => _allAlbums;
-  List<Track> _allTracks = <Track>[];
-  List<Track> get allTracks => _allTracks;
-  Set<Album> _boughtAlbums = Set();
-  Set<Album> get boughtAlbums => _boughtAlbums;
-  bool isLoaded = true;
 
+  final List<Track> _allTracks = <Track>[];
+  List<Track> get allTracks => _allTracks;
+
+  final Set<Album> _boughtAlbums = <Album>{};
+  Set<Album> get boughtAlbums => _boughtAlbums;
+
+  bool isLoaded = true;
   int selectedIndex = 0;
   bool toSearch = false;
-  Widget searchWidget;
+  Widget? searchWidget;
   String searchKeyword = "";
   List<Track> searchedTracks = [];
 
-  gotoSearch(val) {
+  void gotoSearch(bool val) {
     toSearch = val;
     if (toSearch) {
       searchWidget = SearchBox(
         onSearch: (s) {
-          // setState(() {
           searchKeyword = s;
-          // });
-          // if (s.length > 0) {
           searchedTracks = searchData(s);
-          // }
         },
       );
+    } else {
+      searchWidget = null;
+      searchKeyword = "";
+      searchedTracks = [];
     }
     notifyListeners();
   }
 
-  changeNav(val) {
+  void changeNav(int val) {
     selectedIndex = val;
     notifyListeners();
   }
 
-  fetchAlbums() async {
+  Future<void> fetchAlbums() async {
     isLoaded = false;
-    // notifyListeners();
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('X8HFP87CWWGX8WUE6C193HT27PQ3P6QM:'));
-    http.Response albumResponse =
-        await http.get(Uri.parse('${AppConfig.API}/album/list'));
-    http.Response priceResponse = await http.get(
-        Uri.parse(
-            "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/products?display=[id,price]&output_format=JSON"),
-        headers: <String, String>{'authorization': basicAuth});
+
+    final albumResponse =
+    await http.get(Uri.parse('${AppConfig.API}/album/list'));
+
+    final priceResponse = await http.get(
+      Uri.parse(
+          "http://ec2-35-180-207-66.eu-west-3.compute.amazonaws.com/senetunesproduction/api/products?display=[id,price]&output_format=JSON"),
+      headers: <String, String>{'authorization': basicAuth},
+    );
+
     if (albumResponse.statusCode == 200 && priceResponse.statusCode == 200) {
-      var transformer = Xml2Json();
-
+      final transformer = Xml2Json();
       transformer.parse(albumResponse.body);
+      final List<dynamic> b =
+      jsonDecode(transformer.toBadgerfish())['albums']['album'];
 
-      List<dynamic> b =
-          jsonDecode(transformer.toBadgerfish())['albums']['album'];
-      Map<int, double> prices = Map();
-      (jsonDecode(priceResponse.body)['products'] as List<dynamic>)
-          .forEach((element) {
-        prices[element['id']] = double.parse(element['price']);
-      });
-      for (dynamic a in b) {
-        Album album = Album.fromJson(a as Map<String, dynamic>);
-        for (Track track in album.tracks) {
+      final Map<int, double> prices = {};
+      for (final element in (jsonDecode(priceResponse.body)['products'] as List<dynamic>)) {
+        prices[element['id'] as int] = double.tryParse("${element['price']}") ?? 0.0;
+      }
+
+      for (final dynamic a in b) {
+        final Album album = Album.fromJson(a as Map<String, dynamic>);
+        for (final track in album.tracks) {
           track.albumInfo = album;
-          print("TRACK: ${track.displayedName}");
         }
-        album.price = prices[album.id];
+        album.price = prices[album.id] ?? 0.0;
         _allAlbums.add(album);
         _allTracks.addAll(album.tracks);
       }
     } else {
-      print(albumResponse.body);
-      print(priceResponse.body);
+      debugPrint(albumResponse.body);
+      debugPrint(priceResponse.body);
     }
+
     isLoaded = true;
     notifyListeners();
   }
 
   List<Track> searchData(String trackName) {
-    List<Track> searchedTracks = [];
-    for (Track track in _allTracks) {
-      if (track.name.toLowerCase().contains(trackName.toLowerCase()))
-        searchedTracks.add(track);
-    }
-    return searchedTracks;
+    final q = trackName.toLowerCase();
+    return _allTracks
+        .where((t) => t.name.toLowerCase().contains(q))
+        .toList(growable: false);
   }
 
   List<Album> searchAlbums(String albumName) {
-    List<Album> searchedAlbums = [];
-    for (Album album in _allAlbums) {
-      //print(album.name);
-      if (album.name.toLowerCase().contains(albumName.toLowerCase())) {
-        searchedAlbums.add(album);
-        print(album.name);
-      }
+    final q = albumName.toLowerCase();
+    final res = _allAlbums.where((a) => a.name.toLowerCase().contains(q)).toList();
+    for (final a in res) {
+      debugPrint(a.name);
     }
-    return searchedAlbums;
+    return res;
   }
 
-  updateTracksAndAlbumsWithArtists(List<Artist> artists) async {
+  Future<void> updateTracksAndAlbumsWithArtists(List<Artist> artists) async {
     if (!_updated) {
       for (var i = 0; i < _allTracks.length; i++) {
-        _allTracks[i].artistInfo = artists[artists
-            .indexWhere((element) => element.id == _allTracks[i].artistId)];
+        final idx = artists.indexWhere((e) => e.id == _allTracks[i].artistId);
+        if (idx != -1) _allTracks[i].artistInfo = artists[idx];
       }
       for (var i = 0; i < _allAlbums.length; i++) {
-        _allAlbums[i].artistInfo = artists[artists
-            .indexWhere((element) => element.id == _allAlbums[i].artistId)];
+        final idx = artists.indexWhere((e) => e.id == _allAlbums[i].artistId);
+        if (idx != -1) _allAlbums[i].artistInfo = artists[idx];
       }
       _updated = true;
     }
   }
 
-  updateBoughtAlbums(Map<int, bool> boughtAlbums) async {
+  Future<void> updateBoughtAlbums(Map<int, bool> boughtAlbums) async {
     isLoaded = false;
     notifyListeners();
+
     for (var i = 0; i < _allAlbums.length; i++) {
       if (boughtAlbums.containsKey(_allAlbums[i].id)) {
         _allAlbums[i].isBought = true;
@@ -142,6 +141,7 @@ class AlbumProvider extends ChangeNotifier {
         _allAlbums[i].isBought = false;
       }
     }
+
     isLoaded = true;
     notifyListeners();
   }

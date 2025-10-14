@@ -36,8 +36,8 @@ class TrackTileActions extends StatelessWidget with BaseMixins {
       },
       itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
         PopupMenuItem<String>(
-          value: !isRemove || isRemove==null?'download':'remove',
-          child: Text($t(context, !isRemove || isRemove==null?'downloading':'remove'),
+          value: !isRemove?'download':'remove',
+          child: Text($t(context, !isRemove?'downloading':'remove'),
               style:TextStyle(color:primary)),
         )
       ],

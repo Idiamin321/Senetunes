@@ -10,7 +10,6 @@ class AppValidation with BaseMixins {
   }
 
   String validateLocation(String value) {
-    if (value == null) return 'Select a location';
     return null;
   }
 

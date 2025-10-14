@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senetunes/config/AppColors.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
@@ -30,10 +30,7 @@ class DownloadButton extends StatelessWidget {
                   "Ce bouton vous permet de télécharger les Albums que vous avez acheté et de les écouter où vous voulez sans connexion internet",
               context: context,
               popoverDirection: PopoverDirection.top);
-        else if (album != null)
-          await context.read<DownloadProvider>().downloadAlbum(album, context);
-        else if (track != null)
-          await context.read<DownloadProvider>().downloadAudio(track, context);
+        else await context.read<DownloadProvider>().downloadAlbum(album, context);
       },
       child: SvgPicture.asset(
         "assets/icons/svg/download.svg",

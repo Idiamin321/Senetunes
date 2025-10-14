@@ -172,7 +172,7 @@ class TrackContainer extends StatelessWidget with BaseMixins {
             ? favoriteProvider.isLoaded
                 ? ListView.builder(
           physics: BouncingScrollPhysics(),
-          padding: EdgeInsets.only(bottom:track!=null?130:85),
+          padding: EdgeInsets.only(bottom:130),
                     itemCount: favoriteProvider.favoriteTracks.length,
                     itemBuilder: (context, index) {
                       Album album = new Album(

@@ -45,7 +45,7 @@ class BoughtAlbumsScreen extends StatelessWidget with BaseMixins {
               Expanded(
                 child: Container(
                   color: background,
-                  padding: EdgeInsets.only(bottom: track != null ? 40 : 0),
+                  padding: EdgeInsets.only(bottom: 40),
                   margin: EdgeInsets.symmetric(horizontal: 10),
                   // color: Theme.of(context).scaffoldBackgroundColor,
                   child: TrackContainer(),

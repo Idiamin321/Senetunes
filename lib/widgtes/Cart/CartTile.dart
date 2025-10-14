@@ -36,7 +36,7 @@ class CartTile extends StatelessWidget with BaseMixins {
           //   flex: 1,
           //   child:
           BaseImage(
-            imageUrl: album.media.thumbnail,
+            imageUrl: album.media.medium,
             heroId: album.id,
             width: 50,
             height: 50,

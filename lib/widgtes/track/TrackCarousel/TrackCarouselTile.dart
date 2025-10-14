@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
@@ -13,7 +14,7 @@ class TrackCarouselTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String _title = this.title != null ? title : 'Featured';
+    String _title = title;
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
@@ -27,15 +28,13 @@ class TrackCarouselTile extends StatelessWidget {
                     width: 100,
                     child: Stack(
                       children: [
-                        track.albumInfo.media.cover != null
-                            ? Padding(
+                        Padding(
                                 padding: EdgeInsets.only(right: 20),
                                 child: BaseImage(
                                   imageUrl: track.albumInfo.media.cover,
                                   height: 30,
                                 ),
-                              )
-                            : SizedBox(),
+                              ),
                         TrackPlayButton(
                           track: track,
                           index: index,
@@ -46,7 +45,7 @@ class TrackCarouselTile extends StatelessWidget {
                   ),
                   title: Transform(
                     transform: Matrix4.translationValues(-12, 0.0, 0.0),
-                    child: Text(track?.name,
+                    child: Text(track.name,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(
@@ -55,7 +54,8 @@ class TrackCarouselTile extends StatelessWidget {
                   ),
                   subtitle: Transform(
                     transform: Matrix4.translationValues(-12, 0.0, 0.0),
-                    child: Text(track?.artistInfo?.name != null ? track.artistInfo.name : '',
+                    child: Text(
+                        track.artistInfo.name,
                         style: TextStyle(
                           fontSize: 12,
                         )),
@@ -64,7 +64,7 @@ class TrackCarouselTile extends StatelessWidget {
                   //     ? Padding(
                   //         padding: EdgeInsets.only(right: 20),
                   //         child: BaseImage(
-                  //           imageUrl: track.media.thumbnail,
+                  //           imageUrl: track.media.medium,
                   //           height: 30,
                   //         ),
                   //       )

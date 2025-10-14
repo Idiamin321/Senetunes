@@ -1,11 +1,12 @@
+import 'dart:io';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 
+import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Album.dart';
@@ -14,213 +15,250 @@ import 'package:senetunes/providers/CartProvider.dart';
 
 class PlayerProvider extends ChangeNotifier with BaseMixins {
   final AssetsAudioPlayer player = AssetsAudioPlayer();
-  var directory;
+
+  late Directory directory;
 
   bool isLoading = true;
+
   PlayerProvider() {
     init();
   }
 
-  init() async {
+  Future<void> init() async {
     _isLoaded = false;
     isLoading = true;
+
     directory = await getTemporaryDirectory();
+
+    // Quand une piste se termine
     player.playlistAudioFinished.listen((Playing playing) {
       next(action: false);
     });
+
     isLoading = true;
     _isLoaded = true;
   }
 
-  Album _currentAlbum;
-  Album get currentAlbum => _currentAlbum;
+  Album? _currentAlbum;
+  Album? get currentAlbum => _currentAlbum;
 
-  Album _playlist;
-  Album get playlist => _playlist;
+  Album? _playlist;
+  Album? get playlist => _playlist;
 
-  Track _currentTrack;
-  Track get currentTrack => _currentTrack;
+  Track? _currentTrack;
+  Track? get currentTrack => _currentTrack;
 
   bool _isLoaded = false;
   bool get isLoaded => _isLoaded;
+
   bool _loopMode = false;
   bool get loopMode => _loopMode;
+
   bool _loopPlaylist = false;
   bool get loopPlaylist => _loopPlaylist;
+
   bool _isTrackLoaded = true;
   bool get isTrackLoaded => _isTrackLoaded;
+
   int _currentIndex = -1;
   int get currentIndex => _currentIndex;
-  CancelToken _currentSongCancelToken;
-  set currentAlbum(album) {
+
+  CancelToken? _currentSongCancelToken;
+
+  set currentAlbum(Album? album) {
     _currentAlbum = album;
     notifyListeners();
   }
 
-  set currentTrack(track) {
+  set currentTrack(Track? track) {
     _currentTrack = track;
     notifyListeners();
   }
 
-  int _sessionId;
-  int get sessionId => _sessionId;
+  int? _sessionId;
+  int? get sessionId => _sessionId;
 
-  int tIndex;
+  int? tIndex;
 
-  setBuffering(index) {
+  void setBuffering(int index) {
     tIndex = index;
   }
 
-  playOrPause() async {
+  Future<void> playOrPause() async {
     isLoading = false;
     try {
       await player.playOrPause();
-    } catch (t) {}
+    } catch (_) {
+      // noop
+    }
     notifyListeners();
   }
 
-  isFirstTrack() {
-    return _currentIndex == 0;
-  }
+  bool isFirstTrack() => _currentIndex == 0;
 
-  isLastTrack(next) {
-    return next == _currentAlbum.tracks.length;
+  bool isLastTrack(int next) {
+    final album = _currentAlbum;
+    if (album == null) return true;
+    return next >= album.tracks.length;
   }
 
   /// Next Track:
-  /// Action will be false if used with playlistAudioFinished listener
-  /// A track can be next by action or on playlistAudioFinished
-  next({action: true}) {
-    int next = _currentIndex + 1;
-    if (!action && _loopMode && isLastTrack(next) && _loopPlaylist) {
-      print("onlyy ifff");
-      setPlaying(_currentAlbum, 0, _currentAlbum.tracks[0]);
-      play(0);
+  /// [action] = false quand appelé par playlistAudioFinished
+  Future<void> next({bool action = true}) async {
+    if (_currentAlbum == null) return;
+    final int nextIndex = _currentIndex + 1;
+
+    if (!action && _loopMode && isLastTrack(nextIndex) && _loopPlaylist) {
+      // Repart du début
+      setPlaying(_currentAlbum!, 0, _currentAlbum!.tracks[0]);
+      await play(0);
     } else if (!action && _loopMode && !_loopPlaylist) {
-      print("elseee ifff");
-      setPlaying(
-          _currentAlbum, _currentIndex, _currentAlbum.tracks[_currentIndex]);
-      play(_currentIndex);
+      // Boucle sur la même piste
+      setPlaying(_currentAlbum!, _currentIndex, _currentAlbum!.tracks[_currentIndex]);
+      await play(_currentIndex);
     } else {
-      print("elseee");
-      play(next);
+      await play(nextIndex);
     }
   }
 
-  prev() {
-    int pre = _currentIndex - 1;
-    if (pre <= _currentAlbum.tracks.length) {
-      play(pre);
+  Future<void> prev() async {
+    if (_currentAlbum == null) return;
+    final int prevIndex = _currentIndex - 1;
+    if (prevIndex >= 0) {
+      await play(prevIndex);
     }
   }
 
-  /// Tracks Loop:
-  /// Loop a single track or complete playlist
-  ///
-  int c = 0;
-  handleLoop() {
-    c++;
-    if (c == 1) {
+  // Gestion boucle
+  int _loopStep = 0;
+  void handleLoop() {
+    _loopStep++;
+    if (_loopStep == 1) {
       _loopMode = true;
-      _loopPlaylist = true;
-    } else if (c == 2) {
+      _loopPlaylist = true; // repeat playlist
+    } else if (_loopStep == 2) {
       _loopMode = true;
+      _loopPlaylist = false; // repeat one
+    } else {
+      _loopMode = false;
       _loopPlaylist = false;
-    } else if (c > 2) {
-      _loopMode = _loopPlaylist = false;
-      c = 0;
+      _loopStep = 0;
     }
     notifyListeners();
   }
 
-  /// Playlist Shuffing:
-  /// Make a copy of original before shuffle
-  ///
-  Album _beforeShuffling;
+  /// Shuffle
+  Album? _beforeShuffling;
   bool _shuffled = false;
   bool get shuffled => _shuffled;
-  handleShuffle() {
+
+  void handleShuffle() {
+    if (_currentAlbum == null) return;
+
     _shuffled = !_shuffled;
-    List<Track> tracks = _currentAlbum.tracks;
-    _beforeShuffling = _currentAlbum;
-    var shuffledTracks = shuffle(tracks);
+    final tracks = List<Track>.from(_currentAlbum!.tracks);
+    _beforeShuffling ??= _currentAlbum;
+
     if (_shuffled) {
-      Album album = Album(
-        id: _currentAlbum.id,
-        name: _currentAlbum.name,
-        description: _currentAlbum.description,
-        media: _currentAlbum.media,
+      final shuffledTracks = shuffle(tracks);
+      _currentAlbum = Album(
+        id: _currentAlbum!.id,
+        name: _currentAlbum!.name,
+        description: _currentAlbum!.description,
+        media: _currentAlbum!.media,
         tracks: shuffledTracks,
       );
-      _currentAlbum = album;
     } else {
       _currentAlbum = _beforeShuffling;
     }
+    notifyListeners();
   }
 
-  /// Play Track
-  /// Play track and set current track index
-  ///
-  play(index) async {
-    print('\n\nPLAY PLAY PLAY\n\n');
+  /// Play track at [index]
+  Future<void> play(int index) async {
+    final album = _currentAlbum;
+    if (album == null) return;
+
+    if (index < 0 || index >= album.tracks.length) {
+      return; // out of bounds
+    }
+
     player.stop();
+
     try {
-      _currentTrack = _currentAlbum.tracks[index];
+      _currentTrack = album.tracks[index];
       notifyListeners();
-      Dio dio = Dio();
-      dio.download(_currentAlbum.tracks[index].playUrl,
-          "${directory.path}/${_currentAlbum.tracks[index].playUrl}.mp3",
-          cancelToken: _currentSongCancelToken,
-          onReceiveProgress: (received, total) async {
-        if ((received / total * 100 > 9)) {
-          if (!_isTrackLoaded) {
-            print("downloading");
-            player
-                .open(
-                    Audio.file(
-                        "${directory.path}/${_currentAlbum.tracks[index].playUrl}.mp3"),
-                    showNotification: true,
-                    playInBackground: PlayInBackground.enabled)
-                .catchError((e) => print(e));
-            _isTrackLoaded = true;
-            notifyListeners();
-            setPlaying(_currentAlbum, index, _currentAlbum.tracks[index]);
+
+      final Dio dio = Dio();
+      final url = album.tracks[index].playUrl;
+      final localPath = "${directory.path}/$url.mp3";
+
+      // Annule le téléchargement précédent s'il existe
+      _currentSongCancelToken?.cancel();
+      _currentSongCancelToken = CancelToken();
+
+      await dio.download(
+        url,
+        localPath,
+        cancelToken: _currentSongCancelToken,
+        onReceiveProgress: (received, total) async {
+          // Démarre la lecture après un tampon minimal (~10%)
+          if (total > 0 && (received / total * 100 > 9)) {
+            if (!_isTrackLoaded) {
+              try {
+                await player.open(
+                  Audio.file(
+                    localPath,
+                    metas: Metas(
+                      title: album.tracks[index].displayedName,
+                      artist: album.tracks[index].artistInfo.name,
+                      album: album.name,
+                      image: MetasImage.network(album.tracks[index].albumInfo.media.medium),
+                      onImageLoadFail: const MetasImage.asset('assets/images/album.png'),
+                    ),
+                  ),
+                  showNotification: true,
+                  playInBackground: PlayInBackground.enabled,
+                );
+              } catch (e) {
+                debugPrint('player.open error: $e');
+              }
+              _isTrackLoaded = true;
+              notifyListeners();
+              setPlaying(album, index, album.tracks[index]);
+            }
+          } else {
+            _isTrackLoaded = false;
           }
-        } else
-          _isTrackLoaded = false;
-      });
-      // await player.open(Audio.network(
-      //     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"));
-      // await player.open(
-      //   Audio.network(_currentAlbum.tracks[index].playUrl),
-      // );
+        },
+      );
+
       _currentIndex = index;
     } catch (t) {
-      print('HERE: $t');
-      //mp3 unreachable
+      debugPrint('Play error: $t');
+      // mp3 unreachable or download error
     }
   }
 
-  isSameAlbum() {
-    return _playlist.id == _currentAlbum.id;
+  bool isSameAlbum() {
+    if (_playlist == null || _currentAlbum == null) return false;
+    return _playlist!.id == _currentAlbum!.id;
   }
 
-  isTrackInProgress(Track track) {
-    return player.isPlaying.value &&
-        player.current.value != null &&
-        player.current.value.audio.assetAudioPath ==
-            '${directory.path}/${track.playUrl}.mp3';
+  bool isTrackInProgress(Track track) {
+    final isPlayingNow = player.isPlaying.value;
+    final current = player.current.value;
+    final path = '${directory.path}/${track.playUrl}.mp3';
+    return isPlayingNow && current != null && current.audio.assetAudioPath == path;
   }
 
-  isLocalTrackInProgress(filePath) {
-    return player.isPlaying.value &&
-        player.current.value != null &&
-        player.current.value.audio.assetAudioPath == filePath;
+  bool isLocalTrackInProgress(String filePath) {
+    final isPlayingNow = player.isPlaying.value;
+    final current = player.current.value;
+    return isPlayingNow && current != null && current.audio.assetAudioPath == filePath;
   }
 
-  bool isPlaying() {
-    return player.isPlaying.value;
-  }
+  bool isPlaying() => player.isPlaying.value;
 
   void audioSessionListener() {
     player.audioSessionId.listen((sessionId) {
@@ -228,65 +266,41 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
     });
   }
 
-  handlePlayButton({album, Track track, index, BuildContext context}) async {
-    print('\n\nHANDLE PLAY BUTTON\n\n');
-    //Disable shuffling
+  Future<void> handlePlayButton({
+    required Album album,
+    required Track track,
+    required int index,
+    required BuildContext context,
+  }) async {
+    // Désactive le shuffle
     isLoading = false;
-    CartProvider cartProvider = context.read<CartProvider>();
     _shuffled = false;
 
     setBuffering(index);
 
+    final cartProvider = Navigator.of(context).context.read<CartProvider>();
+
     if (album.isBought) {
       try {
-        if (isTrackInProgress(track) ||
-            isLocalTrackInProgress(track.localPath)) {
-          player.pause();
-          _currentSongCancelToken.cancel();
+        if (isTrackInProgress(track) || isLocalTrackInProgress(track.localPath)) {
+          await player.pause();
+          _currentSongCancelToken?.cancel();
         } else {
           _isTrackLoaded = false;
           _currentSongCancelToken = CancelToken();
-          notifyListeners();
-          print(track.localPath);
-          print(track.playUrl);
-          if (track.localPath != null) {
-            print("in ifff");
-            await player
-                .open(Audio.file(track.localPath), showNotification: true)
-                .catchError((e) => print(e));
-            _isTrackLoaded = true;
-            notifyListeners();
-            setPlaying(album, index, track);
-          } else {
-            print("elseee in");
-            _isTrackLoaded = false;
-            notifyListeners();
-            Dio dio = Dio();
-            dio.download(
-                track.playUrl, "${directory.path}/${track.playUrl}.mp3",
-                cancelToken: _currentSongCancelToken,
-                onReceiveProgress: (received, total) async {
-              if ((received / total * 100 > 9)) {
-                if (!_isTrackLoaded) {
-                  print("downloading");
-                  player
-                      .open(
-                          Audio.file("${directory.path}/${track.playUrl}.mp3"),
-                          showNotification: true,
-                          playInBackground: PlayInBackground.enabled)
-                      .catchError((e) => print(e));
-                  _isTrackLoaded = true;
-                  notifyListeners();
-                  setPlaying(album, index, track);
-                }
-              } else
-                _isTrackLoaded = false;
-            });
+          try {
+            await player.open(
+              Audio.file(track.localPath),
+              showNotification: true,
+            );
+          } catch (e) {
+            debugPrint('player.open (local) error: $e');
           }
+          _isTrackLoaded = true;
+          setPlaying(album, index, track);
         }
-      } on PlatformException catch (t, stacktrace) {
-        //mp3 unreachable
-        print(t);
+      } on PlatformException catch (t) {
+        debugPrint('PlatformException: $t');
       }
     } else {
       showDialog(
@@ -300,10 +314,11 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
               color: primary,
             ),
           ),
-          content: Text(
-              "Achetez cet album afin  d'écouter vos musiques préférez où vous voulez avec ou sans connexion",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black)),
+          content: const Text(
+            "Achetez cet album afin d'écouter vos musiques préférées où vous voulez avec ou sans connexion",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black),
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -311,9 +326,11 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, AppRoutes.cart);
               },
-              child: Text("Achetez l'album maintenant",
-                  textAlign: TextAlign.end,
-                  style: TextStyle(color: Colors.black)),
+              child: const Text(
+                "Achetez l'album maintenant",
+                textAlign: TextAlign.end,
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ],
         ),
@@ -322,67 +339,38 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
     notifyListeners();
   }
 
-  handleDownloadPlayButton(
-      {album, Track track, index, BuildContext context}) async {
-    //Disable shuffling
-    CartProvider cartProvider = context.read<CartProvider>();
+  Future<void> handleDownloadPlayButton({
+    required Album album,
+    required Track track,
+    required int index,
+    required BuildContext context,
+  }) async {
+    final cartProvider = Navigator.of(context).context.read<CartProvider>();
+
     _shuffled = false;
     _currentIndex = index;
     setBuffering(index);
 
     if (album.isBought) {
       try {
-        if (isTrackInProgress(track) ||
-            isLocalTrackInProgress(track.localPath)) {
-          player.pause();
-          _currentSongCancelToken.cancel();
+        if (isTrackInProgress(track) || isLocalTrackInProgress(track.localPath)) {
+          await player.pause();
+          _currentSongCancelToken?.cancel();
         } else {
           _isTrackLoaded = false;
           _currentSongCancelToken = CancelToken();
-          // notifyListeners();
-          print(track.localPath);
-          print(track.playUrl);
-          if (track.localPath != null) {
-            print("in ifff");
-            await player
-                .open(
-                  Audio.file(track.localPath),
-                  showNotification: true,
-                )
-                .catchError((e) => print(e));
-            _isTrackLoaded = true;
-            // notifyListeners();
-            // setPlaying(album, index, track);
-          } else {
-            print("elseee in");
-            _isTrackLoaded = false;
-            notifyListeners();
-            Dio dio = Dio();
-            dio.download(
-                track.playUrl, "${directory.path}/${track.playUrl}.mp3",
-                cancelToken: _currentSongCancelToken,
-                onReceiveProgress: (received, total) async {
-              if ((received / total * 100 > 9)) {
-                if (!_isTrackLoaded) {
-                  print("downloading");
-                  player
-                      .open(
-                          Audio.file("${directory.path}/${track.playUrl}.mp3"),
-                          showNotification: true,
-                          playInBackground: PlayInBackground.enabled)
-                      .catchError((e) => print(e));
-                  _isTrackLoaded = true;
-                  notifyListeners();
-                  setPlaying(album, index, track);
-                }
-              } else
-                _isTrackLoaded = false;
-            });
+          try {
+            await player.open(
+              Audio.file(track.localPath),
+              showNotification: true,
+            );
+          } catch (e) {
+            debugPrint('player.open (download) error: $e');
           }
+          _isTrackLoaded = true;
         }
-      } on PlatformException catch (t, stacktrace) {
-        //mp3 unreachable
-        print(t);
+      } on PlatformException catch (t) {
+        debugPrint('PlatformException: $t');
       }
     } else {
       showDialog(
@@ -396,10 +384,11 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
               color: primary,
             ),
           ),
-          content: Text(
-              "Achetez cet album afin  d'écouter vos musiques préférez où vous voulez avec ou sans connexion",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black)),
+          content: const Text(
+            "Achetez cet album afin d'écouter vos musiques préférées où vous voulez avec ou sans connexion",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black),
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -407,9 +396,11 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, AppRoutes.cart);
               },
-              child: Text("Achetez l'album maintenant",
-                  textAlign: TextAlign.end,
-                  style: TextStyle(color: Colors.black)),
+              child: const Text(
+                "Achetez l'album maintenant",
+                textAlign: TextAlign.end,
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ],
         ),
@@ -418,29 +409,21 @@ class PlayerProvider extends ChangeNotifier with BaseMixins {
     notifyListeners();
   }
 
-  setPlaying(Album album, int index, Track track) {
+  void setPlaying(Album album, int index, Track track) {
     _currentAlbum = album;
     _currentIndex = index;
     _currentTrack = track;
   }
 
   String getTrackThumbnail() {
-    String image = '';
-    if (_currentTrack?.albumInfo?.media != null &&
-        _currentTrack?.albumInfo?.media?.thumbnail != null) {
-      image = _currentTrack.albumInfo.media.thumbnail;
-    }
-    return image;
+    final track = _currentTrack;
+    if (track == null) return '';
+    return track.albumInfo.media.medium;
   }
 
   String getTrackCover() {
-    String image = '';
-    if (_currentTrack.albumInfo.media != null &&
-        _currentTrack.albumInfo.media.cover != null) {
-      image = _currentTrack.albumInfo.media.cover;
-    } else {
-      image = getTrackThumbnail();
-    }
-    return image;
+    final track = _currentTrack;
+    if (track == null) return '';
+    return track.albumInfo.media.cover;
   }
 }

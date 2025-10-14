@@ -7,7 +7,7 @@
  *  
  */
 
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
 import 'package:senetunes/screens/Artist/ArtistDetailScreen.dart';
 import 'package:senetunes/screens/Artist/ArtistsScreen.dart';
 import 'package:senetunes/screens/Auth/ConfirmationScreen.dart';

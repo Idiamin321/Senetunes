@@ -98,21 +98,7 @@ class _ImageInputState extends State<ImageInput> {
       children: <Widget>[
         GestureDetector(
           onTap: () => _openImagePicker(context),
-          child: _imageFile == null
-              ? Center(
-                  child: Container(
-                    height: 80,
-                    width: 80,
-                    child: CircleAvatar(
-                        child: ClipOval(
-                            child: BaseImage(
-                      radius: 40,
-                      height: 150,
-                      imageUrl: widget.imageUrl,
-                    ))),
-                  ),
-                )
-              : Center(
+          child: Center(
                   child: CircleAvatar(
                       radius: 40.0,
                       child: ClipOval(

@@ -1,100 +1,124 @@
+// lib/main.dart
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:senetunes/config/AppColors.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:senetunes/config/AppProvider.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/config/AppTheme.dart';
 import 'package:senetunes/models/DownloadTaskInfo.dart';
 import 'package:senetunes/providers/ThemeProvider.dart';
-import 'package:senetunes/screens/Auth/LoginScreen.dart';
 import 'package:senetunes/screens/Auth/WelcomeScreen.dart';
 import 'package:senetunes/screens/exploreScreen.dart';
-import 'package:senetunes/widgtes/Common/BaseDrawer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/Applocalizations.dart';
-import 'screens/Auth/SplashScreen.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-void main() async {
+Future<void> _initDownloader() async {
+  await FlutterDownloader.initialize(
+    debug: true,
+    ignoreSsl: true, // retire en prod si warning
+  );
+}
+
+Future<void> _initLocalNotifications() async {
+  final plugin = FlutterLocalNotificationsPlugin();
+
+  const AndroidInitializationSettings androidInit =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const DarwinInitializationSettings darwinInit = DarwinInitializationSettings();
+
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidInit,
+    iOS: darwinInit,
+    macOS: darwinInit,
+  );
+
+  await plugin.initialize(initSettings);
+}
+
+Future<void> _initHive() async {
+  await Hive.initFlutter();
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(DownloadTaskInfoAdapter());
+  }
+  await Hive.openBox('downloads');
+}
+
+Future<void> _requestRuntimePermissions() async {
+  if (Platform.isAndroid) {
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+    if (await Permission.storage.isDenied) {
+      await Permission.storage.request();
+    }
+  }
+}
+
+Future<bool> _isLoggedIn() async {
+  final prefs = await SharedPreferences.getInstance();
+  final user = prefs.getString('user');
+  return (user != null && user.isNotEmpty);
+}
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GlobalConfiguration().loadFromAsset("config");
-  await FlutterDownloader.initialize(debug: true);
+  await _initDownloader();
+  await _initLocalNotifications();
+  await _initHive();
+  await _requestRuntimePermissions();
 
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-// initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-  final IOSInitializationSettings initializationSettingsIOS =
-      IOSInitializationSettings();
-  final InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-    iOS: initializationSettingsIOS,
-  );
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  await Hive.initFlutter();
-  Hive.registerAdapter(DownloadTaskInfoAdapter());
-  await Hive.openBox('downloads');
+  final loggedIn = await _isLoggedIn();
 
-  var status = await Permission.storage.status;
-  if (!status.isGranted) {
-    await Permission.storage.request();
-  }
-  bool loggedIn;
-  await SharedPreferences.getInstance().then((value) =>
-      value.getString('user') != null ? loggedIn = true : loggedIn = false);
-
-  runApp(RekordApp(loggedIn));
+  runApp(RekordApp(loggedIn: loggedIn));
 }
 
 class RekordApp extends StatelessWidget {
-  // This widget is the root of your application.
-  RekordApp(this.loggedIn);
+  const RekordApp({super.key, required this.loggedIn});
   final bool loggedIn;
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: providers(),
-        child: Consumer<ThemeProvider>(
-          builder: (context, value, child) {
-            final isDark = context.watch<ThemeProvider>().darkMode;
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'Senetunes',
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              routes: AppRoutes().routes(),
-              home: loggedIn ? ExploreScreen() : WelcomeScreen(),
-              themeMode: value.darkMode ? ThemeMode.light : ThemeMode.dark,
-              // List all of the app's supported locales here
-              supportedLocales: [
-                Locale('fr', 'FR'),
-                Locale('en', 'EN'),
-              ],
-              // These delegates make sure that the localization data for the proper language is loaded
-              localizationsDelegates: [
-                // A class which loads the translations from JSON files
-                AppLocalizations.delegate,
-                // Built-in localization of basic text for Material widgets
-                GlobalMaterialLocalizations.delegate,
-                // Built-in localization for text direction LTR/RTL
-                GlobalWidgetsLocalizations.delegate,
-              ],
-              // Returns a locale which will be used by the app
-              localeResolutionCallback: (locale, supportedLocales) =>
-                  AppLocalizations(locale)
-                      .localeResolutionCallback(supportedLocales),
-            );
-          },
-        ));
+      providers: providers(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Senetunes',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.darkMode ? ThemeMode.dark : ThemeMode.light,
+            routes: AppRoutes().routes(),
+            home: loggedIn ? const ExploreScreen() : const WelcomeScreen(),
+            supportedLocales: const [
+              Locale('fr', 'FR'),
+              Locale('en', 'US'),
+            ],
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            localeResolutionCallback: (locale, supportedLocales) {
+              return AppLocalizations(locale)
+                  .localeResolutionCallback(supportedLocales);
+            },
+          );
+        },
+      ),
+    );
   }
 }

@@ -31,7 +31,7 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
               // height:800,color: Colors.red,
               child: ListView.builder(
                 physics: BouncingScrollPhysics(),
-                padding:EdgeInsets.symmetric(horizontal: 15),
+                padding: EdgeInsets.symmetric(horizontal: 15),
                 scrollDirection: Axis.horizontal,
                 itemCount: albums.length,
                 itemBuilder: (context, index) {
@@ -53,14 +53,15 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                         $t(context, "bought"),
                                         textAlign: TextAlign.right,
                                         style: TextStyle(
-                                            fontSize: 12, color: white,
+                                          fontSize: 12,
+                                          color: white,
                                         ),
                                       ),
-                                      SizedBox(width:5),
+                                      SizedBox(width: 5),
                                       Icon(
                                         Icons.check_circle,
                                         color: white,
-                                        size:14,
+                                        size: 14,
                                       )
                                     ],
                                   ),
@@ -89,15 +90,13 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                album.media.thumbnail == null
-                                    ? Container()
-                                    : BaseImage(
-                                        imageUrl: album.media.thumbnail,
+                                BaseImage(
+                                        imageUrl: album.media.medium,
                                         height: 140,
                                         width: 140,
                                         radius: 15,
                                       ),
-                                //  albumCard(album.media.thumbnail, 100, 100),
+                                //  albumCard(album.media.medium, 100, 100),
                                 // Padding(
                                 //   padding:
                                 //       const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
@@ -112,7 +111,7 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                       // textAlign: TextAlign.center,
                                       softWrap: true,
                                       maxFontSize: 14,
-                                      minFontSize: 14,maxLines: 1,
+                                      minFontSize: 14, maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           // fontSize: 12,
@@ -190,10 +189,10 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                               ),
                                             ),
                                             content: Text(
-                                              "Vous devez être connecté avant d'acheter un album",
-                                              textAlign: TextAlign.center,
-                                                style:TextStyle(color:Colors.black)
-                                            ),
+                                                "Vous devez être connecté avant d'acheter un album",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: Colors.black)),
                                             actions: [
                                               TextButton(
                                                 onPressed: () {
@@ -202,13 +201,13 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                                       AppRoutes.loginRoute);
                                                 },
                                                 child: Text(
-                                                  $t(
-                                                    context,
-                                                    'sign_in',
-                                                  ),
-                                                  textAlign: TextAlign.end,
-                                                    style:TextStyle(color:primary)
-                                                ),
+                                                    $t(
+                                                      context,
+                                                      'sign_in',
+                                                    ),
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        color: primary)),
                                               ),
                                               TextButton(
                                                 onPressed: () {
@@ -217,13 +216,13 @@ class AlbumsWidget extends StatelessWidget with BaseMixins {
                                                       AppRoutes.registerRoute);
                                                 },
                                                 child: Text(
-                                                  $t(
-                                                    context,
-                                                    'create_new_Account',
-                                                  ),
-                                                  textAlign: TextAlign.end,
-                                                    style:TextStyle(color:primary)
-                                                ),
+                                                    $t(
+                                                      context,
+                                                      'create_new_Account',
+                                                    ),
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        color: primary)),
                                               ),
                                             ],
                                           ),

@@ -42,16 +42,14 @@ class ArtistProvider extends ChangeNotifier {
       for (var i = 0; i < _allArtists.length; i++) {
         Iterable<Album> albumsMatch =
             albums.where((element) => element.artistId == _allArtists[i].id);
-        if (albumsMatch != null) {
-          _allArtists[i].albums = [];
-          _allArtists[i].tracks = [];
-          _allArtists[i].albums.addAll(albumsMatch);
-          _allArtists[i].tracks.addAll(albumsMatch
-              .map((e) => e.tracks)
-              .expand((element) => element)
-              .toList());
-        }
-      }
+        _allArtists[i].albums = [];
+        _allArtists[i].tracks = [];
+        _allArtists[i].albums.addAll(albumsMatch);
+        _allArtists[i].tracks.addAll(albumsMatch
+            .map((e) => e.tracks)
+            .expand((element) => element)
+            .toList());
+            }
       _updated = true;
     }
   }

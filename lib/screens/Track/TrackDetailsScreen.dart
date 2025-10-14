@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
@@ -21,18 +22,13 @@ class TrackDetailsScreen extends StatelessWidget {
             ListTile(
               title: Text(track.name),
               contentPadding: EdgeInsets.symmetric(horizontal: 20),
-              leading: track.albumInfo?.media?.thumbnail != null
-                  ? BaseImage(
-                      imageUrl: track.albumInfo.media.thumbnail,
+              leading: BaseImage(
+                      imageUrl: track.albumInfo.media.medium,
                       height: 50,
                       width: 50,
                       radius: 5,
-                    )
-                  : Icon(
-                      Icons.library_music,
-                      size: 36,
                     ),
-              subtitle: track.artistInfo.name == null ? Container() : Text(track.artistInfo.name),
+              subtitle: Text(track.artistInfo.name),
             ),
             Container(
               padding: EdgeInsets.all(20),

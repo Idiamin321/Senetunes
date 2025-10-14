@@ -1,0 +1,4562 @@
+# Source bundle généré le 2025-10-14T01:52:06.551101
+# Racine: C:\Projets\senetunes
+
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Download\DownloadDetailsScreen.dart =====
+import 'dart:math';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/DownloadProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/providers/PlaylistProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/track/TrackBottomBar.dart';
+import 'package:senetunes/widgtes/track/TrackFavouriteButton.dart';
+import 'package:senetunes/widgtes/track/TrackPlayButton.dart';
+import 'package:senetunes/widgtes/track/TrackTileActions.dart';
+
+import '../downloadPlayerScreen.dart';
+
+class DownloadDetailsScreen extends StatefulWidget {
+  const DownloadDetailsScreen({super.key});
+
+  @override
+  State<DownloadDetailsScreen> createState() => _DownloadDetailsScreenState();
+}
+
+class _DownloadDetailsScreenState extends State<DownloadDetailsScreen>
+    with BaseMixins {
+  final Connectivity _connectivity = Connectivity();
+
+  @override
+  Widget build(BuildContext context) {
+    final downloadedAlbum =
+    ModalRoute.of(context)!.settings.arguments as Album;
+
+    // Juste pour déclencher le provider (si nécessaire)
+    // ignore: unused_local_variable
+    final _ = context.read<PlaylistProvider>().playlists;
+
+    return StreamBuilder<ConnectivityResult>(
+      stream: _connectivity.onConnectivityChanged,
+      builder: (context, snapshot) {
+        final connected = snapshot.data != ConnectivityResult.none;
+
+        return Scaffold(
+          backgroundColor: background,
+          appBar: const PreferredSize(
+            preferredSize: Size.fromHeight(100),
+            child: BaseScreenHeading(
+              title: "Downloads",
+              centerTitle: false,
+              isBack: true,
+            ),
+          ),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  color: background,
+                  child: TrackContainer(downloadedAlbum, connected),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class TrackContainer extends StatefulWidget {
+  const TrackContainer(this.downloadedAlbum, this.connected, {super.key});
+  final bool connected;
+  final Album downloadedAlbum;
+
+  @override
+  State<TrackContainer> createState() => _TrackContainerState();
+}
+
+class _TrackContainerState extends State<TrackContainer> with BaseMixins {
+  late DownloadProvider downloadProvider;
+  late List<Track> tracks;
+
+  @override
+  Widget build(BuildContext context) {
+    downloadProvider = context.watch<DownloadProvider>();
+    tracks = downloadProvider.downloadSongs
+        .where((e) => e.albumId == widget.downloadedAlbum.id)
+        .toList();
+
+    final playerProvider = Provider.of<PlayerProvider>(context, listen: true);
+    final Track? track = playerProvider.currentTrack;
+
+    return Stack(
+      children: [
+        Container(
+          color: background,
+          padding: const EdgeInsets.only(bottom: 50),
+          child: tracks.isNotEmpty
+              ? ListView.builder(
+            itemCount: tracks.length,
+            itemBuilder: (context, index) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: DownloadTrackTile(
+                      track: tracks[index],
+                      index: index,
+                      album: widget.downloadedAlbum,
+                      isDownloadTile: true,
+                    ),
+                  ),
+                ],
+              );
+            },
+          )
+              : const SizedBox.shrink(),
+        ),
+        widget.connected
+            ? const Positioned(
+          bottom: 0.0,
+          left: 0.0,
+          height: 55,
+          right: 0.0,
+          child: TrackBottomBar(),
+        )
+            : Positioned(
+          bottom: 0.0,
+          left: 0.0,
+          height: 55,
+          right: 0.0,
+          child: playerProvider.isLoading
+              ? const SizedBox.shrink()
+              : const DownloadTrackBottomBar(),
+        ),
+      ],
+    );
+  }
+}
+
+class DownloadTrackBottomBar extends StatefulWidget {
+  const DownloadTrackBottomBar({super.key});
+
+  @override
+  State<DownloadTrackBottomBar> createState() => _DownloadTrackBottomBarState();
+}
+
+class _DownloadTrackBottomBarState extends State<DownloadTrackBottomBar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late DownloadProvider downloadProvider;
+  late List<Track> tracks;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+    AnimationController(vsync: this, duration: const Duration(seconds: 10))
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
+    return PlayerBuilder.realtimePlayingInfos(
+      player: playerProvider.player,
+      builder: (context, infos) {
+        downloadProvider = context.watch<DownloadProvider>();
+        tracks = downloadProvider.downloadSongs
+            .where((e) => e.albumId == playerProvider.currentAlbum.id)
+            .toList();
+
+        final currentIdx = playerProvider.currentIndex;
+        final current = (currentIdx >= 0 &&
+            currentIdx < downloadProvider.downloadSongs.length)
+            ? downloadProvider.downloadSongs[currentIdx]
+            : null;
+
+        return GestureDetector(
+          onTap: () {
+            if (playerProvider.currentTrack.localPath != null) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DownloadPlayerScreen(
+                    allTracks: downloadProvider.downloadSongs,
+                    currentOne: playerProvider.currentTrack,
+                  ),
+                ),
+              );
+            }
+          },
+          child: Container(
+            decoration: const BoxDecoration(
+              color: barColor,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(0),
+                topLeft: Radius.circular(0),
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 15.0),
+            height: 20,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 15),
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (_, child) {
+                      double angle = _controller.value * 2 * pi;
+                      if (!playerProvider.isPlaying()) {
+                        angle = 0.0;
+                      }
+                      return Transform.rotate(
+                        angle: angle,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: BaseImage(
+                            imageUrl: playerProvider.getTrackThumbnail(),
+                            width: 40,
+                            height: 40,
+                            radius: 500,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding:
+                    const EdgeInsets.only(left: 10.0, top: 8, bottom: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: AutoSizeText(
+                              current?.name ?? '',
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                              softWrap: true,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: AutoSizeText(
+                              current?.artistInfo?.name ?? '',
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.fade,
+                              softWrap: true,
+                              maxFontSize: 11,
+                              minFontSize: 11,
+                              style: const TextStyle(color: Colors.white70),
+                              maxLines: 1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      IconButton(
+                        icon: const Icon(Icons.fast_rewind),
+                        iconSize: 20,
+                        color: playerProvider.currentIndex == 0
+                            ? Theme.of(context).iconTheme.color
+                            : Theme.of(context).primaryColor,
+                        onPressed: () async {
+                          if (playerProvider.currentIndex != 0) {
+                            await playerProvider.handleDownloadPlayButton(
+                              album: playerProvider.currentAlbum,
+                              track: downloadProvider.downloadSongs[
+                              playerProvider.currentIndex - 1],
+                              index: playerProvider.currentIndex - 1,
+                              context: context,
+                            );
+                          }
+                        },
+                      ),
+                      TrackPlayButton(
+                        track: current ??
+                            (downloadProvider.downloadSongs.isNotEmpty
+                                ? downloadProvider
+                                .downloadSongs[playerProvider.currentIndex]
+                                : playerProvider.currentTrack),
+                        album: playerProvider.currentAlbum,
+                        index: playerProvider.currentIndex,
+                        onPressed: () => playerProvider.playOrPause(),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.fast_forward),
+                        color: (downloadProvider.downloadSongs.length - 1 ==
+                            playerProvider.currentIndex)
+                            ? Theme.of(context).iconTheme.color
+                            : Theme.of(context).primaryColor,
+                        iconSize: 20,
+                        onPressed: () async {
+                          if (downloadProvider.downloadSongs.length - 1 !=
+                              playerProvider.currentIndex) {
+                            await playerProvider.handleDownloadPlayButton(
+                              album: playerProvider.currentAlbum,
+                              track: downloadProvider.downloadSongs[
+                              playerProvider.currentIndex + 1],
+                              index: playerProvider.currentIndex + 1,
+                              context: context,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class DownloadTrackTile extends StatefulWidget {
+  final bool? isDownloadTile;
+  final Album album;
+  final Track track;
+  final int index;
+  final List<Track>? tracks;
+
+  const DownloadTrackTile({
+    super.key,
+    required this.track,
+    required this.index,
+    required this.album,
+    this.isDownloadTile,
+    this.tracks,
+  });
+
+  @override
+  State<DownloadTrackTile> createState() => _DownloadTrackTileState();
+}
+
+class _DownloadTrackTileState extends State<DownloadTrackTile> with BaseMixins {
+  late List<Track> tracks;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = Provider.of<PlayerProvider>(context);
+    var downloadProvider = Provider.of<DownloadProvider>(context);
+    downloadProvider = context.watch<DownloadProvider>();
+
+    tracks = downloadProvider.downloadSongs
+        .where((e) => e.albumId == widget.album.id)
+        .toList();
+
+    final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
+    return PlayerBuilder.isPlaying(
+      player: p.player,
+      builder: (context, isPlaying) {
+        return Container(
+          color: background,
+          margin: const EdgeInsets.symmetric(horizontal: 0),
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                tileColor: Colors.black,
+                onTap: () {
+                  p.setBuffering(widget.index);
+                  if (p.isTrackInProgress(widget.track) ||
+                      p.isLocalTrackInProgress(widget.track.localPath)) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DownloadPlayerScreen(
+                          allTracks: downloadProvider.downloadSongs,
+                          currentOne: playerProvider.currentTrack,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                title: Text(
+                  widget.track.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: widget.track.artistInfo?.name == null
+                    ? null
+                    : Text(
+                  widget.track.artistInfo!.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                  ),
+                ),
+                leading: TrackPlayButton(
+                  track: widget.track,
+                  index: widget.index,
+                  album: widget.album,
+                ),
+                trailing: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TrackFavouriteButton(
+                      track: widget.track,
+                      iconSize: 20.0,
+                    ),
+                    if (!downloadProvider.isDownloadSong(widget.track))
+                      TrackTileActions(
+                        child: widget.isDownloadTile == null
+                            ? SvgPicture.asset(
+                          "assets/icons/svg/download.svg",
+                          height: 20,
+                          color: Colors.white70,
+                        )
+                            : const Icon(Icons.close, color: Colors.white70),
+                        track: widget.track,
+                        title: $t(context, 'download'),
+                        isRemove: false,
+                      )
+                    else
+                      TrackTileActions(
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white70,
+                        ),
+                        track: widget.track,
+                        title: $t(context, 'remove'),
+                        isRemove: true,
+                      ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                child: const Divider(
+                  height: 0,
+                  color: white,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Download\DownloadDetailsScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Favourites\FavouritesScreen.dart =====
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/FavoriteProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Artist/AlbumsList.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Common/BasicAppBar.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
+
+class Choice {
+  final String title;
+  final String image;
+
+  Choice(this.title, this.image);
+}
+
+List<Choice> tabs = [
+  Choice('tracks', 'assets/images/music.png'),
+  Choice('albums', 'assets/images/album.png'),
+];
+
+class FavouritesScreen extends StatelessWidget with BaseMixins {
+  const FavouritesScreen({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var favoriteProvider = Provider.of<FavoriteProvider>(context);
+    return
+        // Scaffold(
+        // backgroundColor: background,
+        //backgroundColor: Theme.of(context).cardColor,
+        // appBar: PreferredSize(
+        //   preferredSize: const Size.fromHeight(100),
+        //   child: BasicAppBar(
+        //     isHome: false,
+        //     title: "fav",
+        //   ),
+        // ),
+        // body:
+        DefaultTabController(
+      length: tabs.length,
+      child:Container(
+        color: background,
+        child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // BaseScreenHeading(
+          //   title: $t(context, 'fvrt'),
+          //   centerTitle: false,
+          //   isBack: false,
+          // ),
+          TabBar(
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 2,
+                color: Theme.of(context).primaryColor,
+              ),
+              // insets: EdgeInsets.only(left: 13, right: 0, bottom: 0),
+            ),
+            isScrollable: true,
+            // labelPadding: EdgeInsets.only(left: 20, right: 0, bottom: 0),
+            // indicatorColor: Theme.of(context).primaryColor,
+            // indicatorWeight: 1.0,
+            // indicatorSize: TabBarIndicatorSize.label,
+            // labelColor: Theme.of(context).primaryColor,
+            // labelStyle: TextStyle(fontSize: 14),
+            // unselectedLabelColor: Colors.grey,
+            // indicatorPadding: EdgeInsets.all(0),
+            labelPadding: EdgeInsets.zero,
+            tabs: tabs
+                .map(
+                  (Choice tab) => Container(
+                    width: MediaQuery.of(context).size.width / 2.3,
+                    height: 100,
+                    // color: Colors.red,
+                    margin: EdgeInsets.only(right: 5, left: 5),
+                    child: Tab(
+                      // text: tab.title,
+                      icon: Stack(children: [
+                        Image.asset(tab.image),
+                        Positioned.fill(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              $t(context, tab.title),
+                              softWrap: true,
+                              style: TextStyle(
+                                  color: white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ),
+                )
+                .toList(),
+            // [
+            //   Tab(
+            //     text: "ss",
+            //     icon: SizedBox(
+            //       width: MediaQuery.of(context).size.width / 2.5,
+            //       child: Image.asset(
+            //         "assets/images/music.png",
+            //         fit: BoxFit.cover,
+            //       ),
+            //     ),
+            //   ),
+            //   Tab(
+            //     child: Container(
+            //       width: MediaQuery.of(context).size.width / 2.5,
+            //       child: Text(
+            //         $t(context, 'albums'),
+            //         textAlign: TextAlign.center,
+            //         style: TextStyle(color: Theme.of(context).primaryColor),
+            //       ),
+            //     ),
+            //   ),
+            // ],
+            // ),
+          ),
+          Expanded(
+              child: Container(
+            color: background,
+
+            // color: Theme.of(context).scaffoldBackgroundColor,
+            child: TabBarView(
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  child:TrackContainer(favoriteProvider: favoriteProvider),),
+    Container(
+    margin: EdgeInsets.symmetric(horizontal: 15),
+    child:AlbumsList(albums: favoriteProvider.favoriteAlbums),),
+              ],
+            ),
+          )),
+        ],
+      ),),
+      // ),
+    );
+  }
+}
+
+class TrackContainer extends StatelessWidget with BaseMixins {
+  const TrackContainer({
+    Key key,
+    @required this.favoriteProvider,
+  }) : super(key: key);
+
+  final FavoriteProvider favoriteProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    final PlayerProvider playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+    Track track;
+    track = playerProvider.currentTrack;
+    return Container(
+        padding: EdgeInsets.symmetric(horizontal: 0),
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        color: background,
+        child: favoriteProvider.favoriteTracks.length > 0
+            ? favoriteProvider.isLoaded
+                ? ListView.builder(
+          physics: BouncingScrollPhysics(),
+          padding: EdgeInsets.only(bottom:130),
+                    itemCount: favoriteProvider.favoriteTracks.length,
+                    itemBuilder: (context, index) {
+                      Album album = new Album(
+                          name: 'Favourites',
+                          tracks: favoriteProvider.favoriteTracks);
+                      return TrackTile(
+                        track: album.tracks[index],
+                        index: index,
+                        album: album,
+                      );
+                    },
+                  )
+                : CustomCircularProgressIndicator()
+            : BaseMessageScreen(
+                title: $t(context, 'no_tracks'),
+                icon: Icons.data_usage,
+                subtitle: $t(context, 'msg_no_tracks'),
+              ));
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Favourites\FavouritesScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Favourites\MyFavouritesScreen.dart =====
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/FavoriteProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Artist/AlbumsList.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/BaseScaffold.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Common/BasicAppBar.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
+
+class Choice {
+  final String title;
+  final String image;
+
+  Choice(this.title, this.image);
+}
+
+List<Choice> tabs = [
+  Choice('tracks', 'assets/images/music.png'),
+  Choice('albums', 'assets/images/album.png'),
+];
+
+class MyFavouritesScreen extends StatelessWidget with BaseMixins {
+  const MyFavouritesScreen({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final PlayerProvider playerProvider =
+        Provider.of<PlayerProvider>(context, listen: false);
+    Track track;
+    track = playerProvider.currentTrack;
+    var favoriteProvider = Provider.of<FavoriteProvider>(context);
+    return Scaffold(
+      backgroundColor: background,
+      //backgroundColor: Theme.of(context).cardColor,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100),
+        child: BaseScreenHeading(
+          centerTitle: false,
+          isBack: true,
+          title: $t(context, 'fvrt'),
+        ),
+      ),
+      body: SafeArea(
+        child: BaseConnectivity(
+          child: BaseScaffold(
+            isLoaded: true,
+            child: Container(
+              color: background,
+
+              child: DefaultTabController(
+                length: tabs.length,
+                child: Column(
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // BaseScreenHeading(
+                    //   title: $t(context, 'fvrt'),
+                    //   centerTitle: false,
+                    //   isBack: false,
+                    // ),
+                    TabBar(
+                      indicator: UnderlineTabIndicator(
+                        borderSide: BorderSide(
+                          width: 2,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        // insets: EdgeInsets.only(left: 13, right: 0, bottom: 0),
+                      ),
+                      isScrollable: true,
+                      // labelPadding: EdgeInsets.only(left: 20, right: 0, bottom: 0),
+                      // indicatorColor: Theme.of(context).primaryColor,
+                      // indicatorWeight: 1.0,
+                      // indicatorSize: TabBarIndicatorSize.label,
+                      // labelColor: Theme.of(context).primaryColor,
+                      // labelStyle: TextStyle(fontSize: 14),
+                      // unselectedLabelColor: Colors.grey,
+                      // indicatorPadding: EdgeInsets.all(0),
+                      labelPadding: EdgeInsets.zero,
+                      tabs: tabs
+                          .map(
+                            (Choice tab) => Container(
+                              width: MediaQuery.of(context).size.width / 2.3,
+                              height: 100,
+                              color: background,
+                              // color: Colors.red,
+                              margin: EdgeInsets.only(right: 5, left: 5),
+                              child: Tab(
+                                // text: tab.title,
+                                icon: Stack(children: [
+                                  Image.asset(tab.image),
+                                  Positioned.fill(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        $t(context, tab.title),
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            color: white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
+                                ]),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      // [
+                      //   Tab(
+                      //     text: "ss",
+                      //     icon: SizedBox(
+                      //       width: MediaQuery.of(context).size.width / 2.5,
+                      //       child: Image.asset(
+                      //         "assets/images/music.png",
+                      //         fit: BoxFit.cover,
+                      //       ),
+                      //     ),
+                      //   ),
+                      //   Tab(
+                      //     child: Container(
+                      //       width: MediaQuery.of(context).size.width / 2.5,
+                      //       child: Text(
+                      //         $t(context, 'albums'),
+                      //         textAlign: TextAlign.center,
+                      //         style: TextStyle(color: Theme.of(context).primaryColor),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ],
+                      // ),
+                    ),
+                    Expanded(
+                        child: Container(
+                      color: background,
+                      // color: Theme.of(context).scaffoldBackgroundColor,
+                      child: TabBarView(
+                        children: [
+                          TrackContainer(favoriteProvider: favoriteProvider),
+                          AlbumsList(albums: favoriteProvider.favoriteAlbums),
+                        ],
+                      ),
+                    )),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TrackContainer extends StatelessWidget with BaseMixins {
+  const TrackContainer({
+    Key key,
+    @required this.favoriteProvider,
+  }) : super(key: key);
+
+  final FavoriteProvider favoriteProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    final PlayerProvider playerProvider =
+    Provider.of<PlayerProvider>(context, listen: false);
+    Track track;
+    track = playerProvider.currentTrack;
+    return Container(
+        padding: EdgeInsets.symmetric(horizontal: 0),
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: favoriteProvider.favoriteTracks.length > 0
+            ? favoriteProvider.isLoaded
+                ? ListView.builder(
+          padding: EdgeInsets.only(bottom: 50),
+                    itemCount: favoriteProvider.favoriteTracks.length,
+                    itemBuilder: (context, index) {
+                      Album album = new Album(
+                          name: 'Favourites',
+                          tracks: favoriteProvider.favoriteTracks);
+                      return TrackTile(
+                        track: album.tracks[index],
+                        index: index,
+                        album: album,
+                      );
+                    },
+                  )
+                : CustomCircularProgressIndicator()
+            : BaseMessageScreen(
+                title: $t(context, 'no_tracks'),
+                icon: Icons.data_usage,
+                subtitle: $t(context, 'msg_no_tracks'),
+              ));
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Favourites\MyFavouritesScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Bought Albums\BoughtAlbumsScreen.dart =====
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Album/AlbumTile.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/BaseScaffold.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+
+class BoughtAlbumsScreen extends StatelessWidget with BaseMixins {
+  @override
+  Widget build(BuildContext context) {
+    final PlayerProvider playerProvider =
+        Provider.of<PlayerProvider>(context, listen: false);
+    Track track;
+    track = playerProvider.currentTrack;
+    return Scaffold(
+        backgroundColor: background,
+        //backgroundColor: Theme.of(context).cardColor,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(100),
+          child: BaseScreenHeading(
+            title: $t(context, 'bought_albums'),
+            centerTitle: false,
+            isBack: true,
+          ),
+          // child: BaseAppBar(
+          //   isHome: false,
+          // ),
+        ),
+        body: SafeArea(
+            child: BaseConnectivity(
+                child: BaseScaffold(
+          isLoaded: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  color: background,
+                  padding: EdgeInsets.only(bottom: 40),
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  // color: Theme.of(context).scaffoldBackgroundColor,
+                  child: TrackContainer(),
+                ),
+              ),
+            ],
+          ),
+        ))));
+  }
+}
+
+class TrackContainer extends StatefulWidget with BaseMixins {
+  @override
+  _TrackContainerState createState() => _TrackContainerState();
+}
+
+class _TrackContainerState extends State<TrackContainer> with BaseMixins {
+  AlbumProvider albumProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    albumProvider = context.watch<AlbumProvider>();
+    print(albumProvider.boughtAlbums);
+
+    return Container(
+      padding: EdgeInsets.only(bottom: 0.0),
+      child: albumProvider.boughtAlbums.length > 0
+          ? albumProvider.isLoaded
+              ? GridView.builder(
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  controller: ScrollController(),
+                  itemCount: albumProvider.boughtAlbums.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: responsive(context,
+                          isSmallPhone: 2, isPhone: 2, isTablet: 4),
+                      childAspectRatio: responsive(context,
+                          isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          AppRoutes.boughtAlbumsDetails,
+                          arguments:
+                              albumProvider.boughtAlbums.elementAt(index),
+                        );
+                      },
+                      child: AlbumTile(
+                        album: albumProvider.boughtAlbums.elementAt(index),
+                      ),
+                    );
+                  },
+                )
+              : CustomCircularProgressIndicator()
+          : BaseMessageScreen(
+              title: $t(context, 'bought_albums_empty'),
+              icon: Icons.money_off,
+            ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Bought Albums\BoughtAlbumsScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Bought Albums\BoughtAlbumsDetailsScreen.dart =====
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/AlbumProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:senetunes/widgtes/Common/BaseScaffold.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/track/TrackTile.dart';
+
+class BoughtAlbumsDetailsScreen extends StatefulWidget {
+  @override
+  _BoughtAlbumsDetailsScreenState createState() =>
+      _BoughtAlbumsDetailsScreenState();
+}
+
+class _BoughtAlbumsDetailsScreenState extends State<BoughtAlbumsDetailsScreen>
+    with BaseMixins {
+  @override
+  Widget build(BuildContext context) {
+    Album boughtAlbum = ModalRoute.of(context).settings.arguments;
+    AlbumProvider p = Provider.of<AlbumProvider>(context);
+    final PlayerProvider playerProvider =
+        Provider.of<PlayerProvider>(context, listen: false);
+    Track track;
+    boughtAlbum.tracks.map((e) => {e.displayedName});
+    return Scaffold(
+      backgroundColor: background,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100),
+        child: BaseScreenHeading(
+          title: boughtAlbum.name,
+          centerTitle: false,
+          isBack: true,
+        ),
+        // child: BaseAppBar(
+        //   isHome: false,
+        // ),
+      ),
+      body: BaseScaffold(
+        isLoaded: true,
+        child: Padding(
+          padding: EdgeInsets.only(
+              left: 10, right: 10, bottom: 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  color: background,
+                  // margin: EdgeInsets.only(
+                  //     left: 10, right: 10),
+                  // color: Theme.of(context).scaffoldBackgroundColor,
+                  child: TrackContainer(boughtAlbum),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TrackContainer extends StatefulWidget {
+  TrackContainer(this.boughtAlbum);
+
+  final Album boughtAlbum;
+
+  @override
+  _TrackContainerState createState() => _TrackContainerState();
+}
+
+class _TrackContainerState extends State<TrackContainer> with BaseMixins {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        padding: EdgeInsets.only(bottom: 0.0),
+        color: background,
+        child: widget.boughtAlbum.tracks.length > 0
+            ? ListView.builder(
+                itemCount: widget.boughtAlbum.tracks.length,
+                itemBuilder: (context, index) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 10,
+                        child: TrackTile(
+                          track: widget.boughtAlbum.tracks[index],
+                          index: index,
+                          album: widget.boughtAlbum,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              )
+            : Container());
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Bought Albums\BoughtAlbumsDetailsScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Cart\Cart.dart =====
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Cart/CartTile.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/BaseScaffold.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:tuple/tuple.dart';
+
+class Cart extends StatefulWidget {
+  @override
+  _CartState createState() => _CartState();
+}
+
+class _CartState extends State<Cart> with BaseMixins {
+  late CartProvider cartProvider;
+  double total = 0.0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    cartProvider = context.watch<CartProvider>();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+    final Track? _ = playerProvider.currentTrack;
+
+    // ping PayDunya status (safe si user null)
+    cartProvider.getResponse(
+      context,
+      context.read<AuthProvider>().user == null
+          ? ""
+          : context.read<AuthProvider>().user.email,
+    );
+
+    total = 0.0;
+    for (final a in cartProvider.cart) {
+      total += a.price;
+      total = double.parse(total.toStringAsFixed(2));
+    }
+
+    return Scaffold(
+      floatingActionButton: cartProvider.showPopMessage
+          ? InkWell(
+        onTap: () => Navigator.pushNamed(
+            context, AppRoutes.boughtAlbumsScreenRoute),
+        child: Container(
+          decoration: BoxDecoration(
+            color: primary,
+            borderRadius: BorderRadius.circular(100),
+          ),
+          margin:
+          const EdgeInsets.only(left: 50, right: 20, top: 10, bottom: 60),
+          height: 60,
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: const Text(
+            "Go to the bought Albums",
+            style: TextStyle(color: white, fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+        ),
+      )
+          : const SizedBox.shrink(),
+      backgroundColor: background,
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: BaseScreenHeading(
+          title: 'cart',
+          centerTitle: false,
+          isBack: true,
+        ),
+      ),
+      body: SafeArea(
+        child: BaseConnectivity(
+          child: BaseScaffold(
+            isLoaded: true,
+            child: cartProvider.cart.isNotEmpty
+                ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(right: 20, left: 20, top: 10, bottom: 10),
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    "${cartProvider.cart.length}  ${$t(context, "music")}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 50),
+                    itemCount: cartProvider.cart.length,
+                    itemBuilder: (context, index) {
+                      return SizedBox(
+                        height: 70,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 0),
+                                child: CartTile(
+                                  album: cartProvider.cart[index],
+                                  remove: () {
+                                    setState(() {
+                                      cartProvider.removeAlbum(cartProvider.cart[index]);
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 15),
+                              child: const Divider(height: 0, color: white),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 20, right: 15, top: 10),
+                  child: Text.rich(
+                    TextSpan(
+                      text: "Total:  ",
+                      style: const TextStyle(color: Colors.white70, fontSize: 22),
+                      children: [
+                        TextSpan(
+                          text: "$total €",
+                          style: const TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () async {
+                    final request = await cartProvider.postRequest();
+                    if (request['response_code'] == '00') {
+                      cartProvider.url = request['response_text'];
+                      await Navigator.pushNamed(
+                        context,
+                        AppRoutes.webView,
+                        arguments: Tuple2('Paydunya', cartProvider.url),
+                      );
+                      if (cartProvider.showPopMessage) {
+                        // message de succès
+                        // ignore: use_build_context_synchronously
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: white,
+                            title: Center(
+                              child: Icon(Icons.warning, size: 30, color: primary),
+                            ),
+                            content: const Text(
+                              "Votre album a été acheté avec succès. Rendez-vous dans la page de vos Albums Achetés afin de l'écouter",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pushNamed(
+                                      context, AppRoutes.boughtAlbumsScreenRoute);
+                                },
+                                child: const Text("Mes albums achetés",
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(color: Colors.black)),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: primary,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    margin: const EdgeInsets.only(
+                        left: 20, right: 20, top: 10, bottom: 60),
+                    height: 60,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: Text(
+                      $t(context, "order"),
+                      style: const TextStyle(
+                          color: white, fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
+            )
+                : BaseMessageScreen(
+              title: $t(context, 'cart_empty'),
+              icon: Icons.add_shopping_cart,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Cart\Cart.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Auth\WelcomeScreen.dart =====
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppConfig.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Media.dart';
+import 'package:senetunes/screens/Auth/LoginScreen.dart';
+import 'package:senetunes/widgtes/Common/BaseBlocButton.dart';
+import 'package:senetunes/widgtes/Common/OutlineBorderButton.dart';
+
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({Key key}) : super(key: key);
+
+  @override
+  _WelcomeScreenState createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> with BaseMixins {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: background,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.fitWidth,
+            image: AssetImage(
+              "assets/Splash/welcome_background.png",
+            ),
+          ),
+        ),
+        padding: EdgeInsets.only(top: 50, left: 20, right: 15),
+        alignment: Alignment.topCenter,
+        child: Column(
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 220,
+                child: Image.asset(
+                  AppConfig.APP_LOGO,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Expanded(flex:2,child:SizedBox()),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  $t(
+                    context,
+                    'enjoy_best_music',
+                  ),
+                  textAlign: TextAlign.start,
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ),
+
+              SizedBox(height: 35),
+              BaseBlockButton(
+                // isLoaded: provider.check,
+                color: Theme.of(context).primaryColor,
+                radius: 100,
+                label: $t(context, 'sign_in'),
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+              OutlineBorderButton(
+                // isLoaded: provider.check,
+                // color: Theme.of(context).primaryColor,
+                radius: 100,
+                label: $t(context, 'create_new_Account'),
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.pushNamed(
+                      context, AppRoutes.registerRoute);
+                },
+              ),
+              Expanded(child:SizedBox()),
+            ]),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Auth\WelcomeScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Auth\ConfirmationScreen.dart =====
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+
+class ConfirmationScreen extends StatelessWidget with BaseMixins {
+  const ConfirmationScreen({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Scaffold(
+      backgroundColor: background,
+        body: BaseMessageScreen(
+            title: $t(context, 'register_title'),
+            icon: Icons.check_box,
+            child: FlatButton.icon(
+                icon: Icon(
+                  EvilIcons.arrow_right,
+                  color: Theme.of(context).primaryColor,
+                ),
+                label: Text(
+                  $t(context, 'sign_in'),
+                  style:
+                      TextStyle(fontWeight: FontWeight.w300, color: Theme.of(context).primaryColor),
+                ),
+                onPressed: () {
+                  Navigator.popAndPushNamed(context, AppRoutes.home);
+                  // package:senetunes
+                })),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Auth\ConfirmationScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Auth\LoginScreen.dart =====
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:provider/provider.dart';
+
+import 'package:senetunes/config/AppConfig.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/config/AppTheme.dart';
+import 'package:senetunes/config/AppValidation_rules.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/User.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseBlocButton.dart';
+import 'package:senetunes/widgtes/common/BaseAppIcon.dart';
+import 'package:xml2json/xml2json.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+class LoginScreen extends StatefulWidget {
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> with BaseMixins {
+  final Map<String, String> formData = {'email': null, 'password': null};
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  var media;
+
+  Widget _buildUsernameField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white, fontSize: 16),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 15, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/email.svg",
+            color: primary,
+          ),
+        ),
+      ),
+      validator: (value) => AppValidation(context).validateEmail(value),
+      onSaved: (String value) {
+        formData['email'] = value;
+      },
+    );
+  }
+
+  bool hidePass=true;
+  Widget _buildPasswordField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white, fontSize: 16),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/padlock.svg",
+            color: primary,
+          ),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            hidePass?Icons.remove_red_eye_outlined:Icons.visibility_off_outlined,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() {
+              hidePass=!hidePass;
+            });
+          },
+        ),
+      ),
+      validator: (value) => AppValidation(context).validatePassword(value),
+      obscureText: hidePass,
+      onSaved: (String value) {
+        formData['password'] = value;
+      },
+    );
+  }
+
+  _handleSubmit(BuildContext context, AuthProvider provider) async {
+    if (_formKey.currentState.validate()) {
+      // If all data are correct then save data to out variables
+      _formKey.currentState.save();
+
+      //Call Auth Provider here...
+      Response response = await provider.singInWithEmail(formData);
+      var transformer = Xml2Json();
+      transformer.parse(response.data);
+      print(response.data);
+      final Map<String, dynamic> jsonMap =
+          json.decode(transformer.toBadgerfish());
+      if (response.statusCode != 200) {
+        Flushbar(
+          backgroundColor:
+              barColor.withOpacity(0.95),
+          icon: Icon(
+            Icons.error_outline,
+            color: Theme.of(context).primaryColor,
+          ),
+          duration: Duration(seconds: 3),
+          flushbarPosition: FlushbarPosition.TOP,
+          titleText: Text($t(context, 'wrong_credentials'),style:TextStyle(color:white)),
+          messageText: Text(jsonMap['error']['message']['\$'],style:TextStyle(color:white)),
+        ).show(context);
+      } else {
+        provider.setUser(User.fromJson(jsonMap));
+        Navigator.popAndPushNamed(context, AppRoutes.home);
+        // Navigator.pushReplacementNamed(context, AppRoutes.home);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    media = MediaQuery.of(context).size;
+    var provider = Provider.of<AuthProvider>(context);
+    return Scaffold(
+      backgroundColor: background,
+      body: Container(
+        // height:MediaQuery.of(context).size.height,
+        child: Form(
+          key: _formKey, //Works with statefull widget
+          child: SingleChildScrollView(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Stack(children: [
+                    Container(
+                      width: double.infinity,
+                      height: 261,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.contain,
+                          image: ExactAssetImage(
+                            AppConfig.TOP_BACKGROUND,
+                          ),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      // color: Colors.red,
+                    ),
+                    Positioned.fill(
+                      child: Container(color: Color.fromRGBO(18, 18, 18, 0.7)),
+                    ),
+                    Align(
+                      child: Container(
+                        width: 220,
+                        height: 261,
+                        child: Image.asset(
+                          AppConfig.APP_LOGO,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ]),
+                  SizedBox(height: 20.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        vertical: media.height / 20,
+                        horizontal: media.height / 40),
+                    // padding: EdgeInsets.only(
+                    //     top: media.height / 20,
+                    //     left: media.height / 20,
+                    //     right: media.height / 20),
+                    child: Column(
+                      children: [
+                        Text(
+                          $t(context, 'sign_in'),
+                          style: TextStyle(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              fontSize: 25),
+                        ),
+                        SizedBox(height: 20.0),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          heightFactor: 1,
+                          child: Text(
+                            $t(context, 'email'),
+                            style: TextStyle(
+                              fontFamily: "Montserrat",
+                              color: Colors.white70,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        _buildUsernameField(),
+                        SizedBox(height: 15.0),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          heightFactor: 1,
+                          child: Text(
+                            $t(context, 'password'),
+                            style: TextStyle(
+                              fontFamily: "Montserrat",
+                              color: Colors.white70,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        _buildPasswordField(),
+                        SizedBox(height: 40.0),
+                        BaseBlockButton(
+                          isLoaded: provider.check,
+                          color: Theme.of(context).primaryColor,
+                          radius: 100,
+                          label: $t(context, 'sign_in'),
+                          textColor: Colors.white,
+                          onPressed: () => _handleSubmit(context, provider),
+                        ),
+                        SizedBox(height: 20.0),
+                        Wrap(
+                          spacing: 2,
+                          children: [
+                            // FlatButton.icon(
+                            //   icon: Icon(
+                            //     EvilIcons.arrow_right,
+                            //     color: Theme.of(context).primaryColor,
+                            //   ),
+                            //    label:
+                            Text(
+                              $t(
+                                context,
+                                'no_Account',
+                              ),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 12,
+                                  color: Colors.white70),
+                            ),
+                            InkWell(
+                              child: Text(
+                                $t(
+                                  context,
+                                  'create_your_Account',
+                                ),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 12,
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, AppRoutes.registerRoute);
+                                // Navigator.pushNamed(context, AppRoutes.webView,
+                                //     arguments: Tuple2("Senetunes", "https://www.senetunes.com/fr/authentification?back=my-account"));
+                              },
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 14.0),
+                        // Center(
+                        //   child: FlatButton(
+                        //     child: Text(
+                        //       $t(
+                        //         context,
+                        //         'skip',
+                        //       ),
+                        //       style: TextStyle(
+                        //           fontWeight: FontWeight.w300,
+                        //           fontSize: 16,
+                        //           color: Colors.grey,
+                        //           ),
+                        //     ),
+                        //     onPressed: () {
+                        //       Navigator.pushNamed(
+                        //         context,
+                        //         AppRoutes.home,
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Auth\LoginScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Auth\RegisterScreen.dart =====
+import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppConfig.dart';
+
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/config/AppTheme.dart';
+import 'package:senetunes/config/AppValidation_rules.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseBlocButton.dart';
+import 'package:senetunes/widgtes/common/BaseAppIcon.dart';
+
+class RegisterScreen extends StatefulWidget {
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
+  DateTime birthday = DateTime.now();
+  TextEditingController birthdayController = TextEditingController();
+  final Map<String, dynamic> formData = {
+    'firstname': null,
+    'lastname': null,
+    'email': null,
+    'password': null
+  };
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  var passKey = GlobalKey<FormFieldState>();
+  var media;
+
+  Widget _buildFirstNameField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/Nom.svg",
+            color: primary,
+          ),
+        ),
+      ),
+      // decoration: InputDecoration(
+      //   labelText: $t(context, 'f_name'),
+      // ),
+      validator: (value) => AppValidation(context).validateName(value),
+      onSaved: (String value) {
+        formData['firstname'] = value;
+      },
+    );
+  }
+
+  Widget _buildLastNameField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/Nom.svg",
+            color: primary,
+          ),
+        ),
+      ),
+      // decoration: InputDecoration(
+      //   labelText: $t(context, 'l_name'),
+      // ),
+      validator: (value) => AppValidation(context).validateName(value),
+      onSaved: (String value) {
+        formData['lastname'] = value;
+      },
+    );
+  }
+
+  // Widget _buildBirthDayPicker() {
+  //   return TextFormField(
+  //     controller: birthdayController,
+  //     onTap: () async {
+  //       birthday = await showDatePicker(
+  //           builder: (BuildContext context, Widget child) {
+  //             return Theme(
+  //               data: ThemeData.dark().copyWith(
+  //                 colorScheme: ColorScheme.dark(
+  //                   primary: primary,
+  //                   onPrimary: Colors.white,
+  //                 ),
+  //               ),
+  //               child: child,
+  //             );
+  //           },
+  //           context: context,
+  //           initialDate: birthday,
+  //           lastDate: DateTime.now(),
+  //           firstDate: DateTime(1940),
+  //           locale: Locale.fromSubtags(languageCode: 'fr'));
+  //       if (birthday == null) birthday = DateTime.now();
+  //       setState(() {
+  //         birthdayController.text = "${birthday.year}-${birthday.month}-${birthday.day}";
+  //       });
+  //     },
+  //     decoration: InputDecoration(
+  //       suffixIcon: Icon(
+  //         Icons.calendar_today_outlined,
+  //         color: primary,
+  //       ),
+  //       labelText: $t(context, 'birthday'),
+  //     ),
+  //     onSaved: (String value) {
+  //       formData['birthday'] = value;
+  //     },
+  //   );
+  // }
+
+  Widget _buildEmailField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 20),
+          child: SvgPicture.asset(
+            "assets/icons/svg/email.svg",
+            color: primary,
+          ),
+        ),
+      ),
+      // decoration: InputDecoration(labelText: $t(context, 'email')),
+      validator: (value) => AppValidation(context).validateEmail(value),
+      onSaved: (String value) {
+        formData['email'] = value;
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      key: passKey,
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/padlock.svg",
+            color: primary,
+          ),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            hidePass
+                ? Icons.remove_red_eye_outlined
+                : Icons.visibility_off_outlined,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() {
+              hidePass = !hidePass;
+            });
+          },
+        ),
+      ),
+      // decoration: InputDecoration(
+      //     labelText: $t(context, 'password', value: 'Password')),
+      validator: (value) => AppValidation(context).validatePassword(value),
+      obscureText: hidePass,
+      onSaved: (String value) {
+        formData['passwd'] = value;
+      },
+    );
+  }
+
+  bool _termsChecked = false;
+  bool errorShow = true;
+  bool hidePass = true;
+  bool hideConfirmPass = true;
+
+  Widget _buildTermsCheck() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5.0),
+      child: ListTile(
+        leading: Checkbox(
+          activeColor: Theme.of(context).primaryColor,
+          side: BorderSide(
+            color: Colors.white,
+            width: 1,
+          ),
+          // shape: RoundedRectangleBorder(
+          //   side:
+          // ),
+          value: _termsChecked,
+          onChanged: (bool value) => setState(() => _termsChecked = value),
+        ),
+        // controlAffinity: ListTileControlAffinity.leading,
+        title: Text(
+            $t(
+              context,
+              'terms',
+            ),
+            style: TextStyle(color: white)),
+        subtitle: !errorShow
+            ? Text(
+                $t(
+                  context,
+                  'r_field',
+                ),
+                style: TextStyle(color: Color(0xFFe53935), fontSize: 12),
+              )
+            : null,
+        dense: true,
+      ),
+    );
+  }
+
+  Widget _buildConfirmPasswordField() {
+    return TextFormField(
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecorationStyle.defaultStyle.copyWith(
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+          child: SvgPicture.asset(
+            "assets/icons/svg/padlock.svg",
+            color: primary,
+          ),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            hideConfirmPass
+                ? Icons.remove_red_eye_outlined
+                : Icons.visibility_off_outlined,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() {
+              hideConfirmPass = !hideConfirmPass;
+            });
+          },
+        ),
+      ),
+      // decoration: InputDecoration(labelText: $t(context, 'cnfrm_account')),
+      validator: (value) => AppValidation(context)
+          .validateConfirmPassword(value, passKey.currentState.value),
+      obscureText: hideConfirmPass,
+    );
+  }
+
+  _submit(BuildContext context, AuthProvider provider) {
+    FocusScope.of(context).requestFocus(new FocusNode());
+    setState(() {
+      errorShow = _termsChecked;
+    });
+
+    if (_formKey.currentState.validate() && _termsChecked) {
+      // If all data are correct then save data to out variables
+      _formKey.currentState.save();
+      // formData['AUTH_KEY'] = AppConfig.API_AUTH_KEY;
+
+      provider.singUpWithEmail(formData).then((response) {
+        Flushbar(
+                backgroundColor: barColor.withOpacity(0.95),
+                icon: Icon(
+                  Icons.error_outline,
+                  color: Theme.of(context).primaryColor,
+                ),
+                duration: Duration(seconds: 3),
+                flushbarPosition: FlushbarPosition.TOP,
+                titleText:
+                    Text($t(context, 'ops'), style: TextStyle(color: white)),
+                messageText: Text(response, style: TextStyle(color: white)),
+              ).show(context);
+        // Navigator.pushReplacementNamed(context, AppRoutes.confirmScreenRoute);
+      });
+    } else {
+      //   If all data are not valid then start auto validation.
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    media = MediaQuery.of(context).size;
+    var provider = Provider.of<AuthProvider>(context);
+
+    return Scaffold(
+      backgroundColor: background,
+      resizeToAvoidBottomInset: true,
+      extendBodyBehindAppBar: true,
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //     onPressed: () => Navigator.pop(context),
+      //     icon: Icon(
+      //       Icons.arrow_back,
+      //       color: Theme.of(context).iconTheme.color,
+      //     ),
+      //   ),
+      //   title: Text(
+      //     $t(context, 'create_new_Account'),
+      //     style: TextStyle(color: primary),
+      //   ),
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      // ),
+      body: Container(
+        height: media.height,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Stack(children: [
+                        Container(
+                          width: double.infinity,
+                          height: 261,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              fit: BoxFit.contain,
+                              image: ExactAssetImage(
+                                AppConfig.TOP_BACKGROUND,
+                              ),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          // color: Colors.red,
+                        ),
+                        Positioned.fill(
+                          child:
+                              Container(color: Color.fromRGBO(18, 18, 18, 0.7)),
+                        ),
+                        Align(
+                          child: Container(
+                            width: 220,
+                            height: 261,
+                            child: Image.asset(
+                              AppConfig.APP_LOGO,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ]),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          $t(context, 'create_new_Account'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              fontSize: 20),
+                        ),
+                      ),
+                      // SizedBox(
+                      //   height: 90,
+                      // ),
+                      // BaseAppIcon(
+                      //   width: media.width * 0.5,
+                      // ),
+
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: media.height / 20,
+                            horizontal: media.height / 40),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'f_name'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildFirstNameField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'l_name'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildLastNameField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'email'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              // _buildBirthDayPicker(),
+                              _buildEmailField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'password'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildPasswordField(),
+                              SizedBox(height: 20.0),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                heightFactor: 1,
+                                child: Text(
+                                  $t(context, 'cnfrm_account'),
+                                  style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              _buildConfirmPasswordField(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // ),
+
+                  _buildTermsCheck(),
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        vertical: 20, horizontal: media.height / 40),
+                    // padding: EdgeInsets.symmetric(
+                    //     horizontal: media.height / 20, vertical: 20),
+                    child: BaseBlockButton(
+                      isLoaded: provider.isLoaded,
+                      color: Theme.of(context).primaryColor,
+                      label: $t(context, 'create_new_Account'),
+                      textColor: Colors.white,
+                      radius: 100,
+                      onPressed: () => _submit(context, provider),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Auth\RegisterScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\Auth\UserAccountPage.dart =====
+import 'package:in_app_review/in_app_review.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:global_configuration/global_configuration.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/providers/ThemeProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
+import 'package:senetunes/widgtes/Common/BaseScaffold.dart';
+import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
+
+import '../../widgtes/Common/BaseAppBar.dart';
+
+class UserAccountPage extends StatefulWidget {
+  @override
+  _UserAccountPageState createState() => _UserAccountPageState();
+}
+
+class _UserAccountPageState extends State<UserAccountPage> with BaseMixins {
+  @override
+  Widget build(BuildContext context) {
+    var provider = context.watch<AuthProvider>();
+    GlobalConfiguration cfg = GlobalConfiguration();
+    var themeProvider = Provider.of<ThemeProvider>(context);
+    final PlayerProvider playerProvider =
+    Provider.of<PlayerProvider>(context, listen: false);
+    Track track = playerProvider.currentTrack;
+
+    return Scaffold(
+      backgroundColor: background,
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: BaseScreenHeading(
+          title: 'Settings',
+          isBack: true,
+          centerTitle: false,
+        ),
+      ),
+      body: SafeArea(
+        child: BaseConnectivity(
+          child: BaseScaffold(
+            isLoaded: true,
+            child: provider.isLoaded
+                ? Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  decoration: BoxDecoration(
+                    color: barColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: provider.user != null
+                      ? ListTile(
+                    title: Text(
+                      provider.user.firstName != null
+                          ? provider.user.firstName
+                          : "",
+                      style: const TextStyle(color: white),
+                    ),
+                    subtitle: Text(
+                      provider.user.email != null
+                          ? provider.user.email
+                          : "",
+                      style: const TextStyle(color: white),
+                    ),
+                  )
+                      : Column(
+                    children: <Widget>[
+                      ListTile(
+                        tileColor: background,
+                        title: Text($t(context, 'sign_in')),
+                        leading: const Icon(
+                          Icons.verified_user,
+                          size: 22,
+                          color: primary,
+                        ),
+                        onTap: () => Navigator.pushNamed(
+                            context, AppRoutes.loginRoute),
+                      ),
+                      const Divider(height: 0),
+                      ListTile(
+                        tileColor: background,
+                        title:
+                        Text($t(context, 'create_new_Account')),
+                        leading: const Icon(
+                          Icons.account_circle,
+                          size: 22,
+                          color: primary,
+                        ),
+                        onTap: () => Navigator.pushNamed(
+                            context, AppRoutes.registerRoute),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0),
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      ListTile(
+                        tileColor: background,
+                        title: Text($t(context, 'download')),
+                        leading: SizedBox(
+                          height: 50,
+                          child: SvgPicture.asset(
+                            "assets/icons/svg/download.svg",
+                            height: 18,
+                            color: primary,
+                          ),
+                        ),
+                        onTap: () => {
+                          Navigator.pushNamed(
+                              context, AppRoutes.downloadScreenRoute)
+                        },
+                      ),
+                      ListTile(
+                        tileColor: background,
+                        title: Text($t(context, 'help')),
+                        leading: const Icon(
+                          Icons.help,
+                          size: 22,
+                          color: primary,
+                        ),
+                        onTap: () => {
+                          Navigator.pushNamed(
+                              context, AppRoutes.contactUs)
+                        },
+                      ),
+                      const Divider(height: 0),
+                      ListTile(
+                        tileColor: background,
+                        title: Text($t(context, 'rate')),
+                        leading: const Icon(
+                          Icons.star,
+                          size: 22,
+                          color: primary,
+                        ),
+                        onTap: () async {
+                          final inAppReview = InAppReview.instance;
+                          if (await inAppReview.isAvailable()) {
+                            await inAppReview.requestReview();
+                          } else {
+                            await inAppReview.openStoreListing();
+                          }
+                        },
+                      ),
+                      const Divider(height: 0),
+                      ListTile(
+                        tileColor: background,
+                        title: Text($t(context, 'who_is_senetunes')),
+                        leading: const Icon(
+                          Icons.info,
+                          size: 22,
+                          color: primary,
+                        ),
+                        onTap: () => {
+                          Navigator.pushNamed(
+                              context, AppRoutes.aboutUs)
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (provider.isLoggedIn)
+                  Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0),
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                          tileColor: background,
+                          title: Text($t(context, 'sign_out')),
+                          leading: SizedBox(
+                            height: 50,
+                            child: SvgPicture.asset(
+                              "assets/icons/svg/logout (4).svg",
+                              height: 18,
+                              color: primary,
+                            ),
+                          ),
+                          onTap: () => provider.logout(),
+                        ),
+                      ],
+                    ),
+                  ),
+                const Spacer(),
+              ],
+            )
+                : const CustomCircularProgressIndicator(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\Auth\UserAccountPage.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\screens\WebView\WebView.dart =====
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/DownloadProvider.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
+
+class WebViewCart extends StatefulWidget {
+  const WebViewCart({super.key});
+
+  @override
+  State<WebViewCart> createState() => _WebViewCartState();
+}
+
+class _WebViewCartState extends State<WebViewCart> {
+  late final CartProvider cartProvider;
+  late final DownloadProvider downloadProvider;
+
+  WebViewController? _controller;
+  bool _loading = true;
+  bool _canGoBack = false;
+  bool _canGoForward = false;
+
+  @override
+  void didChangeDependencies() {
+    cartProvider = context.watch<CartProvider>();
+    downloadProvider = context.watch<DownloadProvider>();
+    super.didChangeDependencies();
+  }
+
+  Future<void> _refreshNavAvailability() async {
+    if (_controller == null) return;
+    final canBack = await _controller!.canGoBack();
+    final canFwd = await _controller!.canGoForward();
+    if (mounted) {
+      setState(() {
+        _canGoBack = canBack;
+        _canGoForward = canFwd;
+      });
+    }
+  }
+
+  WebViewController _buildController(String initialUrl, String email) {
+    final c = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(background)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (NavigationRequest req) {
+            cartProvider.isBought = 0;
+            unawaited(cartProvider.getResponse(context, email));
+            return NavigationDecision.navigate;
+          },
+          onPageStarted: (u) {
+            setState(() => _loading = true);
+          },
+          onPageFinished: (u) async {
+            setState(() => _loading = false);
+            await _refreshNavAvailability();
+            unawaited(cartProvider.getResponse(context, email));
+          },
+          onProgress: (progress) {
+            unawaited(cartProvider.getResponse(context, email));
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(initialUrl), headers: {
+        'User-Agent':
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari',
+      });
+    return c;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Tuple2<String, String>?;
+    final title = args?.item1 ?? '';
+    final url = args?.item2 ?? '';
+    final email = context.read<AuthProvider>().user?.email ?? '';
+
+    _controller ??= _buildController(url, email);
+
+    return WillPopScope(
+      onWillPop: () async {
+        if (_controller != null && await _controller!.canGoBack()) {
+          await _controller!.goBack();
+          await _refreshNavAvailability();
+          await cartProvider.getResponse(context, email);
+          return false;
+        }
+        await cartProvider.getResponse(context, email);
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: background,
+        appBar: AppBar(
+          backgroundColor: background,
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              "assets/icons/svg/back_arrow.svg",
+              height: 25,
+              color: white,
+            ),
+            onPressed: () async {
+              await cartProvider.getResponse(context, email);
+              log("backkk");
+              if (mounted) Navigator.of(context).pop();
+            },
+          ),
+          title: Text(title, style: const TextStyle(color: white)),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              color: white,
+              disabledColor: Colors.grey,
+              onPressed: _canGoBack
+                  ? () async {
+                await _controller?.goBack();
+                await _refreshNavAvailability();
+                await cartProvider.getResponse(context, email);
+              }
+                  : null,
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward_ios),
+              color: white,
+              disabledColor: Colors.grey,
+              onPressed: _canGoForward
+                  ? () async {
+                await _controller?.goForward();
+                await _refreshNavAvailability();
+                await cartProvider.getResponse(context, email);
+              }
+                  : null,
+            ),
+            IconButton(
+              icon: const Icon(Icons.autorenew),
+              color: white,
+              onPressed: () async {
+                await _controller?.reload();
+                await _refreshNavAvailability();
+              },
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            if (_controller != null) WebViewWidget(controller: _controller!),
+            if (_loading)
+              Container(
+                color: background,
+                alignment: Alignment.center,
+                child: const CustomCircularProgressIndicator(),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\screens\WebView\WebView.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\track\TrackCarousel\TrackCarouselWidget.dart =====
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart' as cs;
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+
+class TrackCarouselWidget extends StatefulWidget {
+  final List<Track> tracks;
+  final String? title;
+
+  TrackCarouselWidget({required this.tracks, this.title, Key? key}) : super(key: key) {
+    final random = Random();
+    for (var i = tracks.length - 1; i > 0; i--) {
+      final n = random.nextInt(i + 1);
+      final temp = tracks[i];
+      tracks[i] = tracks[n];
+      tracks[n] = temp;
+    }
+  }
+
+  @override
+  _TrackCarouselWidgetState createState() => _TrackCarouselWidgetState();
+}
+
+class _TrackCarouselWidgetState extends State<TrackCarouselWidget> {
+  int currentImage = 0;
+  final cs.CarouselController _controller = cs.CarouselController();
+
+  Widget _buildSliderItem(Track track) {
+    final cover = track.albumInfo.media.cover;
+    final medium = track.albumInfo.media.medium;
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.symmetric(horizontal: 6.0),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+      child: (cover.isNotEmpty || medium.isNotEmpty)
+          ? BaseImage(
+        radius: 3,
+        overlay: false,
+        imageUrl: cover.isNotEmpty ? cover : medium,
+      )
+          : Container(
+        height: 180,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+        color: Theme.of(context).colorScheme.surface,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        cs.CarouselSlider.builder(
+          carouselController: _controller,
+          options: cs.CarouselOptions(
+            autoPlay: true,
+            enlargeCenterPage: false,
+            initialPage: 0,
+            height: 178,
+            onPageChanged: (index, reason) => setState(() => currentImage = index),
+          ),
+          itemCount: widget.tracks.length,
+          itemBuilder: (context, index, _) => InkWell(
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                AppRoutes.albumDetail,
+                arguments: widget.tracks[index].albumInfo,
+              );
+            },
+            child: _buildSliderItem(widget.tracks[index]),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [1, 2, 3, 4, 5].asMap().entries.map((entry) {
+            return GestureDetector(
+              onTap: () => _controller.animateToPage(entry.key),
+              child: Container(
+                width: (currentImage % 5 == entry.key) ? 7 : 6,
+                height: (currentImage % 5 == entry.key) ? 7 : 6,
+                margin: const EdgeInsets.only(top: 12.0, left: 2.0, right: 2),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white70, width: 0.5),
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(currentImage % 5 == entry.key ? 0.9 : 0.0),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\track\TrackCarousel\TrackCarouselWidget.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\track\TrackTile.dart =====
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/DownloadProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/track/TrackFavouriteButton.dart';
+import 'package:senetunes/widgtes/track/TrackTileActions.dart';
+
+import 'TrackPlayButton.dart';
+
+class TrackTile extends StatefulWidget {
+  final bool? isDownloadTile;
+  final Album? album;
+  final Track track;
+  final int index;
+  final List<Track>? tracks;
+
+  const TrackTile({
+    super.key,
+    required this.track,
+    required this.index,
+    this.isDownloadTile,
+    this.album,
+    this.tracks,
+  });
+
+  @override
+  State<TrackTile> createState() => _TrackTileState();
+}
+
+class _TrackTileState extends State<TrackTile> with BaseMixins {
+  @override
+  Widget build(BuildContext context) {
+    final p = Provider.of<PlayerProvider>(context);
+    final downloadProvider = Provider.of<DownloadProvider>(context);
+
+    return PlayerBuilder.isPlaying(
+      player: p.player,
+      builder: (context, isPlaying) {
+        return Container(
+          color: background,
+          margin: const EdgeInsets.symmetric(horizontal: 0),
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                tileColor: Colors.black,
+                onTap: () {
+                  p.setBuffering(widget.index);
+                  if (p.isTrackInProgress(widget.track) ||
+                      p.isLocalTrackInProgress(widget.track.localPath)) {
+                    Navigator.of(context).pushNamed(AppRoutes.player);
+                  } else {
+                    p.handlePlayButton(
+                      track: widget.track,
+                      index: widget.index,
+                      album: widget.album,
+                      context: context,
+                    );
+                  }
+                },
+                title: Text(
+                  widget.track.name,
+                  maxLines: 2,
+                  style: const TextStyle(
+                    color: white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: (widget.track.artistInfo?.name == null)
+                    ? null
+                    : Text(
+                  widget.track.artistInfo!.name,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                  ),
+                ),
+                leading: TrackPlayButton(
+                  track: widget.track,
+                  index: widget.index,
+                  album: widget.album,
+                ),
+                trailing: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TrackFavouriteButton(
+                      track: widget.track,
+                      iconSize: 20.0,
+                    ),
+                    if (!downloadProvider.isDownloadSong(widget.track))
+                      TrackTileActions(
+                        child: (widget.isDownloadTile == null)
+                            ? SvgPicture.asset(
+                          "assets/icons/svg/download.svg",
+                          height: 20,
+                          color: Colors.white70,
+                        )
+                            : const Icon(Icons.close, color: Colors.white70),
+                        track: widget.track,
+                        title: $t(context, 'download'),
+                        isRemove: false,
+                      )
+                    else
+                      TrackTileActions(
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white70,
+                        ),
+                        track: widget.track,
+                        title: $t(context, 'remove'),
+                        isRemove: true,
+                      ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                child: const Divider(
+                  height: 0,
+                  color: white,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\track\TrackTile.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\track\TrackBottomBar.dart =====
+import 'dart:math';
+
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
+
+import 'TrackPlayButton.dart';
+
+class TrackBottomBar extends StatefulWidget {
+  const TrackBottomBar({Key? key}) : super(key: key);
+
+  @override
+  _TrackBottomBarState createState() => _TrackBottomBarState();
+}
+
+class _TrackBottomBarState extends State<TrackBottomBar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+    AnimationController(vsync: this, duration: const Duration(seconds: 10))
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final playerProvider =
+    Provider.of<PlayerProvider>(context, listen: false);
+
+    return PlayerBuilder.realtimePlayingInfos(
+      player: playerProvider.player,
+      builder: (context, infos) {
+        final Track track = playerProvider.currentTrack;
+
+        return GestureDetector(
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.player),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: barColor,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(0),
+                topLeft: Radius.circular(0),
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 15.0),
+            height: 20,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 15),
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (_, child) {
+                      double angle = _controller.value * 2 * pi;
+                      if (!playerProvider.isPlaying()) {
+                        angle = 0.0;
+                      }
+                      return Transform.rotate(
+                        angle: angle,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: BaseImage(
+                            imageUrl: playerProvider.getTrackThumbnail(),
+                            width: 40,
+                            height: 40,
+                            radius: 500,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding:
+                    const EdgeInsets.only(left: 10.0, top: 8, bottom: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: AutoSizeText(
+                              track.name,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.clip,
+                              softWrap: true,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: AutoSizeText(
+                              track.artistInfo.name,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.fade,
+                              softWrap: true,
+                              maxFontSize: 11,
+                              minFontSize: 11,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                              ),
+                              maxLines: 1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      IconButton(
+                        icon: const Icon(SimpleLineIcons.control_rewind),
+                        iconSize: 20,
+                        color: playerProvider.isFirstTrack()
+                            ? Theme.of(context).iconTheme.color
+                            : Theme.of(context).primaryColor,
+                        onPressed: () {
+                          playerProvider.prev();
+                        },
+                      ),
+                      TrackPlayButton(
+                        track: track,
+                        onPressed: () => playerProvider.playOrPause(),
+                      ),
+                      IconButton(
+                        icon: const Icon(SimpleLineIcons.control_forward),
+                        color: playerProvider.isLastTrack(
+                            playerProvider.currentIndex + 1)
+                            ? Theme.of(context).iconTheme.color
+                            : Theme.of(context).primaryColor,
+                        iconSize: 20,
+                        onPressed: () {
+                          if (playerProvider
+                              .isLastTrack(playerProvider.currentIndex + 1)) {
+                            return;
+                          }
+                          playerProvider.next();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\track\TrackBottomBar.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\track\TrackPlayButton.dart =====
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+
+class TrackPlayButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final Track track;
+  final Album? album;
+  final int? index;
+
+  const TrackPlayButton({
+    super.key,
+    required this.track,
+    this.album,
+    this.index,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final p = Provider.of<PlayerProvider>(context, listen: false);
+
+    return PlayerBuilder.isPlaying(
+      player: p.player,
+      builder: (context, isPlaying) {
+        final isLoading = (!p.isTrackLoaded && p.tIndex == index);
+        final isCurrent =
+            p.isTrackInProgress(track) || p.isLocalTrackInProgress(track.localPath);
+
+        return SizedBox(
+          height: 40,
+          width: 40,
+          child: isLoading
+              ? const Padding(
+            padding: EdgeInsets.all(10),
+            child: CircularProgressIndicator(strokeWidth: 1),
+          )
+              : IconButton(
+            padding: EdgeInsets.zero,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            color: Theme.of(context).primaryColor,
+            icon: Icon(
+              isCurrent ? Icons.pause_circle_outline : Icons.play_arrow,
+              color: Colors.white70,
+            ),
+            onPressed: () {
+              if (onPressed != null) {
+                onPressed!();
+              } else {
+                // Comportement par défaut si aucun handler n'est fourni
+                if (isCurrent) {
+                  p.playOrPause();
+                } else {
+                  p.handlePlayButton(
+                    track: track,
+                    index: index ?? 0,
+                    album: album,
+                    context: context,
+                  );
+                }
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\track\TrackPlayButton.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\track\TrackFavouriteButton.dart =====
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:global_configuration/global_configuration.dart';
+import 'package:popover/popover.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/models/Track.dart';
+import 'package:senetunes/providers/FavoriteProvider.dart';
+import 'package:senetunes/widgtes/Common/PopOverWidget.dart';
+
+class TrackFavouriteButton extends StatelessWidget with BaseMixins {
+  final Album album;
+  final Track track;
+  final double iconSize;
+  TrackFavouriteButton({this.track, this.album, iconSize}) : iconSize = iconSize ?? 20;
+
+  @override
+  Widget build(BuildContext context) {
+    FavoriteProvider favouriteProvider = Provider.of(context);
+
+    return IconButton(
+        icon: Icon(
+          favouriteProvider.isFavouitedTrack(track) ? AntDesign.heart : AntDesign.hearto,
+          color: favouriteProvider.isFavouitedTrack(track) ? primary :Colors.white70,
+        ),
+        iconSize: iconSize,
+        color: activeColor(context, favouriteProvider.isFavouitedTrack(track)),
+        onPressed: () {
+          if (GlobalConfiguration().getValue('favFirst'))
+            PopOverWidget(
+                key: 'favFirst',
+                message: "Vous adorez cette chanson ? Cliquez ici pour l'ajouter à vos favoris",
+                context: context,
+                popoverDirection: PopoverDirection.top);
+          else
+            favouriteProvider.addToFavouritesTrack(track);
+        });
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\track\TrackFavouriteButton.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Album\AlbumsWidget.dart =====
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/Common/WidgetHeader.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+
+class AlbumsWidget extends StatelessWidget with BaseMixins {
+  final List<Album> albums;
+  final String title;
+
+  AlbumsWidget({this.title, this.albums});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 255,
+      child: Column(
+        children: [
+          WidgetHeader(title: title, route: AppRoutes.albums),
+          Expanded(
+            child: Container(
+              // height:800,color: Colors.red,
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                scrollDirection: Axis.horizontal,
+                itemCount: albums.length,
+                itemBuilder: (context, index) {
+                  Album album = albums[index];
+                  return Container(
+                    width: 150,
+                    margin: EdgeInsets.only(right: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        album.isBought
+                            ? Expanded(
+                                flex: 2,
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        $t(context, "bought"),
+                                        textAlign: TextAlign.right,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: white,
+                                        ),
+                                      ),
+                                      SizedBox(width: 5),
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: white,
+                                        size: 14,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        Expanded(
+                          flex: 15,
+                          child: InkWell(
+                            onTap: () {
+                              print(album.isBought);
+                              print(album.id);
+                              var playerProvider = Provider.of<PlayerProvider>(
+                                  context,
+                                  listen: false);
+
+                              playerProvider.currentAlbum = album;
+
+                              Navigator.of(context).pushNamed(
+                                AppRoutes.albumDetail,
+                                arguments: album,
+                              );
+                            },
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                BaseImage(
+                                        imageUrl: album.media.medium,
+                                        height: 140,
+                                        width: 140,
+                                        radius: 15,
+                                      ),
+                                //  albumCard(album.media.medium, 100, 100),
+                                // Padding(
+                                //   padding:
+                                //       const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
+                                //   child:
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    child: AutoSizeText(
+                                      '${album.name}',
+                                      // textAlign: TextAlign.center,
+                                      softWrap: true,
+                                      maxFontSize: 14,
+                                      minFontSize: 14, maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          // fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: white),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // ),
+                        !album.isBought
+                            ? Expanded(
+                                flex: 3,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      padding: MaterialStateProperty.all<
+                                          EdgeInsetsGeometry>(EdgeInsets.zero),
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                    child: Container(
+                                      width: 95,
+                                      // alignment: Alignment.center,
+                                      margin: EdgeInsets.all(5),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Expanded(
+                                            child: FittedBox(
+                                              fit: BoxFit.contain,
+                                              child: Text(
+                                                "Ajouter au panier",
+                                                // textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                "${album.price} €",
+                                                style: TextStyle(
+                                                  fontSize: 30,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      if (context.read<AuthProvider>().user ==
+                                          null)
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            title: Center(
+                                              child: Icon(
+                                                Icons.warning,
+                                                size: 30,
+                                                color: primary,
+                                              ),
+                                            ),
+                                            content: Text(
+                                                "Vous devez être connecté avant d'acheter un album",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: Colors.black)),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.popAndPushNamed(
+                                                      context,
+                                                      AppRoutes.loginRoute);
+                                                },
+                                                child: Text(
+                                                    $t(
+                                                      context,
+                                                      'sign_in',
+                                                    ),
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        color: primary)),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.popAndPushNamed(
+                                                      context,
+                                                      AppRoutes.registerRoute);
+                                                },
+                                                child: Text(
+                                                    $t(
+                                                      context,
+                                                      'create_new_Account',
+                                                    ),
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                        color: primary)),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      else
+                                        context
+                                            .read<CartProvider>()
+                                            .addAlbum(album);
+                                    },
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Album\AlbumsWidget.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Album\AlbumTile.dart =====
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:provider/provider.dart';
+
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/providers/AuthProvider.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/providers/PlayerProvider.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+
+class AlbumTile extends StatelessWidget with BaseMixins {
+  final Album album;
+  final bool downloadScreen;
+
+  AlbumTile({this.album, this.downloadScreen});
+
+  @override
+  Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
+    return Container(
+      width: width,
+      // height: 100,
+      margin: EdgeInsets.only(left: 10,right:10,top:10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 8,
+            child:
+            // Row(mainAxisAlignment: MainAxisAlignment.center,
+            //   mainAxisSize: MainAxisSize.max,
+            //   children: [
+                BaseImage(
+                  heroId: album.id,
+                  imageUrl: album.media.thumbnail,
+                  height: 250,
+                  width: responsive(context,
+                      isTablet: 170.0, isPhone: 180.0, isSmallPhone: 135.0),
+                  radius: 5.0,
+                ),
+            //     Positioned(
+            //       right: 0,
+            //       bottom: 10,
+            //       child: PlayerBuilder.isPlaying(
+            //         player: context.watch<PlayerProvider>().player,
+            //         builder: (context, isPlaying) {
+            //           return downloadScreen != null && downloadScreen == true
+            //               ? Container()
+            //               : IconButton(
+            //                   icon: Icon(
+            //                     isPlaying &&
+            //                             album.id ==
+            //                                 context
+            //                                     .watch<PlayerProvider>()
+            //                                     .currentAlbum
+            //                                     .id
+            //                         ? AntDesign.pausecircleo
+            //                         : AntDesign.playcircleo,
+            //                     size: 30,
+            //                     color: Theme.of(context).primaryColor,
+            //                   ),
+            //                   onPressed: () {
+            //                     context.read<PlayerProvider>().handlePlayButton(
+            //                         album: album,
+            //                         track: album.tracks[0],
+            //                         index: 0,
+            //                         context: context);
+            //                   },
+            //                 );
+            //         },
+            //       ),
+            //     ),
+            //   ],
+            // ),
+          ),
+          Expanded(flex:3,
+            child: Container(
+              // color: Colors.red,height: 90,
+              // padding: EdgeInsets.only(top:5, bottom: 0),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "${album.name}",maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w500, color: white),
+              ),
+            ),
+          ),
+          Expanded(
+            flex:2,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (downloadScreen == false)
+                  Text(
+                    '${album.tracks.length} sons',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color:Colors.white70,
+                    ),
+                  ),
+                // SizedBox(width: 5),
+                if (!album.isBought)
+                // if(true)
+                  if (downloadScreen == false)
+                    Container(
+                      height: 35,
+                      width: width * 0.20,
+
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.symmetric(vertical: 0,horizontal: 2)),
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    "Ajouter au panier",
+                                    style: TextStyle(
+                                      color: white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    "${album.price} €",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        onPressed: () {
+                          if (context.read<AuthProvider>().user == null)
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                title: Center(
+                                  child: Icon(
+                                    Icons.warning,
+                                    size: 30,
+                                    color: primary,
+                                  ),
+                                ),
+                                content: Text(
+                                  "Vous devez être connecté avant d'acheter un album",
+                                  textAlign: TextAlign.center,
+                                  style:TextStyle(color:Colors.black)
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.popAndPushNamed(context, AppRoutes.loginRoute);
+                                    },
+                                    child: Text(
+                                      $t(
+                                        context,
+                                        'sign_in',
+                                      ),
+                                      textAlign: TextAlign.end,
+                                      style:TextStyle(color:primary)
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.popAndPushNamed(context, AppRoutes.registerRoute);
+                                    },
+                                    child: Text(
+                                      $t(
+                                        context,
+                                        'create_new_Account',
+                                      ),
+                                      textAlign: TextAlign.end,
+                                      style:TextStyle(color:primary)
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          else
+                            context.read<CartProvider>().addAlbum(album);
+                        },
+                      ),
+                    ),
+              ],
+            ),
+          ),
+          SizedBox(height:15),
+        ],
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Album\AlbumTile.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Album\AlbumTileActions.dart =====
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/models/Track.dart';
+
+class TrackTileActions extends StatelessWidget {
+  final Track track;
+  final String title;
+  final Function route;
+  final Widget child;
+
+  TrackTileActions({Key key, this.child, this.title, this.route, this.track});
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      child: child,
+      // icon: Icon(
+      //   Icons.more_vert,
+      //   color: Theme.of(context).primaryColor,
+      // ),
+      onSelected: (String value) {
+        if (value == 'details') {
+          route();
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+        PopupMenuItem<String>(
+          value: 'details',
+          child: Text(
+            '$title',
+            style: TextStyle(
+              color: primary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Album\AlbumTileActions.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Artist\ArtistCardForScreen.dart =====
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/screens/Artist/ArtistDetailScreen.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+
+class ArtistCard extends StatelessWidget with BaseMixins {
+  final int index;
+  final Artist artist;
+
+  ArtistCard({this.index, this.artist});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      color: background,
+      child: InkWell(
+        // contentPadding: EdgeInsets.zero,
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ArtistDetailScreen(
+                        artist: artist,
+                      )));
+        },
+        child: Column(
+          children: [
+            BaseImage(
+              heroId: artist.id,
+              imageUrl: artist.media.medium,
+              height: 110,
+              width: 110,
+              radius: 100,
+            ),
+            SizedBox(height: 5),
+            Text(
+              artist.name,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        // title: Text(
+        //   artist.name,
+        //   style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        // ),
+        // subtitle: Text(
+        //   artist.designation,
+        //   style:
+        //       TextStyle(color: Theme.of(context).colorScheme.primaryVariant),
+        // ),
+        // leading:
+        // trailing: DropdownButton<String>(
+        //   underline: Text(''),
+        //   icon: Icon(Icons.more_vert),
+        //   items: <String>[$t(context, 'view_artist')].map((String value) {
+        //     return new DropdownMenuItem<String>(
+        //       value: value,
+        //       child: Text(
+        //         value,
+        //         style: TextStyle(
+        //           color: primary,
+        //         ),
+        //       ),
+        //     );
+        //   }).toList(),
+        //   onChanged: (_) {
+        //     Navigator.push(
+        //         context,
+        //         MaterialPageRoute(
+        //             builder: (context) =>
+        //                 ArtistDetailScreen(artist: artist)));
+        //   },
+        // ),
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Artist\ArtistCardForScreen.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Artist\TrackTileForArtist.dart =====
+import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+import 'package:senetunes/widgtes/Track/TrackTile.dart';
+
+class TrakTileForArtist extends StatelessWidget with BaseMixins {
+  const TrakTileForArtist({
+    Key key,
+    @required this.artist,
+  }) : super(key: key);
+
+  final Artist artist;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Expanded(
+        //   child:
+          Container(
+            child: ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+                    itemCount: artist.tracks.length,
+                    itemBuilder: (context, index) {
+                      return TrackTile(
+                        index: index,
+                        track: artist.tracks[index],
+                        tracks: artist.tracks,
+                        album: artist.tracks[index].albumInfo,
+                      );
+                    },
+                  ),
+          ),
+        // ),
+      ],
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Artist\TrackTileForArtist.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Artist\AlbumsList.dart =====
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Album.dart';
+import 'package:senetunes/widgtes/Album/AlbumFavouriteButton.dart';
+import 'package:senetunes/widgtes/Album/AlbumTileActions.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
+
+class AlbumsList extends StatelessWidget with BaseMixins {
+  final List<Album> albums;
+
+  const AlbumsList({
+    Key key,
+    @required this.albums,
+  }) : super(key: key);
+
+  _buildTile(BuildContext context, Album album) => Column(
+        children: <Widget>[
+          ListTile(
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                AppRoutes.albumDetail,
+                arguments: album,
+              );
+            },
+            title: Text(
+              album.name,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
+            subtitle: Text(
+              '${album.tracks.length} sons',
+              style: TextStyle(
+                // color: Theme.of(context).colorScheme.primaryVariant,
+                color: white,
+              ),
+            ),
+            leading: BaseImage(
+              heroId: album.id,
+              imageUrl: album.media.medium,
+              height: 40,
+              width: 40,
+              radius: 5.0,
+            ),
+            trailing: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AlbumFavouriteButton(
+                  album: album,
+                ),
+                TrackTileActions(
+                  route: () {
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.albumDetail,
+                      arguments: album,
+                    );
+                  },
+                  title: 'Écouter les sons',
+                  // child: Icon(
+                  //   Icons.more_vert,
+                  //   color: Theme.of(context).primaryColor,
+                  // ),
+                  child: SvgPicture.asset(
+                    "assets/icons/svg/download.svg",
+                    height: 20,
+                    color: Colors.white70,
+                  ),
+                )
+              ],
+            ),
+          ),
+          Divider(
+            color: Theme.of(context).cardColor,
+          ),
+        ],
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Container(
+            child: albums.length > 0
+                ? ListView.builder(
+                    itemCount: albums.length,
+                    itemBuilder: (context, index) {
+                      return _buildTile(context, albums[index]);
+                    },
+                  )
+                : BaseMessageScreen(
+                    title: $t(context, 'no_albums'),
+                    icon: Icons.data_usage,
+                    subtitle: $t(context, 'msg_no_albums'),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Artist\AlbumsList.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Artist\ArtistCarousel\ArtistWidget.dart =====
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/models/Artist.dart';
+import 'package:senetunes/screens/Artist/ArtistDetailScreen.dart';
+import 'package:senetunes/widgtes/Common/WidgetHeader.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+
+class ArtistWidget extends StatelessWidget {
+  final List<Artist> artists;
+  final String title;
+
+  ArtistWidget({this.artists, this.title});
+
+  _buildSliderItem(
+      BuildContext context, Artist artist, index, artists, height, width) {
+    print(artist.media.thumbnail);
+    print(artist.media.medium);
+    print(artist.media.cover);
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ArtistDetailScreen(artist: artist)));
+      },
+      // child: Column(
+      //   children: [
+      //     Expanded(
+      child: Container(
+          width: 130,
+          // height:200,
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                      width: 120.0,
+                      height: 120.0,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(artist.media.cover)),
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
+                        color: Colors.redAccent,
+                      ),
+                    ),
+              SizedBox(height: 10),
+              Expanded(
+                child: AutoSizeText(
+                  artist.name,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  maxFontSize: 12,
+                  style: TextStyle(
+                    // fontSize: 12,
+                    color: white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          )),
+      //     ),
+      //   ],
+      // ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+
+    double width = MediaQuery.of(context).size.width;
+
+    return Column(
+      // crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        WidgetHeader(title: title, route: AppRoutes.artists),
+        Container(
+          height: 160,
+          // color: Colors.yellow,
+          child: ListView.builder(
+            physics: BouncingScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            scrollDirection: Axis.horizontal,
+            itemCount: artists.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return _buildSliderItem(
+                  context, artists[index], index, artists, height, width);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Artist\ArtistCarousel\ArtistWidget.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Category\CategoryWidget.dart =====
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Category.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
+import 'package:senetunes/widgtes/Common/WidgetHeader.dart';
+import 'package:senetunes/widgtes/ImagePreview.dart';
+
+class CategoryWidget extends StatelessWidget with BaseMixins {
+  final List<Category> categories;
+  final String title;
+  CategoryWidget({this.title, this.categories});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 250,
+      child: Column(
+        children: [
+          WidgetHeader(title: title, route: AppRoutes.categoryScreen),
+          Expanded(
+            child: Container(
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                scrollDirection: Axis.horizontal,
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  Category category = categories[index];
+                  // print('==${category.albums[0].media.medium}');
+                  return Container(
+                    width: 150,
+                    // color: background,
+                    margin: const EdgeInsets.only(right: 10),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          AppRoutes.categoryDetail,
+                          arguments: category,
+                        );
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BaseImage(
+                            heroId: category.id,
+                            imageUrl: category.albums[0].media.medium,
+                            height: 140,
+                            width: 140,
+                            radius: 15.0,
+                          ),
+//                           ImagePreview(
+//                             images: [
+//                               category.albums[0].media.medium!=null?category.albums[0].media.medium:
+// "assets/images/you.jpg"
+//                             ],
+//                           ),
+//                            albumCard(album.media.medium, 100, 100),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 6.0, horizontal: 0),
+                            child: Container(
+                              child: AutoSizeText(
+                                '${category.name}',
+                                softWrap: true,
+                                maxFontSize: 14,
+                                minFontSize: 12,
+                                style: TextStyle(
+                                    // fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Category\CategoryWidget.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Category\CategoryTile.dart =====
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/mixins/BaseMixins.dart';
+import 'package:senetunes/models/Category.dart';
+import 'package:senetunes/providers/CategoryProvider.dart';
+import 'package:senetunes/widgtes/common/BaseImage.dart';
+
+class CategoryTile extends StatelessWidget with BaseMixins {
+  final Category category;
+
+  CategoryTile({this.category});
+
+  @override
+  Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    CategoryProvider categoryProvider = context.watch<CategoryProvider>();
+    final width = MediaQuery.of(context).size.width;
+
+    return Container(
+      width: width,
+      height: 100,
+      margin: EdgeInsets.symmetric(vertical: 15,horizontal: 5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 6,
+            child: Stack(
+              children: [
+                BaseImage(
+                  heroId: category.id,
+                  imageUrl: categoryProvider.getCategoryMedium(category),
+                  height: height * 0.2,
+                  width: responsive(context,
+                      isTablet: 170.0, isPhone: 150.0, isSmallPhone: 135.0),
+                  radius: 10.0,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex:2,
+            child: Padding(
+              padding: EdgeInsets.only(top: 4, bottom: 4,left:5,),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child:AutoSizeText(
+                "${category.name}",overflow: TextOverflow.fade,
+                textAlign: TextAlign.start,
+                minFontSize: 14,
+                maxFontSize: 16,
+                style: TextStyle(
+                  // fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: white,
+                ),),
+              ),
+            ),
+          ),
+          Expanded(
+            flex:1,
+            child: Padding(
+              padding: EdgeInsets.only(left:5),
+              child:Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                AutoSizeText(
+                  '${category.albums.length} albums',
+                  maxFontSize: 14,minFontSize: 12,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.white70,
+                  ),
+                ),
+                // SizedBox(width: 20),
+              ],
+            ),),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Category\CategoryTile.dart =====
+
+
+===== BEGIN FILE: C:\Projets\senetunes\lib\widgtes\Common\BaseAppBar.dart =====
+import 'package:badges/badges.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:senetunes/config/AppConfig.dart';
+import 'package:senetunes/config/AppRoutes.dart';
+import 'package:senetunes/providers/CartProvider.dart';
+import 'package:senetunes/screens/album/SearchScreen.dart';
+
+import 'BaseDrawer.dart';
+
+class BaseAppBar extends StatelessWidget {
+  final bool darkMode;
+  final String logoPath;
+  final bool isHome;
+
+  const BaseAppBar({Key key, this.logoPath, this.darkMode, this.isHome = false})
+      : super(key: key);
+
+  Widget leadingIcon(
+      {@required bool isHome,
+      @required bool isCart,
+      Brightness brightness,
+      int cartLength,
+      BuildContext context}) {
+    return cartLength > 0 && !isCart
+        ? Theme(
+            data: Theme.of(context),
+            child: Badge(
+              position: BadgePosition.topEnd(top: 10, end: 10),
+              badgeContent: Text(cartLength.toString(),
+                softWrap: true,style: TextStyle(color: white,fontWeight: FontWeight.w700,fontSize: 10),
+              ),
+              child: IconButton(
+                icon: Icon(
+                  isHome ? Icons.menu : Icons.arrow_back,
+                  color: Colors.black,
+                  // color: Theme.of(context).iconTheme.color,
+                ),
+                onPressed: () {
+                  if (isHome)
+                    Scaffold.of(context).openDrawer();
+                  else
+                    Navigator.pop(context);
+                },
+              ),
+            ),
+          )
+        : IconButton(
+            color: background,
+            icon: Icon(
+              isHome ? Icons.menu : Icons.arrow_back,
+              color: Theme.of(context).iconTheme.color,
+              // color: darkMode ? Colors.black : Colors.white,
+            ),
+            onPressed: () {
+              if (isHome)
+                Scaffold.of(context).openDrawer();
+              else
+                Navigator.pop(context);
+            },
+          );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // if(isHome == null) isHome = ModalRoute.of(context).settings.name == AppRoutes.home;
+    final bool isCart = ModalRoute.of(context).settings.name == AppRoutes.cart;
+    return Container(
+      color: background,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            width: 200,
+            child: Image.asset(
+              AppConfig.APP_LOGO,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        !isCart
+            ? IconButton(
+                icon: context.watch<CartProvider>().cart.length > 0
+                    ? Badge(
+                        position: BadgePosition.topEnd(top: 10, end: 10),
+                        badgeContent: Text(context
+                            .watch<CartProvider>()
+                            .cart
+                            .length
+                            .toString(),
+                        softWrap: true,style: TextStyle(color: white,fontWeight: FontWeight.w700,fontSize: 10),
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/icons/svg/shopping-cart.svg',
+                          height: 25,
+                        ),
+                      )
+                    : SvgPicture.asset(
+                        'assets/icons/svg/shopping-cart.svg',
+                        height: 25,
+                      ),
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.cart);
+                },
+              )
+            : SizedBox(
+                width: 0,
+              ),
+      ]),
+    );
+    // return AppBar(
+    //
+    //   automaticallyImplyLeading: !isHome,
+    //   // leading: leadingIcon(
+    //   //   isCart: isCart,
+    //   //   isHome: isHome,
+    //   //   brightness: MediaQuery.of(context).platformBrightness,
+    //   //   cartLength: context.watch<CartProvider>().cart.length,
+    //   //   context: context,
+    //   // ),
+    //   elevation: 0,
+    //   // backgroundColor: Colors.transparent,
+    //   backgroundColor: Colors.red,
+    //   leadingWidth: 0,
+    //   titleSpacing: 0,
+    //
+    //   title: logoPath != null
+    //       ? Container(
+    //     height: 200,
+    //     child:Align(
+    //     alignment: Alignment.centerLeft,
+    //           // heightFactor: 2,
+    //           child: Container(
+    //             width: 220,
+    //             height: 261,
+    //              padding:EdgeInsets.symmetric(vertical: 10),
+    //             child: Image.asset(
+    //               AppConfig.APP_LOGO,
+    //               fit: BoxFit.contain,
+    //             ),
+    //           ),
+    //         ),)
+    //       // ? Image(
+    //       //     fit: BoxFit.scaleDown,
+    //       //     width: 100,
+    //       //     height: 100,
+    //       //     image: AssetImage(logoPath),
+    //       //   )
+    //       : Container(),
+    //   centerTitle: true,
+    //   actions: [
+    //     !isCart
+    //         ? IconButton(
+    //             icon: context.watch<CartProvider>().cart.length > 0
+    //                 ? Badge(
+    //                     position: BadgePosition.topEnd(top: 10, end: 10),
+    //                     badgeContent: Text(context
+    //                         .watch<CartProvider>()
+    //                         .cart
+    //                         .length
+    //                         .toString()),
+    //                     child: Icon(Ionicons.md_cart))
+    //                 : Icon(Ionicons.md_cart),
+    //             onPressed: () {
+    //               Navigator.pushNamed(context, AppRoutes.cart);
+    //             },
+    //           )
+    //         : SizedBox(
+    //             width: 0,
+    //           ),
+    //     // IconButton(
+    //     //   icon: Icon(Icons.search, color: Theme.of(context).primaryColor),
+    //     //   onPressed: () {
+    //     //     Navigator.push(
+    //     //         context,
+    //     //         MaterialPageRoute(
+    //     //           builder: (BuildContext context) => SearchScreen(),
+    //     //           fullscreenDialog: true,
+    //     //         ));
+    //     //   },
+    //     // ),
+    //   ],
+    // );
+  }
+}
+
+===== END FILE: C:\Projets\senetunes\lib\widgtes\Common\BaseAppBar.dart =====
+
+
+
+
+
+########## RÉCAP ##########
+Fichiers collectés: 88
+ - C:\Projets\senetunes\pubspec.yaml
+ - C:\Projets\senetunes\analysis_options.yaml
+ - C:\Projets\senetunes\android\gradle.properties
+ - C:\Projets\senetunes\android\settings.gradle.kts
+ - C:\Projets\senetunes\android\build.gradle.kts
+ - C:\Projets\senetunes\android\app\build.gradle.kts
+ - C:\Projets\senetunes\android\gradle\wrapper\gradle-wrapper.properties
+ - C:\Projets\senetunes\android\app\src\main\AndroidManifest.xml
+ - C:\Projets\senetunes\android\app\src\main\kotlin\com\senetunes\senetunes\MainActivity.kt
+ - C:\Projets\senetunes\ios\Podfile
+ - C:\Projets\senetunes\lib\main.dart
+ - C:\Projets\senetunes\lib\screens\exploreScreen.dart
+ - C:\Projets\senetunes\lib\screens\playerScreen.dart
+ - C:\Projets\senetunes\lib\screens\downloadPlayerScreen.dart
+ - C:\Projets\senetunes\lib\screens\album\AlbumDetailScreen.dart
+ - C:\Projets\senetunes\lib\screens\album\AlbumsScreen.dart
+ - C:\Projets\senetunes\lib\screens\album\SearchScreen.dart
+ - C:\Projets\senetunes\lib\screens\Artist\ArtistDetailScreen.dart
+ - C:\Projets\senetunes\lib\screens\Artist\ArtistsScreen.dart
+ - C:\Projets\senetunes\lib\screens\Category\CategoryDetailScreen.dart
+ - C:\Projets\senetunes\lib\screens\Category\CategoryScreen.dart
+ - C:\Projets\senetunes\lib\screens\Download\DownloadScreen.dart
+ - C:\Projets\senetunes\lib\screens\Download\DownloadDetailsScreen.dart
+ - C:\Projets\senetunes\lib\screens\Favourites\FavouritesScreen.dart
+ - C:\Projets\senetunes\lib\screens\Favourites\MyFavouritesScreen.dart
+ - C:\Projets\senetunes\lib\screens\Bought Albums\BoughtAlbumsScreen.dart
+ - C:\Projets\senetunes\lib\screens\Bought Albums\BoughtAlbumsDetailsScreen.dart
+ - C:\Projets\senetunes\lib\screens\Cart\Cart.dart
+ - C:\Projets\senetunes\lib\screens\Auth\WelcomeScreen.dart
+ - C:\Projets\senetunes\lib\screens\Auth\ConfirmationScreen.dart
+ - C:\Projets\senetunes\lib\screens\Auth\LoginScreen.dart
+ - C:\Projets\senetunes\lib\screens\Auth\RegisterScreen.dart
+ - C:\Projets\senetunes\lib\screens\Auth\UserAccountPage.dart
+ - C:\Projets\senetunes\lib\screens\WebView\WebView.dart
+ - C:\Projets\senetunes\lib\widgtes\track\TrackCarousel\TrackCarouselWidget.dart
+ - C:\Projets\senetunes\lib\widgtes\track\TrackTile.dart
+ - C:\Projets\senetunes\lib\widgtes\track\TrackBottomBar.dart
+ - C:\Projets\senetunes\lib\widgtes\track\TrackPlayButton.dart
+ - C:\Projets\senetunes\lib\widgtes\track\TrackFavouriteButton.dart
+ - C:\Projets\senetunes\lib\widgtes\Album\AlbumsWidget.dart
+ - C:\Projets\senetunes\lib\widgtes\Album\AlbumTile.dart
+ - C:\Projets\senetunes\lib\widgtes\Album\AlbumTileActions.dart
+ - C:\Projets\senetunes\lib\widgtes\Artist\ArtistCardForScreen.dart
+ - C:\Projets\senetunes\lib\widgtes\Artist\TrackTileForArtist.dart
+ - C:\Projets\senetunes\lib\widgtes\Artist\AlbumsList.dart
+ - C:\Projets\senetunes\lib\widgtes\Artist\ArtistCarousel\ArtistWidget.dart
+ - C:\Projets\senetunes\lib\widgtes\Category\CategoryWidget.dart
+ - C:\Projets\senetunes\lib\widgtes\Category\CategoryTile.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\BaseAppBar.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\BaseConnectivity.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\BaseAuthCheck.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\BaseDrawer.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\BaseScreenHeading.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\BaseBlocButton.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\OutlineBorderButton.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\DownloadButton.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\PopOverWidget.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\BasicAppBar.dart
+ - C:\Projets\senetunes\lib\widgtes\Common\WidgetHeader.dart
+ - C:\Projets\senetunes\lib\widgtes\ImagePreview.dart
+ - C:\Projets\senetunes\lib\widgtes\PositionSeekWidget.dart
+ - C:\Projets\senetunes\lib\widgtes\Search\SearchBox.dart
+ - C:\Projets\senetunes\lib\widgtes\Playlist\PlaylistChoice.dart
+ - C:\Projets\senetunes\lib\widgtes\Playlist\PlaylistCard.dart
+ - C:\Projets\senetunes\lib\providers\AuthProvider.dart
+ - C:\Projets\senetunes\lib\providers\AlbumProvider.dart
+ - C:\Projets\senetunes\lib\providers\ArtistProvider.dart
+ - C:\Projets\senetunes\lib\providers\CategoryProvider.dart
+ - C:\Projets\senetunes\lib\providers\PlayerProvider.dart
+ - C:\Projets\senetunes\lib\providers\PlaylistProvider.dart
+ - C:\Projets\senetunes\lib\providers\CartProvider.dart
+ - C:\Projets\senetunes\lib\providers\DownloadProvider.dart
+ - C:\Projets\senetunes\lib\providers\DownloadLogic.dart
+ - C:\Projets\senetunes\lib\providers\UsersProvider.dart
+ - C:\Projets\senetunes\lib\providers\FavoriteProvider.dart
+ - C:\Projets\senetunes\lib\models\Album.dart
+ - C:\Projets\senetunes\lib\models\Artist.dart
+ - C:\Projets\senetunes\lib\models\Track.dart
+ - C:\Projets\senetunes\lib\models\Media.dart
+ - C:\Projets\senetunes\lib\models\User.dart
+ - C:\Projets\senetunes\lib\models\Category.dart
+ - C:\Projets\senetunes\lib\models\DownloadTaskInfo.dart
+ - C:\Projets\senetunes\lib\config\AppTheme.dart
+ - C:\Projets\senetunes\lib\config\AppColors.dart
+ - C:\Projets\senetunes\lib\config\AppRoutes.dart
+ - C:\Projets\senetunes\lib\config\Applocalizations.dart
+ - C:\Projets\senetunes\lib\config\AppValidation_rules.dart
+ - C:\Projets\senetunes\lib\mixins\BaseMixins.dart
+
+Aucun fichier manquant 🎉

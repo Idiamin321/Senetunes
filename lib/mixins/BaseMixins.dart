@@ -1,42 +1,37 @@
 import 'dart:math';
-
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/config/Applocalizations.dart';
 
 mixin BaseMixins {
   String $t(BuildContext context, String key, {String value = ''}) {
-    return AppLocalizations.of(context).translate(key) != null
-        ? AppLocalizations.of(context).translate(key)
-        : key;
+    return AppLocalizations.of(context).translate(key);
   }
 
-  //Color
   dynamic responsive(BuildContext context, {isPhone, isSmallPhone, isTablet}) {
-    var width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
     if (width > 500) {
       return isTablet;
     } else if (width < 370) {
       return isSmallPhone;
-    } else
+    } else {
       return isPhone;
+    }
   }
 
-  activeColor(BuildContext context, check, {Color iconColor}) {
+  Color activeColor(BuildContext context, check, {Color iconColor}) {
     return check
         ? Theme.of(context).primaryColor
-        : iconColor == null
-            ? Theme.of(context).accentColor
-            : iconColor;
+        : (iconColor ?? Theme.of(context).colorScheme.secondary);
   }
 
-  //List Shuffle
   List shuffle(List list) {
-    var random = Random();
-    int length = list.length;
+    final random = Random();
+    var length = list.length;
     while (length > 1) {
-      int pos = random.nextInt(length);
+      final pos = random.nextInt(length);
       length -= 1;
-      var tmp = list[length];
+      final tmp = list[length];
       list[length] = list[pos];
       list[pos] = tmp;
     }

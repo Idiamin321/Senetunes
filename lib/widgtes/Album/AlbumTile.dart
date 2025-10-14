@@ -3,7 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:senetunes/config/AppColors.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
 
 import 'package:senetunes/config/AppRoutes.dart';
@@ -40,8 +40,8 @@ class AlbumTile extends StatelessWidget with BaseMixins {
             //   mainAxisSize: MainAxisSize.max,
             //   children: [
                 BaseImage(
-                  heroId: album?.id,
-                  imageUrl: album?.media?.thumbnail,
+                  heroId: album.id,
+                  imageUrl: album.media.thumbnail,
                   height: 250,
                   width: responsive(context,
                       isTablet: 170.0, isPhone: 180.0, isSmallPhone: 135.0),
@@ -88,7 +88,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
               // padding: EdgeInsets.only(top:5, bottom: 0),
               alignment: Alignment.centerLeft,
               child: Text(
-                "${album?.name}",maxLines: 2,
+                "${album.name}",maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 softWrap: true,
                 style: TextStyle(
@@ -102,7 +102,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (downloadScreen == null || downloadScreen == false)
+                if (downloadScreen == false)
                   Text(
                     '${album.tracks.length} sons',
                     style: TextStyle(
@@ -113,7 +113,7 @@ class AlbumTile extends StatelessWidget with BaseMixins {
                 // SizedBox(width: 5),
                 if (!album.isBought)
                 // if(true)
-                  if (downloadScreen == null || downloadScreen == false)
+                  if (downloadScreen == false)
                     Container(
                       height: 35,
                       width: width * 0.20,

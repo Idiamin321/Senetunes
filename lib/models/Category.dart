@@ -2,30 +2,53 @@ import 'Album.dart';
 import 'Artist.dart';
 
 class Category {
-  int id;
-  String name;
-  String description;
-  String uri;
-  List<Album> albums;
-  List<dynamic> albumIds;
-  String uriAlbums;
-  List<Artist> artist;
-  List<dynamic> artistIds;
-  String uriArtists;
-  Category({this.id, this.name, this.description, this.uri, this.uriArtists, this.uriAlbums});
+  final int id;
+  final String name;
+  final String description;
+  final String uri;
+  final List<Album>? albums;
+  final List<dynamic>? albumIds;
+  final String? uriAlbums;
+  final List<Artist>? artist;
+  final List<dynamic>? artistIds;
+  final String? uriArtists;
+
+  Category({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.uri,
+    this.uriArtists,
+    this.uriAlbums,
+    this.albums,
+    this.albumIds,
+    this.artist,
+    this.artistIds,
+  });
 
   static Category fromJson(Map<String, dynamic> json) {
+    int parseId(dynamic v) {
+      if (v is int) return v;
+      if (v is String) return int.tryParse(v) ?? 0;
+      if (v is Map && v[r'$'] != null) {
+        return int.tryParse(v[r'$'].toString()) ?? 0;
+      }
+      return 0;
+    }
+
+    String parseStr(dynamic v) {
+      if (v is String) return v;
+      if (v is Map && v[r'$'] != null) return v[r'$'].toString();
+      return '';
+    }
+
     return Category(
-      id: json['id'] is String
-          ? int.parse(json['id'])
-          : json['id'] is int
-              ? json['id']
-              : int.parse(json['id']['\$']),
-      name: json['name'] is String ? json['name'] : json['name']["\$"],
-      description: json['description'] is String ? json['description'] : json['description']['\$'],
-      uri: json['uri'] is String ? json['uri'] : json['uri']['\$'],
-      uriAlbums: json['uriAlbums'] is String ? json['uriAlbums'] : json['uriAlbums']['\$'],
-      uriArtists: json['uriArtists'] is String ? json['uriArtists'] : json['uriArtists']['\$'],
+      id: parseId(json['id']),
+      name: parseStr(json['name']),
+      description: parseStr(json['description']),
+      uri: parseStr(json['uri']),
+      uriAlbums: json['uriAlbums'] != null ? parseStr(json['uriAlbums']) : null,
+      uriArtists: json['uriArtists'] != null ? parseStr(json['uriArtists']) : null,
     );
   }
 }

@@ -1,214 +1,138 @@
-import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
+
 import 'package:senetunes/config/AppColors.dart';
-import 'package:provider/provider.dart';
 import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Category.dart';
-import 'package:senetunes/providers/CartProvider.dart';
 import 'package:senetunes/widgtes/Album/AlbumTile.dart';
-import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
 import 'package:senetunes/widgtes/Common/BaseConnectivity.dart';
 import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
-import 'package:senetunes/widgtes/common/BaseImage.dart';
+import 'package:senetunes/widgtes/Common/BaseImage.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
+  const CategoryDetailScreen({super.key});
+
   @override
-  _CategoryDetailScreen createState() => _CategoryDetailScreen();
+  State<CategoryDetailScreen> createState() => _CategoryDetailScreenState();
 }
 
-class _CategoryDetailScreen extends State<CategoryDetailScreen>
+class _CategoryDetailScreenState extends State<CategoryDetailScreen>
     with BaseMixins {
-  double heightScreen;
-  double paddingBottom;
-  double width;
+  late double heightScreen;
+  late double paddingBottom;
+  late double width;
 
-  _buildContent(Category category) => Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          BaseImage(
-            imageUrl: category.albums
-                .firstWhere((e) => e.media.cover != null)
-                ?.media
-                ?.cover,
-            height: heightScreen,
-            width: width,
-            radius: 0,
-            overlay: true,
-            overlayOpacity: 0.1,
-            overlayStops: [0.3, 0.8],
-          ),
-          Positioned(
-            top: heightScreen / 5.5,
-            width: width,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Container(
-                height: heightScreen / 2.5,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    // Expanded(
-                    //   child: Row(
-                    //     children: [
-                    //       Expanded(
-                    //         flex: 3,
-                    //         child: Text(
-                    //           category.name,
-                    //           style: TextStyle(
-                    //               fontSize: 24, fontWeight: FontWeight.w500),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // if (category.description != null)
-                    //   Expanded(
-                    //     child: Container(
-                    //       height: 100,
-                    //       child: ListView(
-                    //         children: [
-                    //           Container(
-                    //             width: width,
-                    //             height: 0,
-                    //             margin: EdgeInsets.only(bottom: 20),
-                    //             child: ExpandableText(category.description,
-                    //                 style: TextStyle(
-                    //                     color: Theme.of(context)
-                    //                         .colorScheme
-                    //                         .primary,
-                    //                     height: 1.5,
-                    //                     fontSize: 12),
-                    //                 expandText: $t(context, 'show_more'),
-                    //                 collapseText: $t(
-                    //                   context,
-                    //                   'show_less',
-                    //                 ),
-                    //                 maxLines: 4,
-                    //                 linkColor: Theme.of(context).primaryColor),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ),
-                  Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              category.name,
-                              softWrap: true,
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                // color: white,
-                              ),
-                            ),
-                            // Text(
-                            //   "${category.description??""}",
-                            //   softWrap: true,
-                            //   style: TextStyle(
-                            //     fontSize: 12,
-                            //     fontWeight: FontWeight.w500,
-                            //     // color: Colors.white70,
-                            //   ),
-                            // ),
-                          ]),
+  Widget _buildContent(Category category) {
+    final coverAlbum = category.albums.firstWhere(
+          (e) => e.media?.cover != null && (e.media!.cover?.isNotEmpty ?? false),
+      orElse: () => category.albums.first,
+    );
+
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        BaseImage(
+          imageUrl: coverAlbum.media?.cover,
+          height: heightScreen,
+          width: width,
+          radius: 0,
+          overlay: true,
+          overlayOpacity: 0.1,
+          overlayStops: const [0.3, 0.8],
+        ),
+        Positioned(
+          top: heightScreen / 5.5,
+          left: 0,
+          right: 0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SizedBox(
+              height: heightScreen / 2.5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    category.name ?? '',
+                    softWrap: true,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
                     ),
-                  ],
-                ),
-              ]),
+                  ),
+                ],
+              ),
             ),
           ),
-          )],
-      );
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
+    final mediaQueryData = MediaQuery.of(context);
 
     heightScreen = mediaQueryData.size.height;
     paddingBottom = mediaQueryData.padding.bottom;
     width = mediaQueryData.size.width;
 
-    Category category = ModalRoute.of(context).settings.arguments;
+    final category =
+    ModalRoute.of(context)?.settings.arguments as Category?;
 
     return Scaffold(
       backgroundColor: background,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(100),
         child: BaseScreenHeading(
-          title: $t(context, 'categories'),
+          title: 'categories',
           centerTitle: true,
           isBack: true,
         ),
       ),
       body: BaseConnectivity(
-        child:Container(
-          margin: EdgeInsets.symmetric(horizontal: 15),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 15),
           child: CustomScrollView(
-          slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                    height: heightScreen/4,
-                    child: _buildContent(category),
-                  ),
-                ],
+            slivers: <Widget>[
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    if (category != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        height: heightScreen / 4,
+                        child: _buildContent(category),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            // SliverAppBar(
-            // leading: BaseAppBar(
-            //   isHome: false,
-            // ).leadingIcon(
-            //   isCart: false,
-            //   isHome: false,
-            //   cartLength: context.watch<CartProvider>().cart.length,
-            //   context: context,
-            // ),
-            // expandedHeight: heightScreen / 3.0,
-            // pinned: true,
-            // floating: false,
-            // elevation: 1,
-            // snap: false,
-            // actions: <Widget>[],
-            // flexibleSpace: FlexibleSpaceBar(
-            //   background: _buildContent(category),
-            // ),
-            // ),
-            SliverGrid(
-              gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.of(context).pushNamed(
-                        AppRoutes.albumDetail,
-                        arguments: category.albums[index],
+              if (category != null)
+                SliverGrid(
+                  gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.albumDetail,
+                            arguments: category.albums[index],
+                          );
+                        },
+                        child: AlbumTile(
+                          album: category.albums[index],
+                        ),
                       );
                     },
-                    child: AlbumTile(
-                      album: category.albums[index],
-                    ),
-                  );
-                },
-                childCount: category.albums.length,
-              ),
-            ),
-          ],
-        ),),
+                    childCount: category.albums.length,
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

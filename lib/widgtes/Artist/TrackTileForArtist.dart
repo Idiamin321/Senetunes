@@ -20,24 +20,18 @@ class TrakTileForArtist extends StatelessWidget with BaseMixins {
         // Expanded(
         //   child:
           Container(
-            child: artist.tracks != null
-                ? ListView.builder(
+            child: ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-                    itemCount: artist?.tracks?.length,
+                    itemCount: artist.tracks.length,
                     itemBuilder: (context, index) {
                       return TrackTile(
                         index: index,
-                        track: artist?.tracks[index],
-                        tracks: artist?.tracks,
-                        album: artist?.tracks[index]?.albumInfo,
+                        track: artist.tracks[index],
+                        tracks: artist.tracks,
+                        album: artist.tracks[index].albumInfo,
                       );
                     },
-                  )
-                : BaseMessageScreen(
-                    title: $t(context, 'no_tracks'),
-                    icon: Icons.data_usage,
-                    subtitle: $t(context, 'msg_no_tracks'),
                   ),
           ),
         // ),

@@ -9,7 +9,7 @@ class BaseAppIcon extends StatelessWidget {
       tag: 'logo',
       child: Image.asset(
         'assets/images/logo.png',
-        width: width != null ? width : 40,
+        width: width,
       ),
     );
   }

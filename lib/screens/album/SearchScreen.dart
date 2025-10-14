@@ -1,23 +1,29 @@
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:senetunes/config/AppRoutes.dart';
 
+import 'package:senetunes/config/AppColors.dart';
+import 'package:senetunes/config/AppRoutes.dart';
 import 'package:senetunes/mixins/BaseMixins.dart';
 import 'package:senetunes/models/Album.dart';
 import 'package:senetunes/models/Track.dart';
 import 'package:senetunes/providers/AlbumProvider.dart';
-import 'package:senetunes/screens/Favourites/FavouritesScreen.dart';
 import 'package:senetunes/widgtes/Album/AlbumTile.dart';
 import 'package:senetunes/widgtes/Search/BaseMessageScreen.dart';
 import 'package:senetunes/widgtes/Search/SearchBox.dart';
-import 'package:senetunes/widgtes/common/CustomCircularProgressIndicator.dart';
+import 'package:senetunes/widgtes/Common/CustomCircularProgressIndicator.dart';
 import 'package:senetunes/widgtes/track/TrackTile.dart';
 
+class Choice {
+  final String title;
+  final String image;
+  const Choice(this.title, this.image);
+}
+
 class SearchScreen extends StatefulWidget {
-  SearchScreen({Key key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> with BaseMixins {
@@ -27,12 +33,12 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
   bool trackSelected = true;
   bool albumSelected = false;
 
-  List<Choice> tabs = [
+  final List<Choice> tabs = const [
     Choice('tracks', 'assets/images/music.png'),
     Choice('albums', 'assets/images/album.png'),
   ];
 
-  _buildGridItem(BuildContext context, Album album) => InkWell(
+  Widget _buildGridItem(BuildContext context, Album album) => InkWell(
     onTap: () {
       Navigator.of(context).pushNamed(
         AppRoutes.albumDetail,
@@ -42,22 +48,13 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
     child: AlbumTile(album: album),
   );
 
-
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    AlbumProvider albumProvider = Provider.of<AlbumProvider>(context);
+    final albumProvider = context.watch<AlbumProvider>();
 
-    return
-      Scaffold(
+    return Scaffold(
       backgroundColor: background,
-      body:
-      SafeArea(
+      body: SafeArea(
         child: Center(
           child: Column(
             children: [
@@ -66,15 +63,23 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
                   setState(() {
                     searchKeyword = s;
                   });
-                  if (s.length > 0) {
-                    if (trackSelected == true) searchedTracks = albumProvider.searchData(s);
-                    if (albumSelected == true) searchedAlbums = albumProvider.searchAlbums(s);
+                  if (s.isNotEmpty) {
+                    if (trackSelected) {
+                      searchedTracks = albumProvider.searchData(s);
+                    }
+                    if (albumSelected) {
+                      searchedAlbums = albumProvider.searchAlbums(s);
+                    }
+                  } else {
+                    searchedTracks = [];
+                    searchedAlbums = [];
                   }
                 },
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Onglet Tracks
                   InkWell(
                     onTap: () {
                       setState(() {
@@ -85,31 +90,41 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
                     child: Container(
                       width: MediaQuery.of(context).size.width / 2.3,
                       height: 100,
-                      // color: Colors.red,
-                      margin: EdgeInsets.only(right: 5, left: 5),
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
                       child: Tab(
-                        // text: tab.title,
-                        icon: Stack(children: [
-                          Image.asset(tabs[0].image),
-                          Positioned.fill(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                $t(context, tabs[0].title),
-                                softWrap: true,
-                                style: TextStyle(
+                        icon: Stack(
+                          children: [
+                            Image.asset(tabs[0].image),
+                            Positioned.fill(
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  $t(context, tabs[0].title),
+                                  softWrap: true,
+                                  style: const TextStyle(
                                     color: white,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w500),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          trackSelected ? Positioned(child: Container(color: Theme.of(context).primaryColor, height: 10.0)) :
-                          Container(),
-                        ]),
+                            trackSelected
+                                ? Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                  height: 10.0,
+                                  color: Theme.of(context).primaryColor),
+                            )
+                                : const SizedBox.shrink(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
+                  // Onglet Albums
                   InkWell(
                     onTap: () {
                       setState(() {
@@ -120,81 +135,108 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
                     child: Container(
                       width: MediaQuery.of(context).size.width / 2.3,
                       height: 100,
-                      // color: Colors.red,
-                      margin: EdgeInsets.only(right: 5, left: 5),
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
                       child: Tab(
-                        // text: tab.title,
-                        icon: Stack(children: [
-                          Image.asset(tabs[1].image),
-                          Positioned.fill(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                $t(context, tabs[1].title),
-                                softWrap: true,
-                                style: TextStyle(
+                        icon: Stack(
+                          children: [
+                            Image.asset(tabs[1].image),
+                            Positioned.fill(
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  $t(context, tabs[1].title),
+                                  softWrap: true,
+                                  style: const TextStyle(
                                     color: white,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w500),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          albumSelected ? Positioned(child: Container(color: Theme.of(context).primaryColor, height: 10.0)) :
-                          Container(),
-                        ]),
+                            albumSelected
+                                ? Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                  height: 10.0,
+                                  color: Theme.of(context).primaryColor),
+                            )
+                                : const SizedBox.shrink(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
 
-              trackSelected ? Expanded(
-                flex: 2,
-                child: albumProvider.isLoaded
-                    ? searchedTracks.length == 0
-                        ? BaseMessageScreen(
-                            title: searchKeyword == null || searchKeyword.isEmpty
-                                ? trackSelected ? $t(context, 'search_screen_title') : 'Search Albums'
-                                : $t(context, 'search_screen_title_not_found'),
-                            subtitle: $t(context, 'search_screen_subtitle'),
-                            icon: Icons.search,
-                          )
-                        : ListView.builder(
-                            itemCount: searchedTracks.length,
-                            itemBuilder: (context, index) {
-                              return TrackTile(
-                                track: searchedTracks[index],
-                                index: index,
-                                album: searchedTracks[index].albumInfo,
-                              );
-                            })
-                    : CustomCircularProgressIndicator(),
-              ) :
-              albumSelected ? Expanded(
-                flex: 2,
-                child: albumProvider.isLoaded
-                    ? searchedAlbums.length == 0
-                    ? BaseMessageScreen(
-                  title: searchKeyword == null || searchKeyword.isEmpty
-                      ? trackSelected ? $t(context, 'search_screen_title') : 'Search Albums'
-                      : $t(context, 'search_screen_title_not_found'),
-                  subtitle: $t(context, 'search_screen_subtitle'),
-                  icon: Icons.search,
+              // Zone résultats
+              if (trackSelected)
+                Expanded(
+                  flex: 2,
+                  child: albumProvider.isLoaded
+                      ? (searchedTracks.isEmpty
+                      ? BaseMessageScreen(
+                    title: searchKeyword.isEmpty
+                        ? $t(context, 'search_screen_title')
+                        : $t(context, 'search_screen_title_not_found'),
+                    subtitle: $t(context, 'search_screen_subtitle'),
+                    icon: Icons.search,
+                  )
+                      : ListView.builder(
+                    itemCount: searchedTracks.length,
+                    itemBuilder: (context, index) {
+                      return TrackTile(
+                        track: searchedTracks[index],
+                        index: index,
+                        album: searchedTracks[index].albumInfo,
+                      );
+                    },
+                  ))
+                      : const CustomCircularProgressIndicator(),
                 )
-                    : GridView.builder(
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: searchedAlbums.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: responsive(context, isSmallPhone:2, isPhone: 2, isTablet: 4),
-                      childAspectRatio:
-                      responsive(context, isPhone: 0.8, isSmallPhone: 0.8, isTablet: 0.6)),
-                  itemBuilder: (context, index) {
-                    return _buildGridItem(context, searchedAlbums[index]);
-                  },
+              else if (albumSelected)
+                Expanded(
+                  flex: 2,
+                  child: albumProvider.isLoaded
+                      ? (searchedAlbums.isEmpty
+                      ? BaseMessageScreen(
+                    title: searchKeyword.isEmpty
+                        ? $t(context, 'search_screen_title')
+                        : $t(context, 'search_screen_title_not_found'),
+                    subtitle: $t(context, 'search_screen_subtitle'),
+                    icon: Icons.search,
+                  )
+                      : GridView.builder(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: searchedAlbums.length,
+                    gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: responsive(
+                        context,
+                        isSmallPhone: 2,
+                        isPhone: 2,
+                        isTablet: 4,
+                      ),
+                      childAspectRatio: responsive(
+                        context,
+                        isPhone: 0.8,
+                        isSmallPhone: 0.8,
+                        isTablet: 0.6,
+                      ),
+                    ),
+                    itemBuilder: (context, index) {
+                      return _buildGridItem(
+                          context, searchedAlbums[index]);
+                    },
+                  ))
+                      : const CustomCircularProgressIndicator(),
                 )
-                    : CustomCircularProgressIndicator(),
-              ) : Container()
+              else
+                const SizedBox.shrink(),
             ],
           ),
         ),
@@ -202,5 +244,3 @@ class _SearchScreenState extends State<SearchScreen> with BaseMixins {
     );
   }
 }
-
-

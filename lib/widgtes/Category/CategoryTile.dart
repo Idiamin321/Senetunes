@@ -32,11 +32,7 @@ class CategoryTile extends StatelessWidget with BaseMixins {
               children: [
                 BaseImage(
                   heroId: category.id,
-                  imageUrl: categoryProvider.getCategoryMedium(category) != null
-                      ? categoryProvider.getCategoryMedium(category)
-                      : categoryProvider.getCategoryThumbnail(category) != null
-                          ? categoryProvider.getCategoryThumbnail(category)
-                          : categoryProvider.getCategoryCover(category),
+                  imageUrl: categoryProvider.getCategoryMedium(category),
                   height: height * 0.2,
                   width: responsive(context,
                       isTablet: 170.0, isPhone: 150.0, isSmallPhone: 135.0),

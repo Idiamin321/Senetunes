@@ -1,150 +1,116 @@
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
-
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 
 class AppTheme {
   AppTheme._();
 
   static final ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
     fontFamily: 'Montserrat',
-    primaryColorLight: white,
-    primaryColorDark: white,
-    accentColor: Colors.grey,
     primaryColor: primary,
-    scaffoldBackgroundColor: Color(0xfff7f8fa),
-    tabBarTheme: TabBarTheme(labelColor: Color.fromRGBO(255,255,255,1)),
-    appBarTheme: AppBarTheme(
-      actionsIconTheme: IconThemeData(color: Color.fromRGBO(255,255,255,1)),
-      color: white,
-      textTheme: TextTheme(
-        headline1: TextStyle(
-          color: white,
-          fontFamily: 'Montserrat',
-        ),
-      ),
-      iconTheme: IconThemeData(
+    scaffoldBackgroundColor: const Color(0xfff7f8fa),
+    tabBarTheme: const TabBarTheme(labelColor: Color.fromRGBO(255, 255, 255, 1)),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: white,
+      foregroundColor: white,
+      elevation: 0,
+      iconTheme: IconThemeData(color: white),
+      titleTextStyle: TextStyle(
         color: white,
+        fontFamily: 'Montserrat',
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
       ),
     ),
     cardColor: white,
-    colorScheme: ColorScheme.light(
-      primary: white,
+    colorScheme: const ColorScheme.light(
+      primary: primary,
       onPrimary: white,
-      primaryVariant: white,
       surface: white,
+      onSurface: Colors.black87,
+      secondary: Colors.grey,
+      onSecondary: white,
     ),
-    iconTheme: IconThemeData(
-      color: white,
-    ),
-    primaryTextTheme: TextTheme(
-      headline1: TextStyle(color: Colors.red, fontSize: 12),
-      headline3: TextStyle(
+    iconTheme: const IconThemeData(color: white),
+    primaryTextTheme: const TextTheme(
+      titleLarge: TextStyle(color: Colors.red, fontSize: 12),
+      headlineSmall: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w500,
         letterSpacing: 1,
         color: white,
       ),
-      headline5: TextStyle(
+      labelLarge: TextStyle(
         fontSize: 10,
         fontWeight: FontWeight.w500,
         letterSpacing: 1,
         color: primary,
       ),
     ),
-    accentTextTheme: TextTheme(
-      subtitle1: TextStyle(color: white, height: 1.5, fontSize: 12),
-    ),
-    textTheme: TextTheme(
-      //  bodyText1: TextStyle(color: white, height: 1.5, fontSize: 12),
-      headline1: TextStyle(color: white, fontWeight: FontWeight.w100),
-      subtitle1: TextStyle(
-        color: white,
-        fontSize: 14.0,
-      ),
+    textTheme: const TextTheme(
+      headlineSmall: TextStyle(color: white, fontWeight: FontWeight.w100),
+      titleMedium: TextStyle(color: white, fontSize: 14.0),
+      bodyMedium: TextStyle(color: Colors.black87, fontSize: 14),
     ),
   );
 
   static final ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
     fontFamily: 'Montserrat',
-    primaryColorLight: white,
-    primaryColorDark: white,
-    accentColor: Colors.grey,
-    scaffoldBackgroundColor: Color(0xff131722),
+    scaffoldBackgroundColor: const Color(0xff131722),
     primaryColor: primary,
-    appBarTheme: AppBarTheme(
-      color: surface,
-      textTheme: TextTheme(
-        headline1: TextStyle(
-          color: white,
-        ),
-      ),
-      iconTheme: IconThemeData(
+    appBarTheme: const AppBarTheme(
+      backgroundColor: surface,
+      foregroundColor: white,
+      elevation: 0,
+      iconTheme: IconThemeData(color: white),
+      titleTextStyle: TextStyle(
         color: white,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
       ),
     ),
-    colorScheme: ColorScheme.dark(
-      primary: white,
+    colorScheme: const ColorScheme.dark(
+      primary: primary,
       onPrimary: white,
-      primaryVariant: white,
       surface: surface,
+      onSurface: white,
+      secondary: Colors.grey,
+      onSecondary: white,
     ),
     cardColor: surface,
-    iconTheme: IconThemeData(
-      color: white,
-    ),
-    primaryTextTheme: TextTheme(
-      headline1: TextStyle(color: Colors.red, fontSize: 12),
-      headline3: TextStyle(
+    iconTheme: const IconThemeData(color: white),
+    primaryTextTheme: const TextTheme(
+      titleLarge: TextStyle(color: Colors.red, fontSize: 12),
+      headlineSmall: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: white,
       ),
-      headline5: TextStyle(
+      labelLarge: TextStyle(
         fontSize: 10,
         fontWeight: FontWeight.w500,
         letterSpacing: 1,
         color: primary,
       ),
     ),
-    accentTextTheme: TextTheme(
-      subtitle1: TextStyle(color: white, height: 1.5, fontSize: 12),
-    ),
-    textTheme: TextTheme(
-      headline1: TextStyle(
-        color: white,
-      ),
-      subtitle1: TextStyle(
-        color: white,
-        fontSize: 14.0,
-      ),
+    textTheme: const TextTheme(
+      headlineSmall: TextStyle(color: white),
+      titleMedium: TextStyle(color: white, fontSize: 14.0),
+      bodyMedium: TextStyle(color: white, fontSize: 14),
     ),
   );
 }
 
-
 class InputDecorationStyle {
-  static InputDecoration get defaultStyle => InputDecoration(
+  static InputDecoration get defaultStyle => const InputDecoration(
     focusColor: Colors.blue,
     labelStyle: TextStyle(color: Colors.white, fontSize: 22),
-    errorBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.white),
-    ),
-    border: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.white),
-    ),
-    disabledBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.white),
-    ),
-    enabledBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.white),
-    ),
-    focusedErrorBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.white),
-    ),
-    focusedBorder: UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.white),
-    ),
-    // filled: true,fillColor: Colors.red,
-    // labelText: $t(context, 'email'),
-
+    errorBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+    border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+    disabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+    focusedErrorBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
   );
 }

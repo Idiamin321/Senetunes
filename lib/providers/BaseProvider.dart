@@ -1,33 +1,37 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
+
 import 'package:senetunes/config/AppConfig.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BaseProvider extends ChangeNotifier {
   bool isServerDown = false;
 
-  String token;
+  String? token;
   bool isLoaded = false;
   bool isLoadingMoreInProgress = false;
 
   int _total = 0;
   int get total => _total;
 
-  String url;
+  String? url;
 
-  getToken() async {
-    final _prefs = await SharedPreferences.getInstance();
-    token = _prefs.getString('token');
-  }
-
-  Future post(Map<String, String> formData) async {
-    Response response;
+  Future<Response<dynamic>> post(Map<String, String> formData) async {
+    final dio = Dio();
     try {
-      response = await Dio().post("${AppConfig.API}/account/login",
-          data: formData, options: Options(contentType: Headers.formUrlEncodedContentType));
-    } on DioError catch (e) {
-      response = e.response;
+      final response = await dio.post(
+        "${AppConfig.API}/account/login",
+        data: formData,
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      );
+      return response;
+    } on DioException catch (e) {
+      // Retourne quand même la response si dispo (4xx/5xx)
+      return e.response ??
+          Response(
+            requestOptions: e.requestOptions,
+            statusCode: 500,
+            statusMessage: 'DioException: ${e.message}',
+          );
     }
-    return response;
   }
 }

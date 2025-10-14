@@ -9,81 +9,94 @@ import 'package:tuple/tuple.dart';
 import 'BaseProvider.dart';
 
 class PlaylistProvider extends BaseProvider {
-  SharedPreferences prefs;
+  late SharedPreferences _prefs;
+
   List<String> playlistsNames = [];
-  Map<String, List<String>> playlists = Map();
+  Map<String, List<String>> playlists = <String, List<String>>{};
 
   Future<Tuple2<List<String>, Map<String, List<String>>>> getPlaylists() async {
-    prefs = await SharedPreferences.getInstance();
-    playlistsNames = prefs.getStringList('playlistsNames') ?? [];
-    for (String playlistName in playlistsNames) {
-      playlists[playlistName] = prefs.getStringList(playlistName);
+    _prefs = await SharedPreferences.getInstance();
+    playlistsNames = _prefs.getStringList('playlistsNames') ?? <String>[];
+    playlists = <String, List<String>>{};
+    for (final playlistName in playlistsNames) {
+      playlists[playlistName] = _prefs.getStringList(playlistName) ?? <String>[];
     }
     notifyListeners();
     return Tuple2(playlistsNames, playlists);
   }
 
-  deleteAllPlaylists() async {
-    playlistsNames = [];
-    playlists = Map();
-    update(playlistsNames, playlists);
+  Future<void> deleteAllPlaylists() async {
+    playlistsNames = <String>[];
+    playlists = <String, List<String>>{};
+    await update(playlistsNames, playlists);
   }
 
-  createPlaylist(String playlistName) async {
-    Tuple2 result = await getPlaylists();
+  Future<void> createPlaylist(String playlistName) async {
+    final result = await getPlaylists();
     playlistsNames = result.item1;
     playlists = result.item2;
-    playlistsNames.add(playlistName);
-    playlists[playlistName] = [];
-    update(playlistsNames, playlists);
+
+    if (!playlistsNames.contains(playlistName)) {
+      playlistsNames.add(playlistName);
+    }
+    playlists[playlistName] = playlists[playlistName] ?? <String>[];
+
+    await update(playlistsNames, playlists);
     notifyListeners();
   }
 
-  addSong(String playlistName, Track track) async {
-    Tuple2 result = await getPlaylists();
+  Future<void> addSong(String playlistName, Track track) async {
+    final result = await getPlaylists();
     playlistsNames = result.item1;
     playlists = result.item2;
-    List<String> temp = playlists[playlistName] ?? [];
-    temp.add(track.name??"");
+
+    final temp = List<String>.from(playlists[playlistName] ?? <String>[]);
+    temp.add(track.name ?? "");
     playlists[playlistName] = temp;
-    update(playlistsNames, playlists);
+
+    await update(playlistsNames, playlists);
     notifyListeners();
   }
 
-  deleteSong(String playlistName, Track track) async {
-    Tuple2 result = await getPlaylists();
+  Future<void> deleteSong(String playlistName, Track track) async {
+    final result = await getPlaylists();
     playlistsNames = result.item1;
     playlists = result.item2;
-    List<String> temp = playlists[playlistName];
-    temp.remove(track.name);
+
+    final temp = List<String>.from(playlists[playlistName] ?? <String>[]);
+    temp.remove(track.name ?? "");
     playlists[playlistName] = temp;
-    update(playlistsNames, playlists);
+
+    await update(playlistsNames, playlists);
     notifyListeners();
   }
 
-  deletePlaylist(String playlistName) async {
-    Tuple2 result = await getPlaylists();
+  Future<void> deletePlaylist(String playlistName) async {
+    final result = await getPlaylists();
     playlistsNames = result.item1;
     playlists = result.item2;
-    print(playlistsNames);
-    print(playlists);
+
     playlistsNames.remove(playlistName);
     playlists.remove(playlistName);
-    update(playlistsNames, playlists);
+
+    await update(playlistsNames, playlists);
     notifyListeners();
   }
 
-  update(var playlistsNames, var playlists) {
-    prefs.setStringList('playlistsNames', playlistsNames);
-    for (String playlistName in playlists.keys) {
-      prefs.setStringList(playlistName, playlists[playlistName]);
+  Future<void> update(List<String> playlistsNames, Map<String, List<String>> playlists) async {
+    // Assure l'init si appelé directement
+    _prefs = await SharedPreferences.getInstance();
+
+    await _prefs.setStringList('playlistsNames', playlistsNames);
+    for (final entry in playlists.entries) {
+      await _prefs.setStringList(entry.key, entry.value);
     }
     notifyListeners();
   }
 
-  Album findAlbum(Track track, BuildContext context) {
-    List<Album> albums = context.read<AlbumProvider>().allAlbums;
-    for (Album album in albums) {
+  Album? findAlbum(Track track, BuildContext context) {
+    final albums = context.read<AlbumProvider>().allAlbums;
+    for (final album in albums) {
       if (album.tracks.contains(track)) {
         return album;
       }
@@ -92,14 +105,15 @@ class PlaylistProvider extends BaseProvider {
   }
 
   Track findTrack(String trackName, BuildContext context) {
-    List<Album> albums = context.read<AlbumProvider>().allAlbums;
-    for (Album album in albums) {
-      for (Track track in album.tracks) {
-        if (track.name == trackName) {
+    final albums = context.read<AlbumProvider>().allAlbums;
+    for (final album in albums) {
+      for (final track in album.tracks) {
+        if ((track.name ?? '') == trackName) {
           return track;
         }
       }
     }
+    // fallback neutre
     return Track();
   }
 }

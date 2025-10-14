@@ -45,7 +45,7 @@ class _BoughtAlbumsDetailsScreenState extends State<BoughtAlbumsDetailsScreen>
         isLoaded: true,
         child: Padding(
           padding: EdgeInsets.only(
-              left: 10, right: 10, bottom: track != null ? 80 : 0),
+              left: 10, right: 10, bottom: 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

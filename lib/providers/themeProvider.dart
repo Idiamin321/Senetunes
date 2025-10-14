@@ -1,35 +1,33 @@
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  final String key = "theme";
-  SharedPreferences _preferences;
-  bool _darkMode;
+  static const String _key = "theme";
+  late SharedPreferences _preferences;
+  bool _darkMode = true;
 
   bool get darkMode => _darkMode;
 
   ThemeProvider() {
-    _darkMode = true;
     _loadFromPreferences();
   }
 
-  _initialPreferences() async {
-    if (_preferences == null)
-      _preferences = await SharedPreferences.getInstance();
+  Future<void> _initialPreferences() async {
+    _preferences = await SharedPreferences.getInstance();
   }
 
-  _savePreferences() async {
+  Future<void> _savePreferences() async {
     await _initialPreferences();
-    _preferences.setBool(key, _darkMode);
+    await _preferences.setBool(_key, _darkMode);
   }
 
-  _loadFromPreferences() async {
+  Future<void> _loadFromPreferences() async {
     await _initialPreferences();
-    _darkMode = _preferences.getBool(key) ?? true;
+    _darkMode = _preferences.getBool(_key) ?? true;
     notifyListeners();
   }
 
-  toggleChangeTheme() {
+  void toggleChangeTheme() {
     _darkMode = !_darkMode;
     _savePreferences();
     notifyListeners();

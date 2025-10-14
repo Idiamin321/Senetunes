@@ -255,8 +255,7 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
       // formData['AUTH_KEY'] = AppConfig.API_AUTH_KEY;
 
       provider.singUpWithEmail(formData).then((response) {
-        response != null
-            ? Flushbar(
+        Flushbar(
                 backgroundColor: barColor.withOpacity(0.95),
                 icon: Icon(
                   Icons.error_outline,
@@ -267,8 +266,7 @@ class _RegisterScreenState extends State<RegisterScreen> with BaseMixins {
                 titleText:
                     Text($t(context, 'ops'), style: TextStyle(color: white)),
                 messageText: Text(response, style: TextStyle(color: white)),
-              ).show(context)
-            : Navigator.popAndPushNamed(context, AppRoutes.confirmScreenRoute);
+              ).show(context);
         // Navigator.pushReplacementNamed(context, AppRoutes.confirmScreenRoute);
       });
     } else {

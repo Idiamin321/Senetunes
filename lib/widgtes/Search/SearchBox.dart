@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:senetunes/config/AppColors.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
 class SearchBox extends StatefulWidget {
   final Function onSearch;
@@ -29,12 +29,12 @@ class _SearchBoxState extends State<SearchBox> {
   void dispose() {
     _searchQuery.removeListener(_onSearchChanged);
     _searchQuery.dispose();
-    _debounce?.cancel();
+    _debounce.cancel();
     super.dispose();
   }
 
   _onSearchChanged() {
-    if (_debounce?.isActive ?? false) _debounce.cancel();
+    if (_debounce.isActive ?? false) _debounce.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       widget.onSearch(_searchQuery.text);
     });

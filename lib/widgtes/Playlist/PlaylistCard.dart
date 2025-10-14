@@ -7,22 +7,31 @@ import 'package:senetunes/providers/PlaylistProvider.dart';
 import 'package:senetunes/widgtes/ImagePreview.dart';
 
 class PlaylistCard extends StatefulWidget {
-  PlaylistCard({this.playlistName, this.playlistRemove});
+  const PlaylistCard({Key? key, required this.playlistName, required this.playlistRemove})
+      : super(key: key);
 
   final String playlistName;
-  final Function playlistRemove;
+  final VoidCallback playlistRemove;
 
   @override
   _PlaylistCardState createState() => _PlaylistCardState();
 }
 
-class _PlaylistCardState extends State<PlaylistCard> with BaseMixins{
-  List<String> imageUrls;
-
+class _PlaylistCardState extends State<PlaylistCard> with BaseMixins {
   @override
   Widget build(BuildContext context) {
-    PlaylistProvider playlistProvider = context.watch<PlaylistProvider>();
-    List<String> playlist = playlistProvider.playlists[widget.playlistName];
+    final playlistProvider = context.watch<PlaylistProvider>();
+    final List<String> playlist =
+    (playlistProvider.playlists[widget.playlistName] ?? <String>[]);
+
+    final String thumb = playlist.isEmpty
+        ? ""
+        : playlistProvider
+        .findTrack(playlist.first, context)
+        .albumInfo
+        .media
+        .thumbnail;
+
     return Container(
       height: 200,
       color: background,
@@ -43,40 +52,23 @@ class _PlaylistCardState extends State<PlaylistCard> with BaseMixins{
               Expanded(
                 flex: 5,
                 child: ImagePreview(
-                  images:[playlist.length==0?"":playlistProvider
-                          .findTrack(playlist[0], context)
-                          .albumInfo==null?"you.png":playlistProvider
-                      .findTrack(playlist.first, context)
-                      .albumInfo
-                          .media
-                          .thumbnail],
-
-                  // images:playlist
-                  //     .map((e) => playlistProvider
-                  //         .findTrack(e, context)
-                  //         .albumInfo
-                  //         .media
-                  //         .thumbnail)
-                  //     .toList(),
+                  images: [thumb],
                 ),
               ),
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5,vertical: 0),
+                  margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
                   color: background,
                   alignment: Alignment.bottomLeft,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(
-                        width:70,
-                        // alignment: AlignmentDirectional.topCenter,
-                        // fit: BoxFit.cover,
-                        child:
-                        Text(
-                          widget.playlistName??"",
+                        width: 70,
+                        child: Text(
+                          widget.playlistName,
                           overflow: TextOverflow.fade,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: white,
                           ),
@@ -92,32 +84,31 @@ class _PlaylistCardState extends State<PlaylistCard> with BaseMixins{
                             PopupMenuItem(
                               child: TextButton(
                                 onPressed: widget.playlistRemove,
-                                child: Text(
+                                child: const Text(
                                   "effacé",
-                                  style: TextStyle(
-                                    color: primary,
-                                  ),
+                                  style: TextStyle(color: primary),
                                 ),
                               ),
                             ),
                           ];
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
                   alignment: Alignment.topLeft,
-                  child:  Text(
-                  "${playlistProvider.playlists[widget.playlistName].length} ${$t(context,"music")}"
-                      .toString(),
-                  style: TextStyle(color: Colors.white70,
-                  fontSize: 12,
+                  child: Text(
+                    "${playlist.length} ${$t(context, "music")}",
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
                   ),
-                ),),
+                ),
               ),
             ],
           ),

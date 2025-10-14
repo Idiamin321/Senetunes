@@ -1,18 +1,22 @@
-import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
-import 'package:senetunes/widgtes/Common/BaseAppBar.dart';
+import 'package:flutter/material.dart';
+import 'package:senetunes/config/AppColors.dart';
 import 'package:senetunes/widgtes/Common/BaseScreenHeading.dart';
 
 class ContactUs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    TextStyle titleStyle = TextStyle(
+    final TextStyle titleStyle = TextStyle(
       fontSize: 25,
       fontWeight: FontWeight.bold,
       fontStyle: FontStyle.italic,
       color: Theme.of(context).primaryColorDark,
     );
-    TextStyle normalStyle = TextStyle(
-        fontSize: 18, decoration: TextDecoration.none, color: Theme.of(context).primaryColorDark);
+    final TextStyle normalStyle = TextStyle(
+      fontSize: 18,
+      decoration: TextDecoration.none,
+      color: Theme.of(context).primaryColorDark,
+    );
+
     return Scaffold(
       backgroundColor: background,
       appBar: PreferredSize(
@@ -21,7 +25,7 @@ class ContactUs extends StatelessWidget {
           title: "Contactez nous",
           isBack: true,
           centerTitle: false,
-        )
+        ),
       ),
       body: Theme(
         data: Theme.of(context),
@@ -36,12 +40,11 @@ class ContactUs extends StatelessWidget {
                   text: TextSpan(
                     style: normalStyle,
                     children: [
+                      TextSpan(text: 'Contactez nous\n', style: titleStyle),
                       TextSpan(
-                        text: 'Contactez nous\n',
-                        style: titleStyle,
+                        text:
+                        'HENTECH , DAKAR, CITE MIXTA, ROUTE DE L\'AEROPORT, B27B22\n\n',
                       ),
-                      TextSpan(
-                          text: 'HENTECH , DAKAR, CITE MIXTA, ROUTE DE L\'AEROPORT, B27B22\n\n'),
                     ],
                   ),
                 ),

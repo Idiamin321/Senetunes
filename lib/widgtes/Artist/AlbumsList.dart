@@ -39,7 +39,7 @@ class AlbumsList extends StatelessWidget with BaseMixins {
             ),
             leading: BaseImage(
               heroId: album.id,
-              imageUrl: album.media.thumbnail,
+              imageUrl: album.media.medium,
               height: 40,
               width: 40,
               radius: 5.0,
@@ -86,7 +86,7 @@ class AlbumsList extends StatelessWidget with BaseMixins {
       children: [
         Expanded(
           child: Container(
-            child: albums != null && albums.length > 0
+            child: albums.length > 0
                 ? ListView.builder(
                     itemCount: albums.length,
                     itemBuilder: (context, index) {

@@ -19,7 +19,7 @@ class BaseBlockButton extends StatelessWidget {
   }) : isLoaded = isLoaded ?? true;
   @override
   Widget build(BuildContext context) {
-    double _radius = radius != null ? radius : 2;
+    double _radius = radius;
     return isLoaded
         ? Container(
             width: double.infinity,

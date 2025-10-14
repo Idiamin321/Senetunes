@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'; import 'package:senetunes/config/AppColors.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';

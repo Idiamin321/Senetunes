@@ -29,7 +29,7 @@ class CategoryWidget extends StatelessWidget with BaseMixins {
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   Category category = categories[index];
-                  // print('==${category.albums[0].media.thumbnail}');
+                  // print('==${category.albums[0].media.medium}');
                   return Container(
                     width: 150,
                     // color: background,
@@ -47,18 +47,18 @@ class CategoryWidget extends StatelessWidget with BaseMixins {
                         children: [
                           BaseImage(
                             heroId: category.id,
-                            imageUrl: category.albums[0].media.thumbnail,
+                            imageUrl: category.albums[0].media.medium,
                             height: 140,
                             width: 140,
                             radius: 15.0,
                           ),
 //                           ImagePreview(
 //                             images: [
-//                               category.albums[0].media.thumbnail!=null?category.albums[0].media.thumbnail:
+//                               category.albums[0].media.medium!=null?category.albums[0].media.medium:
 // "assets/images/you.jpg"
 //                             ],
 //                           ),
-//                            albumCard(album.media.thumbnail, 100, 100),
+//                            albumCard(album.media.medium, 100, 100),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 6.0, horizontal: 0),

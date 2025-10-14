@@ -30,12 +30,12 @@ class ArtistCard extends StatelessWidget with BaseMixins {
           children: [
             BaseImage(
               heroId: artist.id,
-              imageUrl: artist.media.thumbnail,
+              imageUrl: artist.media.medium,
               height: 110,
               width: 110,
               radius: 100,
             ),
-            SizedBox(height:5),
+            SizedBox(height: 5),
             Text(
               artist.name,
               textAlign: TextAlign.center,
